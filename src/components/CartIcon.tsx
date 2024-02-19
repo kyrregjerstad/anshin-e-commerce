@@ -9,12 +9,10 @@ export const CartIcon = () => {
   const cartAmount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
-    <>
-      <div className="relative">
-        <Svg cartAmount={cartAmount} />
-        <AnimatedCartCounter cartAmount={cartAmount} />
-      </div>
-    </>
+    <div className="relative">
+      <Svg cartAmount={cartAmount} />
+      <AnimatedCartCounter cartAmount={cartAmount} />
+    </div>
   );
 };
 
