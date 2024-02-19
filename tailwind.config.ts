@@ -22,6 +22,7 @@ const config = {
         '8xl': '88rem',
         '9xl': '105rem',
         '10xl': '1920px',
+        '11xl': '2200px',
       },
       colors: {
         border: 'oklch(var(--border) / <alpha-value>)',
