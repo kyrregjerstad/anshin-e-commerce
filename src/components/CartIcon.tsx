@@ -12,23 +12,7 @@ export const CartIcon = () => {
     <>
       <div className="relative">
         <Svg cartAmount={cartAmount} />
-        <div className="pointer-events-none absolute left-0 top-0 flex aspect-square w-full items-center justify-center overflow-hidden text-center">
-          <LazyMotion features={domAnimation}>
-            <AnimatePresence mode="wait">
-              {cartAmount > 0 && (
-                <m.div
-                  key={cartAmount}
-                  initial={{ x: 0, y: 40, opacity: 0 }}
-                  animate={{ x: 0, y: 7, opacity: 1 }}
-                  exit={{ y: -20, opacity: 0 }}
-                  transition={{ type: 'tween', duration: 0.2 }}
-                >
-                  {cartAmount}
-                </m.div>
-              )}
-            </AnimatePresence>
-          </LazyMotion>
-        </div>
+        <AnimatedCartCounter cartAmount={cartAmount} />
       </div>
     </>
   );
@@ -54,3 +38,31 @@ const Svg = ({ cartAmount }: { cartAmount: number | undefined }) => (
     />
   </svg>
 );
+
+const AnimatedCartCounter = ({
+  cartAmount,
+}: {
+  cartAmount: number | undefined;
+}) => {
+  if (cartAmount === undefined) return null;
+
+  return (
+    <div className="pointer-events-none absolute left-0 top-0 flex aspect-square w-full items-center justify-center overflow-hidden text-center">
+      <LazyMotion features={domAnimation}>
+        <AnimatePresence mode="wait">
+          {cartAmount > 0 && (
+            <m.div
+              key={cartAmount}
+              initial={{ x: 0, y: 40, opacity: 0 }}
+              animate={{ x: 0, y: 7, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ type: 'tween', duration: 0.2 }}
+            >
+              {cartAmount}
+            </m.div>
+          )}
+        </AnimatePresence>
+      </LazyMotion>
+    </div>
+  );
+};
