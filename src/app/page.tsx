@@ -1,17 +1,12 @@
 import { CartIcon } from '@/components/CartIcon';
 import { GridItem } from '@/components/GridItem';
 import { db } from '@/lib/server/db';
+import { getAllProducts } from '@/lib/server/productService';
 import { users } from '@/lib/server/tables';
 import { eq } from 'drizzle-orm';
 
 export default async function Home() {
-  const data = await db.query.users.findFirst({
-    where: eq(users.id, 'a'),
-  });
-
-  if (data) {
-    console.log(data);
-  }
+  const allProducts = await getAllProducts();
 
   return (
     <>
@@ -37,11 +32,9 @@ export default async function Home() {
           <div className="py-20"></div>
           <section className="flex w-full flex-col">
             <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:grid-cols-5 2xl:gap-12">
-              {Array(100)
-                .fill(0)
-                .map((_, i) => (
-                  <GridItem key={i} />
-                ))}
+              {allProducts.map((product) => (
+                <GridItem key={product.id} product={product} />
+              ))}
             </div>
           </section>
         </div>

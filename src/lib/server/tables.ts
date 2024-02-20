@@ -24,6 +24,17 @@ export const users = mysqlTable('users', {
   hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
 });
 
+export const usersRelations = relations(users, ({ one, many }) => ({
+  cart: one(cart, {
+    fields: [users.id],
+    references: [cart.userId],
+    relationName: 'user_cart',
+  }),
+  orders: many(orders, {
+    relationName: 'user_orders',
+  }),
+}));
+
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
   userId: varchar('user_id', { length: 64 }).references(() => users.id),
@@ -40,6 +51,17 @@ export const orders = mysqlTable('orders', {
   status: statusEnum,
 });
 
+export const ordersRelations = relations(orders, ({ one, many }) => ({
+  user: one(users, {
+    fields: [orders.userId],
+    references: [users.id],
+    relationName: 'user_orders',
+  }),
+  items: many(orderItems, {
+    relationName: 'order_items',
+  }),
+}));
+
 export const orderItems = mysqlTable('order_items', {
   orderId: varchar('order_id', { length: 36 }).references(() => orders.id),
   productId: varchar('product_id', { length: 36 }).references(
@@ -52,43 +74,12 @@ export const orderToItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {
     fields: [orderItems.orderId],
     references: [orders.id],
+    relationName: 'order_items',
   }),
   product: one(products, {
     fields: [orderItems.productId],
     references: [products.id],
-  }),
-}));
-
-export const usersToOrders = mysqlTable(
-  'users_to_orders',
-  {
-    userId: varchar('user_id', { length: 64 }).references(() => users.id),
-    orderId: varchar('order_id', { length: 36 }).references(() => orders.id),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.userId, table.orderId] }),
-  })
-);
-
-export const usersToOrdersRelations = relations(usersToOrders, ({ one }) => ({
-  user: one(users, {
-    fields: [usersToOrders.userId],
-    references: [users.id],
-  }),
-  order: one(orders, {
-    fields: [usersToOrders.orderId],
-    references: [orders.id],
-  }),
-}));
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-  cart: one(cart, {
-    fields: [users.id],
-    references: [cart.userId],
-  }),
-  orders: one(usersToOrders, {
-    fields: [users.id],
-    references: [usersToOrders.userId],
+    relationName: 'order_products',
   }),
 }));
 
@@ -98,6 +89,17 @@ export const cart = mysqlTable('cart', {
   updatedAt: timestamp('updated_at').onUpdateNow(),
   userId: varchar('user_id', { length: 64 }).references(() => users.id),
 });
+
+export const cartRelations = relations(cart, ({ one, many }) => ({
+  user: one(users, {
+    fields: [cart.userId],
+    references: [users.id],
+    relationName: 'user_cart',
+  }),
+  items: many(cartItems, {
+    relationName: 'cart_items',
+  }),
+}));
 
 export const cartItems = mysqlTable('cart_items', {
   cartId: bigint('cart_id', { unsigned: true, mode: 'number' })
@@ -114,10 +116,12 @@ export const cartToItemsRelations = relations(cartItems, ({ one }) => ({
   cart: one(cart, {
     fields: [cartItems.cartId],
     references: [cart.id],
+    relationName: 'cart_items',
   }),
   product: one(products, {
     fields: [cartItems.productId],
     references: [products.id],
+    relationName: 'cart_products',
   }),
 }));
 
@@ -129,8 +133,19 @@ export const products = mysqlTable('products', {
   discountInCents: int('discount_in_cents', { unsigned: true }).notNull(),
 });
 
-export type Product = InferInsertModel<typeof products>;
+export type InsertProduct = InferInsertModel<typeof products>;
 
+export const productsRelations = relations(products, ({ many }) => ({
+  images: many(images, {
+    relationName: 'images_product',
+  }),
+  tags: many(tags, {
+    relationName: 'tags_product',
+  }),
+  reviews: many(reviews, {
+    relationName: 'reviews_product',
+  }),
+}));
 export const images = mysqlTable('images', {
   id: varchar('id', { length: 36 }).primaryKey(),
   url: varchar('url', { length: 255 }).notNull(),
@@ -146,6 +161,7 @@ export const imagesRelations = relations(images, ({ one }) => ({
   product: one(products, {
     fields: [images.itemId],
     references: [products.id],
+    relationName: 'images_product',
   }),
 }));
 
@@ -160,6 +176,7 @@ export const tagsRelations = relations(tags, ({ one }) => ({
   product: one(products, {
     fields: [tags.itemId],
     references: [products.id],
+    relationName: 'tags_product',
   }),
 }));
 
@@ -175,5 +192,6 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
   product: one(products, {
     fields: [reviews.itemId],
     references: [products.id],
+    relationName: 'reviews_product',
   }),
 }));

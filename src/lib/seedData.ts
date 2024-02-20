@@ -1,4 +1,4 @@
-import { Image, Product, Tag } from './server/tables';
+import { Image, InsertProduct, Tag } from './server/tables';
 
 export const seedData = [
   {
@@ -764,7 +764,7 @@ export const seedProductsData = [
     priceInCents: 7599,
     discountInCents: 7599,
   },
-] satisfies Product[];
+] satisfies InsertProduct[];
 
 export const seedImagesData = [
   {
