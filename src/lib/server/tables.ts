@@ -1,6 +1,7 @@
 import { InferInsertModel, relations } from 'drizzle-orm';
 import {
   bigint,
+  datetime,
   decimal,
   int,
   mysqlEnum,
@@ -24,6 +25,12 @@ export const users = mysqlTable('users', {
   hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
 });
 
+export type DatabaseUser = {
+  id: string;
+  name: string;
+  email: string;
+};
+
 export const usersRelations = relations(users, ({ one, many }) => ({
   cart: one(cart, {
     fields: [users.id],
@@ -37,8 +44,10 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
-  userId: varchar('user_id', { length: 64 }).references(() => users.id),
-  expiresAt: timestamp('expires_at').notNull(),
+  userId: varchar('user_id', { length: 64 })
+    .notNull()
+    .references(() => users.id),
+  expiresAt: datetime('expires_at').notNull(),
 });
 
 const statusEnum = mysqlEnum('status', ['pending', 'completed', 'cancelled']);
