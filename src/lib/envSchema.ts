@@ -5,6 +5,7 @@ export const envVariables = z.object({
   DATABASE_HOST: z.string(),
   DATABASE_USERNAME: z.string(),
   DATABASE_PASSWORD: z.string(),
+  DEMO_PASSWORD: z.string(),
 });
 
 envVariables.parse(process.env);

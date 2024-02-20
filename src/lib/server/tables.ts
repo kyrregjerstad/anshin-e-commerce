@@ -1,7 +1,8 @@
-import { relations } from 'drizzle-orm';
+import { InferInsertModel, relations } from 'drizzle-orm';
 import {
   bigint,
   decimal,
+  int,
   mysqlEnum,
   mysqlTableCreator,
   primaryKey,
@@ -124,18 +125,22 @@ export const products = mysqlTable('products', {
   id: varchar('id', { length: 36 }).primaryKey(),
   title: varchar('title', { length: 255 }).notNull(),
   description: varchar('description', { length: 1000 }).notNull(),
-  price: decimal('price', { precision: 10, scale: 2 }).notNull(),
-  discountedPrice: decimal('discountedPrice', {
-    precision: 10,
-    scale: 2,
-  }).notNull(),
+  priceInCents: int('price_in_cents', { unsigned: true }).notNull(),
+  discountInCents: int('discount_in_cents', { unsigned: true }).notNull(),
 });
 
+export type Product = InferInsertModel<typeof products>;
+
 export const images = mysqlTable('images', {
-  url: varchar('url', { length: 255 }).primaryKey(),
+  id: varchar('id', { length: 36 }).primaryKey(),
+  url: varchar('url', { length: 255 }).notNull(),
   alt: varchar('alt', { length: 255 }).notNull(),
-  itemId: varchar('item_id', { length: 36 }).references(() => products.id),
+  itemId: varchar('item_id', { length: 36 }).references(() => products.id, {
+    onDelete: 'cascade',
+  }),
 });
+
+export type Image = InferInsertModel<typeof images>;
 
 export const imagesRelations = relations(images, ({ one }) => ({
   product: one(products, {
@@ -148,6 +153,8 @@ export const tags = mysqlTable('tags', {
   tagName: varchar('tag_name', { length: 255 }).primaryKey(),
   itemId: varchar('item_id', { length: 36 }).references(() => products.id),
 });
+
+export type Tag = InferInsertModel<typeof tags>;
 
 export const tagsRelations = relations(tags, ({ one }) => ({
   product: one(products, {
