@@ -1,25 +1,11 @@
-import { CartIcon } from '@/components/CartIcon';
 import { GridItem } from '@/components/GridItem';
-import { db } from '@/lib/server/db';
 import { getAllProducts } from '@/lib/server/productService';
-import { users } from '@/lib/server/tables';
-import { eq } from 'drizzle-orm';
 
 export default async function Home() {
   const allProducts = await getAllProducts();
 
   return (
     <>
-      <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
-        <nav className="flex w-full max-w-[calc(1920px_+_8rem)] items-center rounded-b-3xl border bg-tea-100 p-4 drop-shadow-sm">
-          <ul className="flex w-full items-center justify-between gap-4">
-            <li>Anshin</li>
-            <li>
-              <CartIcon />
-            </li>
-          </ul>
-        </nav>
-      </header>
       <main className="flex min-h-screen flex-col items-center p-4 sm:p-8">
         <div className="flex w-full max-w-10xl flex-col items-center gap-12">
           <section className="grid w-full grid-cols-2 grid-rows-8 gap-2 sm:aspect-[5/2] sm:grid-cols-8 sm:grid-rows-2 sm:gap-2 md:gap-4 xl:gap-8">

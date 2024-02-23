@@ -35,7 +35,7 @@ export const GridItem = ({ product }: Props) => {
       </CardContent>
       <div className="flex-1" />
       <CardFooter className="flex justify-between">
-        <GridItemButton />
+        <GridItemButton product={product} />
       </CardFooter>
     </Card>
   );
