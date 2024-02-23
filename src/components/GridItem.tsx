@@ -8,23 +8,32 @@ import {
 } from '@/components/ui/card';
 import Image from 'next/image';
 import { GridItemButton } from './GridItemButton';
+import { Product } from '@/lib/server/productService';
 
-export const GridItem = () => {
+type Props = {
+  product: Product;
+};
+
+export const GridItem = ({ product }: Props) => {
+  const { title, description, images } = product;
+
+  const coverImageUrl = images[0].url;
   return (
-    <Card className="aspect-square">
+    <Card className="flex flex-col">
       <CardHeader>
-        <CardTitle>Test</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <AspectRatio ratio={16 / 9} className="bg-muted">
           <Image
-            src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+            src={coverImageUrl}
             alt="Photo by Drew Beamer"
             fill
             className="rounded-md object-cover"
           />
         </AspectRatio>
       </CardContent>
+      <div className="flex-1" />
       <CardFooter className="flex justify-between">
         <GridItemButton />
       </CardFooter>
