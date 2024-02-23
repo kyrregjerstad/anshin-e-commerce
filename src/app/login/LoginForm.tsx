@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import {
   CardTitle,
   CardHeader,
@@ -7,23 +8,64 @@ import {
   CardFooter,
   Card,
 } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
-import Link from 'next/link';
+import { ErrorMessage } from '@hookform/error-message';
 import { Button } from '@/components/ui/button';
-import { useFormState } from 'react-dom';
+import { useFormState, useFormStatus } from 'react-dom';
+import React, { useEffect } from 'react';
+import { type FieldPath, useForm, UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { LoginActionResult, login } from '@/lib/server/auth/authService';
+import { loginSchema } from '@/lib/schema/loginSchema';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
-import React from 'react';
-import { ActionResult } from 'next/dist/server/app-render/types';
+type FormValues = z.infer<typeof loginSchema>;
 
 type Props = {
-  action: (prevState: any, formData: FormData) => Promise<ActionResult>;
+  loginFn: (prevState: any, formData: FormData) => Promise<LoginActionResult>;
 };
-export const LoginForm = ({ action }: Props) => {
-  const [state, formAction] = useFormState(action, {
-    error: null,
+export const LoginForm = ({ loginFn }: Props) => {
+  const [state, formAction] = useFormState<LoginActionResult, FormData>(
+    login,
+    null
+  );
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(loginSchema),
+    criteriaMode: 'all',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
   });
+
+  const { setError, reset } = form;
+
+  useEffect(() => {
+    if (!state) {
+      return;
+    }
+    if (state.status === 'error') {
+      console.log(state.errors);
+      state.errors?.forEach((error) => {
+        setError(error.path as FieldPath<FormValues>, {
+          message: error.message,
+        });
+      });
+    }
+    if (state.status === 'success') {
+      reset();
+    }
+  }, [state, setError, reset]);
 
   return (
     <Card className="w-full max-w-md">
@@ -31,36 +73,11 @@ export const LoginForm = ({ action }: Props) => {
         <CardTitle>User Login</CardTitle>
       </CardHeader>
       <CardContent>
-        <form className="flex flex-col gap-4" action={formAction}>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" placeholder="Email" type="email" />
-          </div>
-          <div className="flex flex-col space-y-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              placeholder="Password"
-              type="password"
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Checkbox id="remember-me" />
-              <label
-                className="text-sm font-medium leading-none"
-                htmlFor="remember-me"
-              >
-                Remember me
-              </label>
-            </div>
-            <Link className="text-sm" href="#">
-              Forgot password?
-            </Link>
-          </div>
-          <Button className="mt-4">Sign in</Button>
-        </form>
+        <Form {...form}>
+          <form action={formAction} className="flex flex-col gap-3">
+            <FormContent form={form} />
+          </form>
+        </Form>
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <span className="text-sm">Don't have an account?</span>
@@ -68,7 +85,56 @@ export const LoginForm = ({ action }: Props) => {
           Sign up
         </Link>
       </CardFooter>
-      <p>{state.error}</p>
     </Card>
+  );
+};
+
+type FormContentProps = {
+  form: UseFormReturn<FormValues>;
+};
+
+export const FormContent = ({ form }: FormContentProps) => {
+  const { pending } = useFormStatus();
+  const {
+    control,
+    formState: { errors },
+  } = form;
+
+  return (
+    <>
+      <FormField
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel htmlFor="email">Email</FormLabel>
+            <FormControl>
+              <Input placeholder="email@noroff.no" {...field} />
+            </FormControl>
+            <FormMessage>
+              <ErrorMessage errors={errors} name="email" />
+            </FormMessage>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name="password"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormControl>
+              <Input type="password" placeholder="password" {...field} />
+            </FormControl>
+            <FormMessage>
+              <ErrorMessage errors={errors} name="password" />
+            </FormMessage>
+          </FormItem>
+        )}
+      />
+      <Button type="submit">
+        {pending ? <LoadingSpinner /> : <span>Login</span>}
+      </Button>
+    </>
   );
 };

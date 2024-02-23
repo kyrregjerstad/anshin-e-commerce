@@ -1,22 +1,62 @@
 'use server';
 import { lucia } from '@/lib/auth';
 import { eq } from 'drizzle-orm';
-import { ActionResult } from 'next/dist/server/app-render/types';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Argon2id } from 'oslo/password';
 import { db } from '../db';
 import { users } from '../tables';
-import { z } from 'zod';
+import { ZodError, z } from 'zod';
+import { loginSchema } from '@/lib/schema/loginSchema';
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string(),
-});
+export type LoginActionResult =
+  | {
+      status: 'success';
+      message: string;
+    }
+  | {
+      status: 'error';
+      message: string;
+      errors?: Array<{
+        path: string;
+        message: string;
+      }>;
+    }
+  | null;
 
-export async function login(_: any, formData: FormData): Promise<ActionResult> {
-  const email = formData.get('email');
-  const password = formData.get('password');
+export async function login(
+  prevState: LoginActionResult | null,
+  data: FormData
+): Promise<LoginActionResult> {
+  console.log(data);
+
+  try {
+    const { email, password } = loginSchema.parse(data);
+
+    console.log(email, password);
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    return {
+      status: 'success',
+      message: 'Logged in',
+    };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return {
+        status: 'error',
+        message: 'Invalid form data',
+        errors: error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: `server: ${issue.message}`,
+        })),
+      };
+    }
+    return {
+      status: 'error',
+      message: 'Something went wrong. Please try again.',
+    };
+  }
 
   const result = loginSchema.parse({
     email: email,
