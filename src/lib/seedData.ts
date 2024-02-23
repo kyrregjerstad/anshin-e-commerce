@@ -1,4 +1,4 @@
-import { Image, InsertProduct, Tag } from './server/tables';
+import { Image, InsertProduct, InsertReview, Tag } from './server/tables';
 
 export const seedData = [
   {
@@ -918,3 +918,194 @@ export const seedImagesData = [
     alt: '',
   },
 ] satisfies Image[];
+
+export const seedReviewData = [
+  {
+    id: '90a61e3e-355a-42e4-b038-d91dcad33c20',
+    itemId: '109566af-c5c2-4f87-86cb-76f36fb8d378',
+    username: 'Jim N.',
+    description: 'My partner loves it, its her favourite.',
+    rating: 5,
+  },
+  {
+    id: '88e11191-d2e5-4bfb-9bcb-d7e158284657',
+    username: 'Michael J.',
+    rating: 4,
+    description: 'Good sound quality.',
+    itemId: '159fdd2f-2b12-46de-9654-d9139525ba87',
+  },
+  {
+    itemId: '1fd1ddca-0d38-4e41-aa62-a1a7a57cf4b5',
+    id: '35eaa065-2772-4f8b-b77e-ad27877aae6a',
+    username: 'John D.',
+    rating: 4,
+    description:
+      "Great hard drive for storing large amounts of data, but it's a bit bulky.",
+  },
+  {
+    itemId: '1fd1ddca-0d38-4e41-aa62-a1a7a57cf4b5',
+    id: '369b50fc-7684-4abe-b2db-9a393685df30',
+    username: 'Megan B.',
+    rating: 5,
+    description:
+      "This external hard drive is perfect for my needs. It's fast and has a lot of storage space.",
+  },
+  {
+    itemId: '31e3a66f-2dbe-47ae-b80d-d9e5814f3e32',
+    id: '498c7a60-28c6-4ab3-a7ca-0e9610cb02e5',
+    username: 'Max T.',
+    rating: 4,
+    description:
+      'Great value for money, but the noise-cancellation could be better.',
+  },
+  {
+    itemId: '3b43b2e4-62b0-4c02-9166-dffa46a0388c',
+    id: '5fc85c8d-5114-4e74-be2d-d1fb3ceab0d1',
+    username: 'Celeste W.',
+    rating: 5,
+    description: 'Amazing build quality, my favourite bag.',
+  },
+  {
+    itemId: '3f328f02-715e-477f-9738-7934af4bc5b0',
+    id: '528a4a62-b685-48d5-8aa3-ef8592b8d438',
+    username: 'David K.',
+    rating: 3,
+    description:
+      "It works, but it's a very expensive. I'll probably buy a cheaper alternative next time.",
+  },
+  {
+    itemId: '7c6353ec-17a9-4a4d-a9d7-6997465367e1',
+    id: '32531b04-e6f3-44a6-9b7c-fa6383c9ebee',
+    username: 'Sarah M.',
+    rating: 5,
+    description: 'Love these shoes, perfect for any outfit!',
+  },
+  {
+    itemId: '83111322-05a9-4a93-bc81-7d6b58f1a707',
+    id: '9fed9d39-cbca-4d34-bfc8-345c4d6e6447',
+    username: 'Peter S..',
+    rating: 3,
+    description: 'Good watch, but the strap is a bit uncomfortable.',
+  },
+  {
+    itemId: '894ca18f-9725-40b3-9429-1420ee2054da',
+    id: '08d5110d-ced9-49b5-a966-a90b65a98640',
+    username: 'Mike M.',
+    rating: 2,
+    description: 'Terrible audio.',
+  },
+  {
+    itemId: '95dc28de-9ef6-4c67-808b-6431a5de43e8',
+    id: '47af5354-b3be-42aa-8780-503fcabe2f3e',
+    username: 'Emma K.',
+    rating: 5,
+    description: "Love these earrings, they're so elegant and versatile.",
+  },
+  {
+    itemId: '95dc28de-9ef6-4c67-808b-6431a5de43e8',
+    id: '71b20a18-3fa0-40a4-ba9e-50dad572eba8',
+    username: 'John P.',
+    rating: 4,
+    description: 'Bought these earrings for my wife and she loves them!',
+  },
+  {
+    itemId: '95dc28de-9ef6-4c67-808b-6431a5de43e8',
+    id: '82497089-9dec-42a1-b8f0-06798c346360',
+    username: 'Maggie T.',
+    rating: 5,
+    description:
+      'These earrings are perfect for dressing up or down, I wear them all the time!',
+  },
+  {
+    itemId: '9be4812e-16b2-44e6-bc55-b3aef9db2b82',
+    id: 'a721f8d2-89b2-4b65-8061-9eb19f780867',
+    username: 'Jamie A.',
+    rating: 5,
+    description: 'Great scent, lasts very long.',
+  },
+  {
+    itemId: 'be5e376d-e657-4035-8916-1580c52f4e98',
+    id: '8615d397-1052-4211-a1d2-d379b0c26af7',
+    username: 'Sarah L.',
+    rating: 5,
+    description:
+      "Love this smartwatch! It's easy to use and has all the features I need.",
+  },
+  {
+    itemId: 'be5e376d-e657-4035-8916-1580c52f4e98',
+    id: 'c80e93ce-8b53-4c9a-ad21-95081260ca14',
+    username: 'Mike K.',
+    rating: 4,
+    description: 'Great quality, but the battery life could be longer.',
+  },
+  {
+    itemId: 'c0d245f1-58fa-4b15-aa0c-a704772a122b',
+    id: '7f5d0844-9ade-4033-90fb-b5631fc6fa00',
+    username: 'John F.',
+    rating: 5,
+    description: 'Great shampoo, keeps my hair feeling fresh.',
+  },
+  {
+    itemId: 'ce5b64e3-440d-46e5-952f-bfdbad8a48d2',
+    id: '1ce10d0f-f562-43c8-9bcc-2a30d3d15511',
+    username: 'Adam L.',
+    rating: 5,
+    description: 'Amazing watch, suits all of my needs',
+  },
+  {
+    itemId: 'ce5b64e3-440d-46e5-952f-bfdbad8a48d2',
+    id: 'e2077393-6ebd-41b1-b890-bc3619481442',
+    username: 'Mark P.',
+    rating: 4,
+    description: "Love the watch, battery doesn't last as long as I'd like.",
+  },
+  {
+    itemId: 'f5d453d1-e811-4225-81ac-cee54ef0384b',
+    id: '19828454-eefd-4783-9aeb-b13521d4a743',
+    username: 'Mark P.',
+    rating: 4.2,
+    description: 'Great keyboard, but some keys are a bit small.',
+  },
+  {
+    itemId: 'f7bdd538-3914-409d-bd71-8ef962a9a9dd',
+    id: '0824fa1e-66d2-42b5-accb-92f700fae4ec',
+    username: 'Neal D.',
+    rating: 5,
+    description: 'Super stylish pair of shoes, love them!',
+  },
+  {
+    itemId: 'f7bdd538-3914-409d-bd71-8ef962a9a9dd',
+    id: '6604d496-2cd6-47d9-8e23-8a696a9222e4',
+    username: 'Jan W.',
+    rating: 5,
+    description: 'Amazing shoes!',
+  },
+  {
+    itemId: 'f99cafd2-bd40-4694-8b33-a6052f36b435',
+    id: 'c6e4fb1a-4c3d-4a4b-b785-a269f7f0707d',
+    username: 'Ola N.',
+    rating: 4,
+    description: 'Did what it needed to do but wish it lasted longer',
+  },
+  {
+    itemId: 'f99cafd2-bd40-4694-8b33-a6052f36b435',
+    id: 'dbe6d28f-35f7-43a7-88f4-93a68f3c131c',
+    username: 'Kate M.',
+    rating: 5,
+    description: 'Perfect!',
+  },
+  {
+    itemId: 'fbf07ebe-9f9a-4895-8a16-567acbbeef4e',
+    id: 'c9670f1b-b611-4f5f-adfe-f8f32de61653',
+    username: 'Adam B.',
+    rating: 5,
+    description: 'Great keyboard with long battery life.',
+  },
+  {
+    itemId: 'fbf07ebe-9f9a-4895-8a16-567acbbeef4e',
+    id: '095d3a10-b727-4612-a3b4-2c3eca00a0c2',
+    username: 'Kate M.',
+    rating: 5,
+    description: 'Perfect!',
+  },
+] satisfies InsertReview[];

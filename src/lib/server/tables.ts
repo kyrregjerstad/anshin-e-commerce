@@ -194,8 +194,12 @@ export const reviews = mysqlTable('reviews', {
   username: varchar('username', { length: 255 }).notNull(),
   rating: tinyint('rating', { unsigned: true }),
   description: varchar('description', { length: 1000 }).notNull(),
-  itemId: varchar('item_id', { length: 36 }).references(() => products.id),
+  itemId: varchar('item_id', { length: 36 })
+    .notNull()
+    .references(() => products.id, { onDelete: 'cascade' }),
 });
+
+export type InsertReview = InferInsertModel<typeof reviews>;
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   product: one(products, {

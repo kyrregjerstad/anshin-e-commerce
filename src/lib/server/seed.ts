@@ -2,7 +2,12 @@ import { connect } from '@planetscale/database';
 import { Argon2id } from 'oslo/password';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
-import { seedImagesData, seedProductsData, seedUsersData } from '../seedData';
+import {
+  seedImagesData,
+  seedProductsData,
+  seedReviewData,
+  seedUsersData,
+} from '../seedData';
 import * as schema from './tables';
 
 dotenv.config();
@@ -16,17 +21,25 @@ const main = async () => {
 
   const db = drizzle(connection, { schema });
 
+  await deleteSessions(db);
   await deleteProducts(db);
   await deleteUsers(db);
 
   await seedProducts(db);
   await seedImages(db);
   await seedUsers(db);
+  await seedReviews(db);
 };
 
 main();
 
 type DB = ReturnType<typeof drizzle>;
+
+async function deleteSessions(db: DB) {
+  await db.delete(schema.sessions).execute();
+
+  console.log('🗑️  Deleted sessions');
+}
 
 async function deleteUsers(db: DB) {
   await db.delete(schema.users).execute();
@@ -73,4 +86,10 @@ async function seedImages(db: DB) {
   await db.insert(schema.images).values(seedImagesData).execute();
 
   console.log('📸 Seeded images');
+}
+
+async function seedReviews(db: DB) {
+  await db.insert(schema.reviews).values(seedReviewData).execute();
+
+  console.log('📝 Seeded reviews');
 }
