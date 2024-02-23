@@ -192,7 +192,7 @@ export const tagsRelations = relations(tags, ({ one }) => ({
 export const reviews = mysqlTable('reviews', {
   id: varchar('id', { length: 36 }).primaryKey(),
   username: varchar('username', { length: 255 }).notNull(),
-  rating: tinyint('rating', { unsigned: true }),
+  rating: tinyint('rating', { unsigned: true }).notNull(),
   description: varchar('description', { length: 1000 }).notNull(),
   itemId: varchar('item_id', { length: 36 })
     .notNull()

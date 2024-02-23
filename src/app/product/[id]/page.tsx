@@ -1,8 +1,13 @@
+import { AddToCartButton } from '@/components/AddToCartButton';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { db } from '@/lib/server/db';
-import { products } from '@/lib/server/tables';
+import { InsertReview, products } from '@/lib/server/tables';
+import { useCartStore } from '@/lib/stores/cart';
+import { cn } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
+import { Car, StarIcon } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import React from 'react';
@@ -82,24 +87,69 @@ const ProductPage = async ({ params }: Props) => {
           </span>
         </div>
         <div className="flex space-x-4">
-          <Button>Add to Cart</Button>
+          <AddToCartButton product={product} />
         </div>
       </Card>
-      {reviews.length > 0 && (
-        <Card className="mx-auto max-w-2xl bg-white p-4">
-          <h2 className="mb-4 text-xl font-bold">Reviews</h2>
-          <ul className="space-y-4">
-            {reviews.map((review) => (
-              <li key={review.id}>
-                <h3 className="text-lg font-semibold">{review.username}</h3>
-                <p>{review.description}</p>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
+      <div className="mt-8">
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Customer Reviews</h2>
+        </div>
+        <div className="grid gap-4">
+          {reviews.map((review) => (
+            <ReviewCard key={review.id} review={review} />
+          ))}
+        </div>
+      </div>
     </main>
   );
 };
 
 export default ProductPage;
+
+type ReviewCardProps = {
+  review: InsertReview;
+};
+
+const ReviewCard = ({ review }: ReviewCardProps) => {
+  const { rating, description, username } = review;
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-4">
+          <Avatar className="h-10 w-10 border">
+            <AvatarImage alt="User" src="/placeholder-user.jpg" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
+          <div>
+            <span className="font-semibold">{username}</span>
+            <StarRating rating={rating} />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-4">
+          <div>
+            <div className="flex items-center gap-2"></div>
+            <p className="text-gray-600">{description}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const StarRating = ({ rating }: { rating: number }) => {
+  return (
+    <div className="flex items-center gap-1">
+      {Array.from({ length: 5 }).map((_, index) => (
+        <StarIcon
+          className={cn(
+            'size-4',
+            rating > index ? 'fill-primary' : 'fill-muted'
+          )}
+          key={index}
+        />
+      ))}
+    </div>
+  );
+};
