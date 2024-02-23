@@ -53,7 +53,9 @@ export const validateRequest = cache(
           sessionCookie.attributes
         );
       }
-    } catch {}
+    } catch (error) {
+      console.error(error);
+    }
     return result;
   }
 );

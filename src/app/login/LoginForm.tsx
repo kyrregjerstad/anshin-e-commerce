@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginActionResult, login } from '@/lib/server/auth/authService';
+import { LoginActionResult } from '@/lib/server/auth/authService';
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 
@@ -35,7 +35,7 @@ type Props = {
 };
 export const LoginForm = ({ loginFn }: Props) => {
   const [state, formAction] = useFormState<LoginActionResult, FormData>(
-    login,
+    loginFn,
     null
   );
 
@@ -55,7 +55,6 @@ export const LoginForm = ({ loginFn }: Props) => {
       return;
     }
     if (state.status === 'error') {
-      console.log(state.errors);
       state.errors?.forEach((error) => {
         setError(error.path as FieldPath<FormValues>, {
           message: error.message,

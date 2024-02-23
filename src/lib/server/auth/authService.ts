@@ -25,21 +25,53 @@ export type LoginActionResult =
   | null;
 
 export async function login(
-  prevState: LoginActionResult | null,
+  _prevState: LoginActionResult | null,
   data: FormData
 ): Promise<LoginActionResult> {
-  console.log(data);
-
   try {
     const { email, password } = loginSchema.parse(data);
 
-    console.log(email, password);
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!existingUser) {
+      return {
+        status: 'error',
+        message: 'No user found with that email address.',
+        errors: [
+          {
+            path: 'email',
+            message: 'No user found with that email address.',
+          },
+        ],
+      };
+    }
+
+    const validPassword = await new Argon2id().verify(
+      existingUser.hashedPassword,
+      password
+    );
+
+    if (!validPassword) {
+      return {
+        status: 'error',
+        message: 'Incorrect email or password',
+      };
+    }
+
+    const session = await lucia.createSession(existingUser.id, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    );
 
     return {
       status: 'success',
-      message: 'Logged in',
+      message: 'Logged in successfully',
     };
   } catch (error) {
     if (error instanceof ZodError) {
@@ -52,53 +84,10 @@ export async function login(
         })),
       };
     }
+
     return {
       status: 'error',
       message: 'Something went wrong. Please try again.',
     };
   }
-
-  const result = loginSchema.parse({
-    email: email,
-    password: password,
-  });
-
-  if (
-    typeof password !== 'string' ||
-    password.length < 6 ||
-    password.length > 255
-  ) {
-    return {
-      error: 'Invalid password',
-    };
-  }
-
-  const existingUser = await db.query.users.findFirst({
-    where: eq(users.email, email),
-  });
-
-  if (!existingUser) {
-    return {
-      error: 'Incorrect email or password',
-    };
-  }
-
-  const validPassword = await new Argon2id().verify(
-    existingUser.hashedPassword,
-    password
-  );
-  if (!validPassword) {
-    return {
-      error: 'Incorrect email or password',
-    };
-  }
-
-  const session = await lucia.createSession(existingUser.id, {});
-  const sessionCookie = lucia.createSessionCookie(session.id);
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes
-  );
-  return redirect('/');
 }
