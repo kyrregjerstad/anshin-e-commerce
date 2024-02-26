@@ -1,9 +1,11 @@
 import { getAllProducts } from '@/lib/server/productService';
 
 import { GridItem } from '@/components/GridItem';
+import { getCart } from '@/lib/server/cartService';
 
 export default async function Home() {
   const allProducts = await getAllProducts();
+  const cartItems = await getCart();
 
   return (
     <>
@@ -20,7 +22,11 @@ export default async function Home() {
           <section className="flex w-full flex-col">
             <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:grid-cols-5 2xl:gap-12">
               {allProducts.map((product) => (
-                <GridItem key={product.id} product={product} />
+                <GridItem
+                  key={product.id}
+                  product={product}
+                  cartItems={cartItems}
+                />
               ))}
             </div>
           </section>

@@ -6,16 +6,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import Image from 'next/image';
-import { GridItemButton } from './GridItemButton';
+import { CartItem } from '@/lib/server/cartService';
 import { Product } from '@/lib/server/productService';
+import Image from 'next/image';
+import Link from 'next/link';
+import { AddToCartButton } from './AddToCartButton';
+import { RemoveFromCartButton } from './RemoveFromCartButton';
+import { buttonVariants } from './ui/button';
 
 type Props = {
   product: Product;
+  cartItems: CartItem[];
 };
 
-export const GridItem = ({ product }: Props) => {
+export const GridItem = ({ product, cartItems }: Props) => {
   const { title, description, images } = product;
+
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   const coverImageUrl = images[0].url;
   return (
@@ -27,7 +34,7 @@ export const GridItem = ({ product }: Props) => {
         <AspectRatio ratio={16 / 9} className="bg-muted">
           <Image
             src={coverImageUrl}
-            alt="Photo by Drew Beamer"
+            alt={`Anshin - ${title} - ${description}`}
             fill
             className="rounded-md object-cover"
           />
@@ -35,7 +42,17 @@ export const GridItem = ({ product }: Props) => {
       </CardContent>
       <div className="flex-1" />
       <CardFooter className="flex justify-between">
-        <GridItemButton product={product} />
+        {isInCart ? (
+          <RemoveFromCartButton id={product.id} />
+        ) : (
+          <AddToCartButton product={product} />
+        )}
+        <Link
+          href={`/product/${product.id}`}
+          className={buttonVariants({ variant: 'outline' })}
+        >
+          View
+        </Link>
       </CardFooter>
     </Card>
   );

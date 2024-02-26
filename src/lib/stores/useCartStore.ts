@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
-type CartItem = {
+export type CartItem = {
   id: string;
   title: string;
   priceInCents: number;

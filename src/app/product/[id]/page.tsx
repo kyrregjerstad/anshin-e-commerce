@@ -1,5 +1,5 @@
 import { AddToCartButton } from '@/components/AddToCartButton';
-import { RemoveFromCartButton } from '@/components/RemoveFromCartButtn';
+import { RemoveFromCartButton } from '@/components/RemoveFromCartButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { getCart } from '@/lib/server/cartService';
