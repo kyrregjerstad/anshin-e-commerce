@@ -6,10 +6,6 @@ import { cart, cartItems } from './tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-export async function addToCart(itemId: string, quantity: number) {
-  await db.insert(cart);
-}
-
 export async function getCartById(cartId: number) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
@@ -44,7 +40,7 @@ export async function getCartById(cartId: number) {
   return transformedCart;
 }
 
-export async function getCart() {
+export async function getServerCart() {
   const cartId = getCartIdCookie();
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
@@ -122,6 +118,7 @@ export async function addItemToCart(productId: string, quantity: number) {
 export type CartItem = Awaited<ReturnType<typeof getCartById>>[number];
 
 function getCartIdCookie() {
+  // return 1;
   const cartIdCookie = cookies().get('cartId')?.value;
 
   if (!cartIdCookie) {
@@ -129,4 +126,8 @@ function getCartIdCookie() {
   }
 
   return parseInt(cartIdCookie);
+}
+
+function createNewCart() {
+  return db.insert(cart);
 }

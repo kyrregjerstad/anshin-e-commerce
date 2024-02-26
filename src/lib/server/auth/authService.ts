@@ -1,5 +1,5 @@
 'use server';
-import { lucia } from '@/lib/auth';
+
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
@@ -7,6 +7,7 @@ import { Argon2id } from 'oslo/password';
 import { ZodError } from 'zod';
 import { db } from '../db';
 import { users } from '../tables';
+import { lucia } from '@/lib/lucia';
 
 export type LoginActionResult =
   | {

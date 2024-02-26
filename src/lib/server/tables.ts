@@ -25,6 +25,20 @@ export const users = mysqlTable('users', {
   hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
 });
 
+export const guestUsers = mysqlTable('guest_users', {
+  id: varchar('id', { length: 64 }).primaryKey(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').onUpdateNow(),
+});
+
+export const guestUsersRelations = relations(guestUsers, ({ one }) => ({
+  session: one(sessions, {
+    fields: [guestUsers.id],
+    references: [sessions.guestUserId],
+    relationName: 'guest_user_session',
+  }),
+}));
+
 export type DatabaseUser = {
   id: string;
   name: string;
@@ -42,7 +56,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     relationName: 'user_orders',
   }),
   sessions: many(sessions, {
-    relationName: 'session_user',
+    relationName: 'user_session',
   }),
 }));
 
@@ -51,6 +65,10 @@ export const sessions = mysqlTable('sessions', {
   userId: varchar('user_id', { length: 64 })
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
+  guestUserId: varchar('guest_user_id', { length: 64 }).references(
+    () => guestUsers.id,
+    { onDelete: 'cascade' }
+  ),
   expiresAt: datetime('expires_at').notNull(),
 });
 
@@ -58,7 +76,12 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],
-    relationName: 'session_user',
+    relationName: 'user_session',
+  }),
+  guestUser: one(guestUsers, {
+    fields: [sessions.guestUserId],
+    references: [guestUsers.id],
+    relationName: 'guest_user_session',
   }),
 }));
 

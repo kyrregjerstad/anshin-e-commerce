@@ -6,6 +6,8 @@ import { LoginForm } from './LoginForm';
 export default async function LoginPage() {
   const { user } = await validateRequest();
 
+  console.log(user);
+
   if (user) {
     redirect('/');
   }
