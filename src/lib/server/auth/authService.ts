@@ -1,13 +1,12 @@
 'use server';
 import { lucia } from '@/lib/auth';
+import { loginSchema } from '@/lib/schema/loginSchema';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { Argon2id } from 'oslo/password';
+import { ZodError } from 'zod';
 import { db } from '../db';
 import { users } from '../tables';
-import { ZodError, z } from 'zod';
-import { loginSchema } from '@/lib/schema/loginSchema';
 
 export type LoginActionResult =
   | {
@@ -33,7 +32,16 @@ export async function login(
 
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
+      with: {
+        cart: {
+          columns: {
+            id: true,
+          },
+        },
+      },
     });
+
+    console.log(existingUser);
 
     if (!existingUser) {
       return {
@@ -48,8 +56,16 @@ export async function login(
       };
     }
 
+    const transformedUser = {
+      id: existingUser.id,
+      email: existingUser.email,
+      name: existingUser.name,
+      hashedPassword: existingUser.hashedPassword,
+      cartId: existingUser.cart?.id ?? null,
+    };
+
     const validPassword = await new Argon2id().verify(
-      existingUser.hashedPassword,
+      transformedUser.hashedPassword,
       password
     );
 
@@ -60,7 +76,10 @@ export async function login(
       };
     }
 
-    const session = await lucia.createSession(existingUser.id, {});
+    const session = await lucia.createSession(transformedUser.id, {
+      cartId: 123,
+    });
+
     const sessionCookie = lucia.createSessionCookie(session.id);
 
     cookies().set(

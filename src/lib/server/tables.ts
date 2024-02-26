@@ -29,6 +29,7 @@ export type DatabaseUser = {
   id: string;
   name: string;
   email: string;
+  cartId: number | null;
 };
 
 export const usersRelations = relations(users, ({ one, many }) => ({
@@ -40,15 +41,26 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   orders: many(orders, {
     relationName: 'user_orders',
   }),
+  sessions: many(sessions, {
+    relationName: 'session_user',
+  }),
 }));
 
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
   userId: varchar('user_id', { length: 64 })
     .notNull()
-    .references(() => users.id),
+    .references(() => users.id, { onDelete: 'cascade' }),
   expiresAt: datetime('expires_at').notNull(),
 });
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+    relationName: 'session_user',
+  }),
+}));
 
 const statusEnum = mysqlEnum('status', ['pending', 'completed', 'cancelled']);
 
@@ -94,10 +106,14 @@ export const orderToItemsRelations = relations(orderItems, ({ one }) => ({
 
 export const cart = mysqlTable('cart', {
   id: serial('id').primaryKey(),
-  createdAt: timestamp('created_at').defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
-  userId: varchar('user_id', { length: 64 }).references(() => users.id),
+  userId: varchar('user_id', { length: 64 })
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
 });
+
+export type InsertCart = InferInsertModel<typeof cart>;
 
 export const cartRelations = relations(cart, ({ one, many }) => ({
   user: one(users, {
@@ -113,13 +129,14 @@ export const cartRelations = relations(cart, ({ one, many }) => ({
 export const cartItems = mysqlTable('cart_items', {
   cartId: bigint('cart_id', { unsigned: true, mode: 'number' })
     .notNull()
-    .unique()
-    .references(() => cart.id),
-  productId: varchar('product_id', { length: 36 }).references(
-    () => products.id
-  ),
+    .references(() => cart.id, { onDelete: 'cascade' }),
+  productId: varchar('product_id', { length: 36 })
+    .notNull()
+    .references(() => products.id, { onDelete: 'cascade' }),
   quantity: smallint('quantity', { unsigned: true }).notNull(),
 });
+
+export type InsertCartItems = InferInsertModel<typeof cartItems>;
 
 export const cartToItemsRelations = relations(cartItems, ({ one }) => ({
   cart: one(cart, {

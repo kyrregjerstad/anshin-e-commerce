@@ -1,12 +1,12 @@
+import type { Session, User } from 'lucia';
 import { Lucia } from 'lucia';
-import { DrizzleMySQLAdapter } from '@lucia-auth/adapter-drizzle';
+import { cookies } from 'next/headers';
+import { cache } from 'react';
+import { ExtendedDrizzleMySQLAdapter } from './adapter';
 import { db } from './server/db';
 import { DatabaseUser, sessions, users } from './server/tables';
-import { cache } from 'react';
-import type { Session, User } from 'lucia';
-import { cookies } from 'next/headers';
 
-export const adapter = new DrizzleMySQLAdapter(db, sessions, users);
+export const adapter = new ExtendedDrizzleMySQLAdapter(db, sessions, users);
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -19,6 +19,7 @@ export const lucia = new Lucia(adapter, {
     id: user.id,
     email: user.email,
     name: user.name,
+    cartId: user.cartId,
   }),
 });
 
@@ -35,6 +36,7 @@ export const validateRequest = cache(
     }
 
     const result = await lucia.validateSession(sessionId);
+    console.log(result);
     // next.js throws when you attempt to set cookie when rendering page
     try {
       if (result.session && result.session.fresh) {
