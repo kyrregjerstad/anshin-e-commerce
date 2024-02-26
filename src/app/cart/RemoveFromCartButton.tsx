@@ -1,36 +1,25 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { removeItemAction } from './actions';
-
 import { X } from 'lucide-react';
-
-export type RemoveFromCartActionResult =
-  | {
-      status: 'success';
-      message: string;
-    }
-  | {
-      status: 'error';
-      message: string;
-      errors?: Array<{
-        path: string;
-        message: string;
-      }>;
-    }
-  | null;
+import { removeItemFromCart } from '@/lib/server/cartService';
+import { CartAction } from './CartItems';
 
 type Props = {
-  cartId: number;
   itemId: string;
-  removeItem: (itemId: string) => void;
+  dispatch: (action: CartAction) => void;
 };
 
-export const RemoveFromCartButton = ({ cartId, itemId, removeItem }: Props) => {
+export const RemoveFromCartButton = ({ itemId, dispatch }: Props) => {
   return (
     <form
-      action={async (formData) => {
-        removeItem(itemId);
+      action={async () => {
+        dispatch({
+          type: 'REMOVE_ITEM',
+          itemId,
+        });
+
+        await removeItemFromCart(itemId);
       }}
     >
       <Button variant="ghost" type="submit">

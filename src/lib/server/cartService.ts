@@ -44,20 +44,18 @@ export async function getCartById(cartId: number) {
   return transformedCart;
 }
 
-export async function removeItemFromCart(cartId: number, itemId: string) {
+export async function removeItemFromCart(itemId: string) {
+  const cartId = getCartIdCookie();
+
   await db
     .delete(cartItems)
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, itemId)));
+
+  revalidatePath('/cart');
 }
 
 export async function updateItemQuantity(itemId: string, quantity: number) {
-  const cartIdCookie = cookies().get('cartId')?.value;
-
-  if (!cartIdCookie) {
-    throw new Error('No cart found');
-  }
-
-  const cartId = parseInt(cartIdCookie);
+  const cartId = getCartIdCookie();
 
   await db
     .update(cartItems)
@@ -68,3 +66,13 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
 }
 
 export type CartItem = Awaited<ReturnType<typeof getCartById>>[number];
+
+function getCartIdCookie() {
+  const cartIdCookie = cookies().get('cartId')?.value;
+
+  if (!cartIdCookie) {
+    throw new Error('No cart found');
+  }
+
+  return parseInt(cartIdCookie);
+}
