@@ -3,6 +3,8 @@
 import { and, eq } from 'drizzle-orm';
 import { db } from './db';
 import { cart, cartItems } from './tables';
+import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 
 export async function addToCart(itemId: string, quantity: number) {
   await db.insert(cart);
@@ -48,16 +50,21 @@ export async function removeItemFromCart(cartId: number, itemId: string) {
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, itemId)));
 }
 
-// function to increment/decrement quantity
-export async function updateItemQuantity(
-  cartId: number,
-  itemId: string,
-  quantity: number
-) {
+export async function updateItemQuantity(itemId: string, quantity: number) {
+  const cartIdCookie = cookies().get('cartId')?.value;
+
+  if (!cartIdCookie) {
+    throw new Error('No cart found');
+  }
+
+  const cartId = parseInt(cartIdCookie);
+
   await db
     .update(cartItems)
     .set({ quantity })
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, itemId)));
+
+  revalidatePath('/cart');
 }
 
 export type CartItem = Awaited<ReturnType<typeof getCartById>>[number];

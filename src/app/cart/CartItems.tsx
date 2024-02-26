@@ -53,15 +53,11 @@ export const CartItem = ({
         <div>
           <p>{item.priceInCents}</p>
           <p>{item.discountInCents}</p>
-          <QuantitySelector item={item} cartId={cartId} dispatch={dispatch} />
+          <QuantitySelector item={item} dispatch={dispatch} />
         </div>
       </CardContent>
       <CardFooter>
-        <RemoveFromCartButton
-          itemId={item.id}
-          cartId={cartId}
-          dispatch={dispatch}
-        />
+        <RemoveFromCartButton itemId={item.id} dispatch={dispatch} />
       </CardFooter>
     </Card>
   );

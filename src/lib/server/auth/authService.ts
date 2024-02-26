@@ -76,9 +76,7 @@ export async function login(
       };
     }
 
-    const session = await lucia.createSession(transformedUser.id, {
-      cartId: 123,
-    });
+    const session = await lucia.createSession(transformedUser.id, {});
 
     const sessionCookie = lucia.createSessionCookie(session.id);
 
@@ -87,6 +85,8 @@ export async function login(
       sessionCookie.value,
       sessionCookie.attributes
     );
+
+    cookies().set('cartId', transformedUser.cartId.toString());
 
     return {
       status: 'success',

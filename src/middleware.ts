@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const allCookies = request.cookies.getAll();
-  // console.log(allCookies);
+  console.log(allCookies);
 
   const response = NextResponse.next();
 

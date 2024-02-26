@@ -1,27 +1,28 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { CartItem } from '@/lib/server/cartService';
+import { CartItem, updateItemQuantity } from '@/lib/server/cartService';
 import { CartAction } from './CartItems';
 
 export const QuantitySelector = ({
   item,
-  cartId,
   dispatch,
 }: {
   item: CartItem;
-  cartId: number;
   dispatch: (action: CartAction) => void;
 }) => {
   return (
     <div className="flex items-center gap-2">
       <form
-        action={async (formData) => {
-          console.log('update quantity');
+        action={async () => {
+          const newQuantity = decrement(item.quantity);
+
           dispatch({
             type: 'UPDATE_QUANTITY',
             itemId: item.id,
-            quantity: item.quantity - 1,
+            quantity: newQuantity,
           });
+
+          await updateItemQuantity(item.id, newQuantity);
         }}
       >
         <Button size="sm" type="submit">
@@ -30,12 +31,16 @@ export const QuantitySelector = ({
       </form>
       <span>{item.quantity}</span>
       <form
-        action={async (formData) => {
+        action={async () => {
+          const newQuantity = increment(item.quantity);
+
           dispatch({
             type: 'UPDATE_QUANTITY',
             itemId: item.id,
-            quantity: item.quantity + 1,
+            quantity: newQuantity,
           });
+
+          await updateItemQuantity(item.id, newQuantity);
         }}
       >
         <Button size="sm" type="submit">
@@ -45,3 +50,6 @@ export const QuantitySelector = ({
     </div>
   );
 };
+
+const increment = (quantity: number) => quantity + 1;
+const decrement = (quantity: number) => Math.max(0, quantity - 1);
