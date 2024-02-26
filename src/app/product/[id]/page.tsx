@@ -1,16 +1,15 @@
 import { AddToCartButton } from '@/components/AddToCartButton';
+import { RemoveFromCartButton } from '@/components/RemoveFromCartButtn';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { getCart } from '@/lib/server/cartService';
 import { db } from '@/lib/server/db';
 import { InsertReview, products } from '@/lib/server/tables';
-import { useCartStore } from '@/lib/stores/cart';
 import { cn } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
-import { Car, StarIcon } from 'lucide-react';
+import { StarIcon } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import React from 'react';
 
 import { z } from 'zod';
 
@@ -46,6 +45,10 @@ const ProductPage = async ({ params }: Props) => {
   if (!product) {
     return notFound();
   }
+
+  const cart = await getCart();
+
+  const isInCart = cart.some((item) => item.id === product.id);
 
   const {
     title,
@@ -87,7 +90,11 @@ const ProductPage = async ({ params }: Props) => {
           </span>
         </div>
         <div className="flex space-x-4">
-          <AddToCartButton product={product} />
+          {isInCart ? (
+            <RemoveFromCartButton product={product} />
+          ) : (
+            <AddToCartButton product={product} />
+          )}
         </div>
       </Card>
       <div className="mt-8">

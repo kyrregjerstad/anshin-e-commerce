@@ -4,25 +4,22 @@ import { useCartStore } from '@/lib/stores/useCartStore';
 import React from 'react';
 import { Button } from './ui/button';
 import { Product } from '@/lib/server/productService';
-import { addItemToCart } from '@/lib/server/cartService';
+import { addItemToCart, removeItemFromCart } from '@/lib/server/cartService';
 
 type Props = {
   product: Product;
 };
-export const AddToCartButton = ({ product }: Props) => {
-  const { addItem } = useCartStore();
+export const RemoveFromCartButton = ({ product }: Props) => {
+  const { addItem, removeItem } = useCartStore();
 
   return (
     <form
       action={async () => {
-        addItem({
-          ...product,
-          quantity: 1,
-        });
-        await addItemToCart(product.id, 1);
+        removeItem(product.id);
+        await removeItemFromCart(product.id);
       }}
     >
-      <Button>Add to Cart</Button>
+      <Button>Remove</Button>
     </form>
   );
 };

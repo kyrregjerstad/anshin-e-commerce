@@ -44,6 +44,41 @@ export async function getCartById(cartId: number) {
   return transformedCart;
 }
 
+export async function getCart() {
+  const cartId = getCartIdCookie();
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.id, cartId),
+    with: {
+      items: {
+        columns: {
+          quantity: true,
+        },
+        with: {
+          product: {
+            columns: {
+              id: true,
+              title: true,
+              priceInCents: true,
+              discountInCents: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!res) {
+    return [];
+  }
+
+  const transformedCart = res.items.map((item) => ({
+    ...item.product,
+    quantity: item.quantity,
+  }));
+
+  return transformedCart;
+}
+
 export async function removeItemFromCart(itemId: string) {
   const cartId = getCartIdCookie();
 
@@ -61,6 +96,25 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
     .update(cartItems)
     .set({ quantity })
     .where(and(eq(cartItems.cartId, cartId), eq(cartItems.productId, itemId)));
+
+  revalidatePath('/cart');
+}
+
+export async function addItemToCart(productId: string, quantity: number) {
+  const cartId = getCartIdCookie();
+
+  await db
+    .insert(cartItems)
+    .values({
+      cartId,
+      productId: productId,
+      quantity: quantity,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
+        quantity: quantity,
+      },
+    });
 
   revalidatePath('/cart');
 }

@@ -1,28 +1,42 @@
 'use client';
-import { useCartStore } from '@/lib/stores/cart';
-import { Button, buttonVariants } from './ui/button';
-import Link from 'next/link';
+import { addItemToCart, removeItemFromCart } from '@/lib/server/cartService';
 import { Product } from '@/lib/server/productService';
+import { useCartStore } from '@/lib/stores/useCartStore';
+import Link from 'next/link';
+import { Button, buttonVariants } from './ui/button';
 
 type Props = {
   product: Product;
 };
 
 export const GridItemButton = ({ product }: Props) => {
-  const { addItem } = useCartStore();
-  const { id: productId, title } = product;
+  const { addItem, removeItem, items } = useCartStore();
+
+  const isInCart = items.some((item) => item.id === product.id);
 
   return (
     <>
-      <Button
-        onClick={() =>
-          addItem({ id: productId, name: title, price: 10, quantity: 1 })
-        }
-      >
-        +
-      </Button>
+      {isInCart ? (
+        <form
+          action={async () => {
+            removeItem(product.id);
+            await removeItemFromCart(product.id);
+          }}
+        >
+          <Button type="submit">Remove</Button>
+        </form>
+      ) : (
+        <form
+          action={async () => {
+            addItem({ ...product, quantity: 1 });
+            await addItemToCart(product.id, 1);
+          }}
+        >
+          <Button type="submit">Add to Cart</Button>
+        </form>
+      )}
       <Link
-        href={`/product/${productId}`}
+        href={`/product/${product.id}`}
         className={buttonVariants({ variant: 'outline' })}
       >
         View

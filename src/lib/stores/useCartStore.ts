@@ -3,8 +3,9 @@ import { devtools } from 'zustand/middleware';
 
 type CartItem = {
   id: string;
-  name: string;
-  price: number;
+  title: string;
+  priceInCents: number;
+  discountInCents: number;
   quantity: number;
 };
 
@@ -14,6 +15,7 @@ type CartState = {
   removeItem: (itemId: string) => void;
   updateItemQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
+  syncCartState: (serverItems: CartItem[]) => void;
 };
 
 export const useCartStore = create<CartState>()(
@@ -34,5 +36,6 @@ export const useCartStore = create<CartState>()(
         ),
       })),
     clearCart: () => set({ items: [] }),
+    syncCartState: (serverItems) => set({ items: serverItems }),
   }))
 );
