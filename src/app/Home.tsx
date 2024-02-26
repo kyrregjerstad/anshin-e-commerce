@@ -1,6 +1,5 @@
-import { getAllProducts } from '@/lib/server/productService';
-
 import { GridItem } from '@/components/GridItem';
+import { getAllProducts } from '@/lib/server/productService';
 
 export default async function Home() {
   const allProducts = await getAllProducts();

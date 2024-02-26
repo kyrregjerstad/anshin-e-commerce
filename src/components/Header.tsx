@@ -11,7 +11,10 @@ export const Header = () => {
             <Link href="/">Anshin</Link>
           </li>
           <li>
-            <CartIcon />
+            <Link href="/cart">
+              <span className="sr-only">cart</span>
+              <CartIcon />
+            </Link>
           </li>
         </ul>
       </nav>
