@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
     response.cookies.set(guestSessionCookie.name, guestSessionCookie.value);
     response.cookies.set('cartId', cartId);
   } else {
-    console.log('Session cookie found:', sessionCookie);
+    // console.log('Session cookie found:', sessionCookie);
   }
   return response;
 }

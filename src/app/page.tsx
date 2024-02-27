@@ -1,7 +1,5 @@
 import { getAllProducts } from '@/lib/server/productService';
-
 import { GridItem } from '@/components/GridItem';
-
 import { validateRequest } from '@/lib/auth';
 
 export default async function Home() {
