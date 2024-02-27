@@ -7,7 +7,7 @@ import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
 import { ZodError } from 'zod';
 import { db } from '../db';
-import { guestSessions, guestUsers, sessions, users } from '../tables';
+import { sessions, users } from '../tables';
 import {
   createBlankSessionCookie,
   createSessionCookie,
@@ -161,47 +161,12 @@ async function createUserSession(userId: string, guest = false) {
 export async function validateSession(sessionId: string) {
   const guestSession = sessionId.startsWith('guest-');
 
-  if (guestSession) {
-    const res = await db.query.guestSessions.findFirst({
-      where: eq(guestSessions.id, sessionId),
-      with: {
-        user: {
-          columns: {
-            id: true,
-          },
-          with: {
-            cart: {
-              columns: {
-                id: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!res) {
-      return { user: null, session: null, guest: true };
-    }
-
-    const user = {
-      id: res.user?.id,
-      email: null,
-      name: null,
-      cartId: res.user?.cart?.id ?? null,
-    };
-
-    const session = {
-      id: res.id,
-      userId: res.guestUserId,
-      expiresAt: res.expiresAt,
-    };
-
-    return { user, session, guest: true };
-  }
-
   const res = await db.query.sessions.findFirst({
     where: eq(sessions.id, sessionId),
+    columns: {
+      id: true,
+      expiresAt: true,
+    },
     with: {
       user: {
         columns: {
@@ -209,10 +174,25 @@ export async function validateSession(sessionId: string) {
           email: true,
           name: true,
         },
+      },
+      cart: {
+        columns: {
+          id: true,
+        },
         with: {
-          cart: {
+          items: {
             columns: {
-              id: true,
+              quantity: true,
+            },
+            with: {
+              product: {
+                columns: {
+                  id: true,
+                  title: true,
+                  priceInCents: true,
+                  discountInCents: true,
+                },
+              },
             },
           },
         },
@@ -220,22 +200,47 @@ export async function validateSession(sessionId: string) {
     },
   });
 
+  console.log(res);
+
+  const transformedCart =
+    res?.cart?.items.map((item) => ({
+      ...item.product,
+      quantity: item.quantity,
+    })) ?? [];
+
   if (!res) {
-    return { user: null, session: null, guest: true };
+    return {
+      user: null,
+      session: null,
+      guest: true,
+      cart: transformedCart,
+    };
+  }
+
+  const session = {
+    id: res.id,
+    userId: res.user?.id ?? null,
+    expiresAt: res.expiresAt,
+    cartId: res.cart.id,
+  };
+
+  if (!res.user) {
+    return {
+      user: null,
+      session,
+      guest: true,
+      cart: transformedCart,
+    };
   }
 
   const user = {
     id: res.user.id,
     email: res.user.email,
     name: res.user.name,
-    cartId: res.user.cart?.id ?? null,
+    cartId: res.cart?.id ?? null,
   };
 
-  const session = {
-    id: res.id,
-    userId: res.userId,
-    expiresAt: res.expiresAt,
-  };
+  console.log(session);
 
-  return { user, session, guest: false };
+  return { user, session, guest: false, cart: transformedCart };
 }

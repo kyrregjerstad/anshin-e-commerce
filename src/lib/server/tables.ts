@@ -14,6 +14,13 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
+export type DatabaseUser = {
+  id: string;
+  name: string;
+  email: string;
+  cartId: number | null;
+};
+
 const mysqlTable = mysqlTableCreator((name) => `anshin_${name}`);
 
 export const users = mysqlTable('users', {
@@ -24,13 +31,6 @@ export const users = mysqlTable('users', {
   email: varchar('email', { length: 100 }).notNull().unique(),
   hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
 });
-
-export type DatabaseUser = {
-  id: string;
-  name: string;
-  email: string;
-  cartId: number | null;
-};
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   cart: one(cart, {
@@ -48,19 +48,24 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
-  userId: varchar('user_id', { length: 64 })
-    .notNull()
-    .references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+  userId: varchar('user_id', { length: 64 }).references(() => users.id, {
+    onDelete: 'cascade',
+  }),
   expiresAt: datetime('expires_at').notNull(),
 });
+
+export type InsertSession = InferInsertModel<typeof sessions>;
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],
     relationName: 'user_session',
+  }),
+  cart: one(cart, {
+    fields: [sessions.id],
+    references: [cart.sessionId],
+    relationName: 'cart_session',
   }),
 }));
 
@@ -110,16 +115,22 @@ export const cart = mysqlTable('cart', {
   id: varchar('id', { length: 64 }).primaryKey(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
-  userId: varchar('user_id', { length: 64 })
+  sessionId: varchar('session_id', { length: 64 })
     .notNull()
-    .references(() => users.id, {
-      onDelete: 'cascade',
-    }),
+    .references(() => sessions.id),
+  userId: varchar('user_id', { length: 64 }).references(() => users.id, {
+    onDelete: 'cascade',
+  }),
 });
 
 export type InsertCart = InferInsertModel<typeof cart>;
 
 export const cartRelations = relations(cart, ({ one, many }) => ({
+  session: one(sessions, {
+    fields: [cart.sessionId],
+    references: [sessions.id],
+    relationName: 'cart_session',
+  }),
   user: one(users, {
     fields: [cart.userId],
     references: [users.id],
@@ -147,11 +158,6 @@ export const cartToItemsRelations = relations(cartItems, ({ one }) => ({
     fields: [cartItems.cartId],
     references: [cart.id],
     relationName: 'cart_items',
-  }),
-  guestCart: one(guestCart, {
-    fields: [cartItems.cartId],
-    references: [guestCart.id],
-    relationName: 'guest_cart_items',
   }),
   product: one(products, {
     fields: [cartItems.productId],
@@ -232,64 +238,5 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
     fields: [reviews.itemId],
     references: [products.id],
     relationName: 'reviews_product',
-  }),
-}));
-
-/* Guest User Tables */
-
-export const guestUsers = mysqlTable('guest_users', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').onUpdateNow(),
-});
-
-export const guestUsersRelations = relations(guestUsers, ({ one }) => ({
-  session: one(guestSessions, {
-    fields: [guestUsers.id],
-    references: [guestSessions.guestUserId],
-    relationName: 'guest_user_session',
-  }),
-  cart: one(guestCart, {
-    fields: [guestUsers.id],
-    references: [guestCart.guestUserId],
-    relationName: 'guest_user_cart',
-  }),
-}));
-
-export const guestSessions = mysqlTable('guest_sessions', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  guestUserId: varchar('guest_user_id', { length: 64 }).references(
-    () => guestUsers.id,
-    { onDelete: 'cascade' }
-  ),
-  expiresAt: datetime('expires_at').notNull(),
-});
-
-export const guestSessionsRelations = relations(guestSessions, ({ one }) => ({
-  user: one(guestUsers, {
-    fields: [guestSessions.guestUserId],
-    references: [guestUsers.id],
-    relationName: 'guest_user_session',
-  }),
-}));
-
-export const guestCart = mysqlTable('guest_cart', {
-  id: varchar('id', { length: 64 }).primaryKey(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').onUpdateNow(),
-  guestUserId: varchar('guest_user_id', { length: 64 }).references(
-    () => guestUsers.id,
-    { onDelete: 'cascade' }
-  ),
-});
-
-export const guestCartRelations = relations(guestCart, ({ one, many }) => ({
-  user: one(guestUsers, {
-    fields: [guestCart.guestUserId],
-    references: [guestUsers.id],
-    relationName: 'guest_user_cart',
-  }),
-  items: many(cartItems, {
-    relationName: 'guest_cart_items',
   }),
 }));

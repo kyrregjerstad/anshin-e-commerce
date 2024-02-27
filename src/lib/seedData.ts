@@ -4,6 +4,7 @@ import {
   InsertCartItems,
   InsertProduct,
   InsertReview,
+  InsertSession,
   Tag,
 } from './server/tables';
 
@@ -582,6 +583,7 @@ export const seedCartsData = [
     id: 'a',
     userId: 'a',
     createdAt: new Date(),
+    sessionId: 'a',
   },
 ] satisfies InsertCart[];
 
@@ -607,6 +609,14 @@ export const seedItemsToCartsData = [
     quantity: 10,
   },
 ] satisfies InsertCartItems[];
+
+export const seedSessionsData = [
+  {
+    id: 'a',
+    userId: 'a',
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+  },
+] as InsertSession[];
 
 export const seedProductsData = [
   {

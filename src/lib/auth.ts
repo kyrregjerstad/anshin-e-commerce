@@ -1,3 +1,5 @@
+'use server';
+
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 import { validateSession } from './server/auth/authService';
@@ -15,6 +17,7 @@ export const validateRequest = cache(async () => {
     return {
       user: null,
       session: null,
+      cart: [],
     };
   }
 
@@ -32,5 +35,6 @@ export const validateRequest = cache(async () => {
   } catch (error) {
     console.error(error);
   }
+
   return result;
 });

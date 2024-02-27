@@ -11,6 +11,7 @@ type Props = {
 };
 export const Header = async ({ user, guest }: Props) => {
   const cartItems = await getCart();
+
   return (
     <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
       <nav className="flex w-full max-w-[calc(1920px_+_8rem)] items-center rounded-b-3xl border bg-tea-100 p-4 drop-shadow-sm">

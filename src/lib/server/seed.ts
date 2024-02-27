@@ -8,6 +8,7 @@ import {
   seedItemsToCartsData,
   seedProductsData,
   seedReviewData,
+  seedSessionsData,
   seedUsersData,
 } from '../seedData';
 import * as schema from './tables';
@@ -23,16 +24,20 @@ const main = async () => {
 
   const db = drizzle(connection, { schema });
 
-  await deleteProducts(db);
-  await deleteUsers(db);
-  await deleteCarts(db);
+  db.transaction(async (tx) => {
+    await deleteProducts(tx);
+    await deleteCarts(tx);
+    await deleteSessions(tx);
+    await deleteUsers(tx);
 
-  await seedProducts(db);
-  await seedImages(db);
-  await seedUsers(db);
-  await seedCarts(db);
-  await seedItemsToCarts(db);
-  await seedReviews(db);
+    await seedProducts(tx);
+    await seedImages(tx);
+    await seedUsers(tx);
+    await seedSessions(tx);
+    await seedCarts(tx);
+    await seedItemsToCarts(tx);
+    await seedReviews(tx);
+  });
 };
 
 main();
@@ -83,7 +88,7 @@ async function deleteCarts(db: DB) {
 async function seedItemsToCarts(db: DB) {
   await db.insert(schema.cartItems).values(seedItemsToCartsData).execute();
 
-  console.log('🛒 Seeded items to carts');
+  console.log('📦 Seeded items to carts');
 }
 
 async function deleteProducts(db: DB) {
@@ -114,4 +119,10 @@ async function seedReviews(db: DB) {
   await db.insert(schema.reviews).values(seedReviewData).execute();
 
   console.log('📝 Seeded reviews');
+}
+
+async function seedSessions(db: DB) {
+  await db.insert(schema.sessions).values(seedSessionsData).execute();
+
+  console.log('📝 Seeded sessions');
 }

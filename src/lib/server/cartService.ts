@@ -2,7 +2,7 @@
 
 import { and, eq } from 'drizzle-orm';
 import { db } from './db';
-import { cart, cartItems, guestCart } from './tables';
+import { cart, cartItems } from './tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
@@ -124,22 +124,18 @@ export async function addItemToCart(productId: string, quantity: number) {
 
   const isGuestCart = cartId.startsWith('guest-');
 
-  if (isGuestCart) {
-    await db.insert(guestCart);
-  } else {
-    await db
-      .insert(cartItems)
-      .values({
-        cartId,
-        productId: productId,
+  await db
+    .insert(cartItems)
+    .values({
+      cartId,
+      productId: productId,
+      quantity: quantity,
+    })
+    .onDuplicateKeyUpdate({
+      set: {
         quantity: quantity,
-      })
-      .onDuplicateKeyUpdate({
-        set: {
-          quantity: quantity,
-        },
-      });
-  }
+      },
+    });
 
   revalidatePath('/cart');
 }
