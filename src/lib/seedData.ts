@@ -4,6 +4,7 @@ import {
   InsertCartItems,
   InsertProduct,
   InsertReview,
+  InsertSession,
   Tag,
 } from './server/tables';
 
@@ -579,34 +580,43 @@ export const seedUsersData = [
 
 export const seedCartsData = [
   {
-    id: 1,
+    id: 'a',
     userId: 'a',
     createdAt: new Date(),
+    sessionId: 'a',
   },
 ] satisfies InsertCart[];
 
 export const seedItemsToCartsData = [
   {
-    cartId: 1,
+    cartId: 'a',
     productId: '109566af-c5c2-4f87-86cb-76f36fb8d378',
     quantity: 1,
   },
   {
-    cartId: 1,
+    cartId: 'a',
     productId: '10d6cc02-b282-46bb-b35c-dbc4bb5d91d9',
     quantity: 5,
   },
   {
-    cartId: 1,
+    cartId: 'a',
     productId: '159fdd2f-2b12-46de-9654-d9139525ba87',
     quantity: 2,
   },
   {
-    cartId: 1,
+    cartId: 'a',
     productId: '1fd1ddca-0d38-4e41-aa62-a1a7a57cf4b5',
     quantity: 10,
   },
 ] satisfies InsertCartItems[];
+
+export const seedSessionsData = [
+  {
+    id: 'a',
+    userId: 'a',
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+  },
+] as InsertSession[];
 
 export const seedProductsData = [
   {

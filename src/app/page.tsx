@@ -1,11 +1,10 @@
 import { getAllProducts } from '@/lib/server/productService';
-
 import { GridItem } from '@/components/GridItem';
-import { getCart } from '@/lib/server/cartService';
+import { validateRequest } from '@/lib/auth';
 
 export default async function Home() {
+  const { user, cart } = await validateRequest();
   const allProducts = await getAllProducts();
-  const cartItems = await getCart();
 
   return (
     <>
@@ -22,11 +21,7 @@ export default async function Home() {
           <section className="flex w-full flex-col">
             <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:grid-cols-5 2xl:gap-12">
               {allProducts.map((product) => (
-                <GridItem
-                  key={product.id}
-                  product={product}
-                  cartItems={cartItems}
-                />
+                <GridItem key={product.id} product={product} cartItems={cart} />
               ))}
             </div>
           </section>

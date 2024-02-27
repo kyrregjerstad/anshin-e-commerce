@@ -3,16 +3,15 @@ import { getCartById } from '@/lib/server/cartService';
 import { CartItems } from './CartItems';
 
 const CartPage = async () => {
-  const { user } = await validateRequest();
+  const { user, cart, session } = await validateRequest();
 
-  if (!user || !user?.cartId) {
+  if (!session) {
     return null;
   }
-  const { cartId } = user;
 
-  const cartItems = await getCartById(cartId);
+  const cartId = session?.cartId;
 
-  return <CartItems cartItems={cartItems} cartId={cartId} />;
+  return <CartItems cartItems={cart} cartId={cartId} />;
 };
 
 export default CartPage;

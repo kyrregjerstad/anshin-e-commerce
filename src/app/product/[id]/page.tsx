@@ -91,7 +91,7 @@ const ProductPage = async ({ params }: Props) => {
         </div>
         <div className="flex space-x-4">
           {isInCart ? (
-            <RemoveFromCartButton product={product} />
+            <RemoveFromCartButton id={productId} />
           ) : (
             <AddToCartButton product={product} />
           )}

@@ -1,16 +1,13 @@
 'use server';
 
-import { and, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { db } from './db';
 import { cart, cartItems } from './tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { generateId } from './auth/utils';
 
-export async function addToCart(itemId: string, quantity: number) {
-  await db.insert(cart);
-}
-
-export async function getCartById(cartId: number) {
+export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
     with: {
@@ -46,6 +43,8 @@ export async function getCartById(cartId: number) {
 
 export async function getCart() {
   const cartId = getCartIdCookie();
+  if (!cartId) return [];
+
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
     with: {
@@ -79,8 +78,33 @@ export async function getCart() {
   return transformedCart;
 }
 
+export async function getCartQuantity() {
+  const cartId = getCartIdCookie();
+  if (!cartId) return;
+
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.id, cartId),
+    with: {
+      items: {
+        columns: {
+          quantity: true,
+        },
+      },
+    },
+  });
+
+  if (!res) {
+    return 0;
+  }
+
+  const total = res.items.reduce((acc, item) => acc + item.quantity, 0);
+
+  return total;
+}
+
 export async function removeItemFromCart(itemId: string) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
 
   await db
     .delete(cartItems)
@@ -91,6 +115,7 @@ export async function removeItemFromCart(itemId: string) {
 
 export async function updateItemQuantity(itemId: string, quantity: number) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
 
   await db
     .update(cartItems)
@@ -102,6 +127,9 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
 
 export async function addItemToCart(productId: string, quantity: number) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
+
+  const isGuestCart = cartId.startsWith('guest-');
 
   await db
     .insert(cartItems)
@@ -125,8 +153,31 @@ function getCartIdCookie() {
   const cartIdCookie = cookies().get('cartId')?.value;
 
   if (!cartIdCookie) {
-    throw new Error('No cart found');
+    return null;
   }
 
-  return parseInt(cartIdCookie);
+  return cartIdCookie;
+}
+
+export async function createCart(sessionId: string, userId?: string) {
+  const cartId = generateId();
+  await db.insert(cart).values({ id: cartId, sessionId, userId });
+  return cartId;
+}
+
+export async function getOrCreateCart(sessionId: string, userId: string) {
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.userId, userId),
+    orderBy: [desc(cart.updatedAt)],
+  });
+
+  if (!res) {
+    return createCart(sessionId, userId);
+  }
+
+  if (res.sessionId !== sessionId) {
+    await db.update(cart).set({ sessionId }).where(eq(cart.id, res.id));
+  }
+
+  return res.id;
 }

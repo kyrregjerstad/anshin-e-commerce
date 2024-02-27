@@ -14,6 +14,12 @@ import {
   varchar,
 } from 'drizzle-orm/mysql-core';
 
+export type DatabaseUser = {
+  id: string;
+  name: string;
+  cartId: string | null;
+};
+
 const mysqlTable = mysqlTableCreator((name) => `anshin_${name}`);
 
 export const users = mysqlTable('users', {
@@ -25,13 +31,6 @@ export const users = mysqlTable('users', {
   hashedPassword: varchar('hashed_password', { length: 255 }).notNull(),
 });
 
-export type DatabaseUser = {
-  id: string;
-  name: string;
-  email: string;
-  cartId: number | null;
-};
-
 export const usersRelations = relations(users, ({ one, many }) => ({
   cart: one(cart, {
     fields: [users.id],
@@ -42,23 +41,30 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     relationName: 'user_orders',
   }),
   sessions: many(sessions, {
-    relationName: 'session_user',
+    relationName: 'user_session',
   }),
 }));
 
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
-  userId: varchar('user_id', { length: 64 })
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+  userId: varchar('user_id', { length: 64 }).references(() => users.id, {
+    onDelete: 'cascade',
+  }),
   expiresAt: datetime('expires_at').notNull(),
 });
+
+export type InsertSession = InferInsertModel<typeof sessions>;
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {
     fields: [sessions.userId],
     references: [users.id],
-    relationName: 'session_user',
+    relationName: 'user_session',
+  }),
+  cart: one(cart, {
+    fields: [sessions.id],
+    references: [cart.sessionId],
+    relationName: 'cart_session',
   }),
 }));
 
@@ -105,17 +111,26 @@ export const orderToItemsRelations = relations(orderItems, ({ one }) => ({
 }));
 
 export const cart = mysqlTable('cart', {
-  id: serial('id').primaryKey(),
+  id: varchar('id', { length: 64 }).primaryKey(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
-  userId: varchar('user_id', { length: 64 })
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+  sessionId: varchar('session_id', { length: 64 }).references(
+    () => sessions.id,
+    { onDelete: 'set null' }
+  ),
+  userId: varchar('user_id', { length: 64 }).references(() => users.id, {
+    onDelete: 'cascade',
+  }),
 });
 
 export type InsertCart = InferInsertModel<typeof cart>;
 
 export const cartRelations = relations(cart, ({ one, many }) => ({
+  session: one(sessions, {
+    fields: [cart.sessionId],
+    references: [sessions.id],
+    relationName: 'cart_session',
+  }),
   user: one(users, {
     fields: [cart.userId],
     references: [users.id],
@@ -127,9 +142,9 @@ export const cartRelations = relations(cart, ({ one, many }) => ({
 }));
 
 export const cartItems = mysqlTable('cart_items', {
-  cartId: bigint('cart_id', { unsigned: true, mode: 'number' })
-    .notNull()
-    .references(() => cart.id, { onDelete: 'cascade' }),
+  cartId: varchar('id', { length: 64 }).references(() => cart.id, {
+    onDelete: 'cascade',
+  }),
   productId: varchar('product_id', { length: 36 })
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
