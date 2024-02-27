@@ -2,11 +2,11 @@
 
 import { and, eq } from 'drizzle-orm';
 import { db } from './db';
-import { cart, cartItems } from './tables';
+import { cart, cartItems, guestCart } from './tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 
-export async function getCartById(cartId: number) {
+export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
     with: {
@@ -40,7 +40,7 @@ export async function getCartById(cartId: number) {
   return transformedCart;
 }
 
-export async function getServerCart() {
+export async function getCart() {
   const cartId = getCartIdCookie();
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
@@ -73,6 +73,29 @@ export async function getServerCart() {
   }));
 
   return transformedCart;
+}
+
+// function which get's the total amount of items in the cart
+export async function getCartQuantity() {
+  const cartId = getCartIdCookie();
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.id, cartId),
+    with: {
+      items: {
+        columns: {
+          quantity: true,
+        },
+      },
+    },
+  });
+
+  if (!res) {
+    return 0;
+  }
+
+  const total = res.items.reduce((acc, item) => acc + item.quantity, 0);
+
+  return total;
 }
 
 export async function removeItemFromCart(itemId: string) {
@@ -99,18 +122,24 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
 export async function addItemToCart(productId: string, quantity: number) {
   const cartId = getCartIdCookie();
 
-  await db
-    .insert(cartItems)
-    .values({
-      cartId,
-      productId: productId,
-      quantity: quantity,
-    })
-    .onDuplicateKeyUpdate({
-      set: {
+  const isGuestCart = cartId.startsWith('guest-');
+
+  if (isGuestCart) {
+    await db.insert(guestCart);
+  } else {
+    await db
+      .insert(cartItems)
+      .values({
+        cartId,
+        productId: productId,
         quantity: quantity,
-      },
-    });
+      })
+      .onDuplicateKeyUpdate({
+        set: {
+          quantity: quantity,
+        },
+      });
+  }
 
   revalidatePath('/cart');
 }
@@ -118,14 +147,13 @@ export async function addItemToCart(productId: string, quantity: number) {
 export type CartItem = Awaited<ReturnType<typeof getCartById>>[number];
 
 function getCartIdCookie() {
-  // return 1;
   const cartIdCookie = cookies().get('cartId')?.value;
 
   if (!cartIdCookie) {
     throw new Error('No cart found');
   }
 
-  return parseInt(cartIdCookie);
+  return cartIdCookie;
 }
 
 function createNewCart() {

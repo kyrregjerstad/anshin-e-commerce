@@ -14,7 +14,7 @@ import { useOptimistic } from 'react';
 
 type Props = {
   cartItems: CartItemType[];
-  cartId: number;
+  cartId: string;
 };
 
 export const CartItems = ({ cartItems, cartId }: Props) => {
@@ -37,11 +37,10 @@ export const CartItems = ({ cartItems, cartId }: Props) => {
 export const CartItem = ({
   item,
   cartId,
-
   dispatch,
 }: {
   item: CartItemType;
-  cartId: number;
+  cartId: string;
   dispatch: (action: CartAction) => void;
 }) => {
   return (

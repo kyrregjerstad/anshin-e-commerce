@@ -1,13 +1,13 @@
 import { getAllProducts } from '@/lib/server/productService';
 
 import { GridItem } from '@/components/GridItem';
-import { getServerCart } from '@/lib/server/cartService';
+import { getCart } from '@/lib/server/cartService';
 import { validateRequest } from '@/lib/auth';
 
 export default async function Home() {
   const { user } = await validateRequest();
   const allProducts = await getAllProducts();
-  const cartItems = user ? await getServerCart() : [];
+  const cartItems = user ? await getCart() : [];
 
   return (
     <>

@@ -2,7 +2,7 @@ import { AddToCartButton } from '@/components/AddToCartButton';
 import { RemoveFromCartButton } from '@/components/RemoveFromCartButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { getServerCart } from '@/lib/server/cartService';
+import { getCart } from '@/lib/server/cartService';
 import { db } from '@/lib/server/db';
 import { InsertReview, products } from '@/lib/server/tables';
 import { cn } from '@/lib/utils';
@@ -46,7 +46,7 @@ const ProductPage = async ({ params }: Props) => {
     return notFound();
   }
 
-  const cart = await getServerCart();
+  const cart = await getCart();
 
   const isInCart = cart.some((item) => item.id === product.id);
 
