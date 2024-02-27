@@ -26,11 +26,11 @@ export const validateRequest = cache(async () => {
   try {
     if (result.session) {
       const sessionCookie = createSessionCookie(result.session.id);
-      cookies().set(sessionCookie.name, sessionCookie.value);
+      // cookies().set(sessionCookie.name, sessionCookie.value);
     }
     if (!result.session) {
       const sessionCookie = createBlankSessionCookie();
-      cookies().set(sessionCookie.name, sessionCookie.value);
+      // cookies().set(sessionCookie.name, sessionCookie.value);
     }
   } catch (error) {
     console.error(error);

@@ -2,14 +2,14 @@ import React from 'react';
 import { CartIcon } from '@/components/CartIcon';
 import Link from 'next/link';
 import { getCart } from '@/lib/server/cartService';
-import { User } from 'lucia';
+
 import { LogOutButton } from './LogOutButton';
+import { DatabaseUser } from '@/lib/server/tables';
 
 type Props = {
-  user: User | null;
-  guest: boolean;
+  user: DatabaseUser | null;
 };
-export const Header = async ({ user, guest }: Props) => {
+export const Header = async ({ user }: Props) => {
   const cartItems = await getCart();
 
   return (

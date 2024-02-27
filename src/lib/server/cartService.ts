@@ -42,6 +42,8 @@ export async function getCartById(cartId: string) {
 
 export async function getCart() {
   const cartId = getCartIdCookie();
+  if (!cartId) return [];
+
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
     with: {
@@ -75,9 +77,10 @@ export async function getCart() {
   return transformedCart;
 }
 
-// function which get's the total amount of items in the cart
 export async function getCartQuantity() {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
+
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
     with: {
@@ -100,6 +103,7 @@ export async function getCartQuantity() {
 
 export async function removeItemFromCart(itemId: string) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
 
   await db
     .delete(cartItems)
@@ -110,6 +114,7 @@ export async function removeItemFromCart(itemId: string) {
 
 export async function updateItemQuantity(itemId: string, quantity: number) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
 
   await db
     .update(cartItems)
@@ -121,6 +126,7 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
 
 export async function addItemToCart(productId: string, quantity: number) {
   const cartId = getCartIdCookie();
+  if (!cartId) return;
 
   const isGuestCart = cartId.startsWith('guest-');
 
@@ -146,7 +152,7 @@ function getCartIdCookie() {
   const cartIdCookie = cookies().get('cartId')?.value;
 
   if (!cartIdCookie) {
-    throw new Error('No cart found');
+    return null;
   }
 
   return cartIdCookie;

@@ -17,8 +17,7 @@ import {
 export type DatabaseUser = {
   id: string;
   name: string;
-  email: string;
-  cartId: number | null;
+  cartId: string | null;
 };
 
 const mysqlTable = mysqlTableCreator((name) => `anshin_${name}`);

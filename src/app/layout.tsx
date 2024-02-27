@@ -16,14 +16,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, guest } = await validateRequest();
-
-  console.log(user);
+  const { user } = await validateRequest();
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header user={user} guest={guest} />
+        <Header user={user} />
         {children}
       </body>
     </html>

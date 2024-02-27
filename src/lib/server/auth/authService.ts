@@ -159,8 +159,6 @@ async function createUserSession(userId: string, guest = false) {
 }
 
 export async function validateSession(sessionId: string) {
-  const guestSession = sessionId.startsWith('guest-');
-
   const res = await db.query.sessions.findFirst({
     where: eq(sessions.id, sessionId),
     columns: {
@@ -171,7 +169,6 @@ export async function validateSession(sessionId: string) {
       user: {
         columns: {
           id: true,
-          email: true,
           name: true,
         },
       },
@@ -199,8 +196,6 @@ export async function validateSession(sessionId: string) {
       },
     },
   });
-
-  console.log(res);
 
   const transformedCart =
     res?.cart?.items.map((item) => ({
@@ -235,7 +230,6 @@ export async function validateSession(sessionId: string) {
 
   const user = {
     id: res.user.id,
-    email: res.user.email,
     name: res.user.name,
     cartId: res.cart?.id ?? null,
   };

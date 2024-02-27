@@ -20,8 +20,6 @@ type Props = {
 export const CartItems = ({ cartItems, cartId }: Props) => {
   const [optimisticCart, dispatch] = useOptimistic(cartItems, cartReducer);
 
-  console.log(cartItems);
-
   return (
     <div>
       {optimisticCart.map((item) => (
