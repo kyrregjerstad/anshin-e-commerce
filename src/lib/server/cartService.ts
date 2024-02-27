@@ -1,10 +1,11 @@
 'use server';
 
-import { and, eq } from 'drizzle-orm';
+import { and, asc, desc, eq } from 'drizzle-orm';
 import { db } from './db';
 import { cart, cartItems } from './tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
+import { generateId } from './auth/utils';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
@@ -158,6 +159,25 @@ function getCartIdCookie() {
   return cartIdCookie;
 }
 
-function createNewCart() {
-  return db.insert(cart);
+export async function createCart(sessionId: string, userId?: string) {
+  const cartId = generateId();
+  await db.insert(cart).values({ id: cartId, sessionId, userId });
+  return cartId;
+}
+
+export async function getOrCreateCart(sessionId: string, userId: string) {
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.userId, userId),
+    orderBy: [desc(cart.updatedAt)],
+  });
+
+  if (!res) {
+    return createCart(sessionId, userId);
+  }
+
+  if (res.sessionId !== sessionId) {
+    await db.update(cart).set({ sessionId }).where(eq(cart.id, res.id));
+  }
+
+  return res.id;
 }

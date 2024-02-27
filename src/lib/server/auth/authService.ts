@@ -7,13 +7,16 @@ import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
 import { ZodError } from 'zod';
 import { db } from '../db';
-import { sessions, users } from '../tables';
+import { cart, sessions, users } from '../tables';
 import {
+  createBlankCartCookie,
   createBlankSessionCookie,
+  createCartCookie,
   createSessionCookie,
   getSessionCookie,
 } from './cookies';
 import { generateId } from './utils';
+import { createCart, getOrCreateCart } from '../cartService';
 
 export type LoginActionResult =
   | {
@@ -39,56 +42,30 @@ export async function login(
 
     const existingUser = await db.query.users.findFirst({
       where: eq(users.email, email),
-      with: {
-        cart: {
-          columns: {
-            id: true,
-          },
-        },
-      },
     });
 
-    console.log(existingUser);
-
-    if (!existingUser) {
-      return {
-        status: 'error',
-        message: 'No user found with that email address.',
-        errors: [
-          {
-            path: 'email',
-            message: 'No user found with that email address.',
-          },
-        ],
-      };
-    }
-
-    const transformedUser = {
-      id: existingUser.id,
-      email: existingUser.email,
-      name: existingUser.name,
-      hashedPassword: existingUser.hashedPassword,
-      cartId: existingUser.cart?.id ?? null,
-    };
-
     const validPassword = await new Argon2id().verify(
-      transformedUser.hashedPassword,
+      existingUser?.hashedPassword ?? '',
       password
     );
 
-    if (!validPassword) {
+    if (!validPassword || !existingUser) {
       return {
         status: 'error',
         message: 'Incorrect email or password',
       };
     }
 
-    const session = await createUserSession(transformedUser.id);
+    const { id: userId } = existingUser;
+
+    const session = await createUserSession(userId);
+    const cartId = await getOrCreateCart(session.id, userId);
+
     const sessionCookie = createSessionCookie(session.id);
+    const cartCookie = createCartCookie(cartId);
 
     cookies().set(sessionCookie.name, sessionCookie.value);
-
-    cookies().set('cartId', transformedUser.cartId.toString());
+    cookies().set(cartCookie.name, cartCookie.value);
 
     return {
       status: 'success',
@@ -129,23 +106,18 @@ export async function logOut() {
   await db.delete(sessions).where(eq(sessions.id, sessionId));
 
   const sessionCookie = createBlankSessionCookie();
+  const cartCookie = createBlankCartCookie();
 
   cookies().delete(sessionCookie.name);
-  cookies().delete('cartId');
+  cookies().delete(cartCookie.name);
 
   revalidatePath('/');
 }
 
-async function createUserSession(userId: string, guest = false) {
+async function createUserSession(userId: string) {
   const userSession = {
     id: generateId(),
     userId,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-  };
-
-  const guestSession = {
-    id: generateId({ guest: true }),
-    guestUserId: userId,
     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
   };
 
@@ -159,6 +131,7 @@ async function createUserSession(userId: string, guest = false) {
 }
 
 export async function validateSession(sessionId: string) {
+  console.log(sessionId);
   const res = await db.query.sessions.findFirst({
     where: eq(sessions.id, sessionId),
     columns: {
@@ -171,7 +144,11 @@ export async function validateSession(sessionId: string) {
           id: true,
           name: true,
         },
+        with: {
+          cart: true,
+        },
       },
+
       cart: {
         columns: {
           id: true,
@@ -203,6 +180,8 @@ export async function validateSession(sessionId: string) {
       quantity: item.quantity,
     })) ?? [];
 
+  console.log(res);
+
   if (!res) {
     return {
       user: null,
@@ -216,7 +195,7 @@ export async function validateSession(sessionId: string) {
     id: res.id,
     userId: res.user?.id ?? null,
     expiresAt: res.expiresAt,
-    cartId: res.cart.id,
+    cartId: res.cart?.id,
   };
 
   if (!res.user) {
@@ -233,8 +212,6 @@ export async function validateSession(sessionId: string) {
     name: res.user.name,
     cartId: res.cart?.id ?? null,
   };
-
-  console.log(session);
 
   return { user, session, guest: false, cart: transformedCart };
 }

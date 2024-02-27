@@ -114,9 +114,10 @@ export const cart = mysqlTable('cart', {
   id: varchar('id', { length: 64 }).primaryKey(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
-  sessionId: varchar('session_id', { length: 64 })
-    .notNull()
-    .references(() => sessions.id),
+  sessionId: varchar('session_id', { length: 64 }).references(
+    () => sessions.id,
+    { onDelete: 'set null' }
+  ),
   userId: varchar('user_id', { length: 64 }).references(() => users.id, {
     onDelete: 'cascade',
   }),
