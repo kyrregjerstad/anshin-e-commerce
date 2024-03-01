@@ -9,7 +9,7 @@ export default async function LoginPage() {
   console.log(user);
 
   if (user) {
-    redirect('/');
+    // redirect('/');
   }
 
   return (

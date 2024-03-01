@@ -27,6 +27,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginActionResult } from '@/lib/server/services/authService';
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { redirect } from 'next/navigation';
 
 type FormValues = z.infer<typeof loginSchema>;
 
@@ -63,6 +64,7 @@ export const LoginForm = ({ loginFn }: Props) => {
     }
     if (state.status === 'success') {
       reset();
+      redirect('/');
     }
   }, [state, setError, reset]);
 

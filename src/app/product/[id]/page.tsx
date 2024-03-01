@@ -2,7 +2,7 @@ import { AddToCartButton } from '@/components/AddToCartButton';
 import { RemoveFromCartButton } from '@/components/RemoveFromCartButton';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { getCart } from '@/lib/server/services/cartService';
+
 import { db } from '@/lib/server/db';
 import { InsertReview, products } from '@/lib/server/tables';
 import { cn } from '@/lib/utils';

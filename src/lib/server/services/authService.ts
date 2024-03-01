@@ -17,6 +17,7 @@ import { db } from '../db';
 import { cart, sessions, users } from '../tables';
 import { getCartBySessionId, getOrCreateCart } from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
+import { redirect } from 'next/navigation';
 
 export type LoginActionResult =
   | {
@@ -63,20 +64,21 @@ export async function login(
 
     const guestSessionId = getSessionCookie();
 
+    console.log('session', session);
     if (guestSessionId) {
       const guestSessionCartItems = await getCartBySessionId(guestSessionId);
       const currentSessionCartItems = await getCartBySessionId(guestSessionId);
 
       // Merge the guest cart with the current cart
 
-      await db.update(cart).set({}).where(eq(cart.id, cartId));
+      // await db.update(cart).set({}).where(eq(cart.id, cartId));
     }
 
     const sessionCookie = createSessionCookie(session.id);
-    const cartCookie = createCartCookie(cartId);
+    // const cartCookie = createCartCookie(cartId);
 
     cookies().set(sessionCookie.name, sessionCookie.value);
-    cookies().set(cartCookie.name, cartCookie.value);
+    // cookies().set(cartCookie.name, cartCookie.value);
 
     return {
       status: 'success',

@@ -109,43 +109,6 @@ export async function getCartByUserId(userId: string) {
   return transformedCart;
 }
 
-export async function getCart() {
-  const cartId = getCartIdCookie();
-  if (!cartId) return [];
-
-  const res = await db.query.cart.findFirst({
-    where: eq(cart.id, cartId),
-    with: {
-      items: {
-        columns: {
-          quantity: true,
-        },
-        with: {
-          product: {
-            columns: {
-              id: true,
-              title: true,
-              priceInCents: true,
-              discountInCents: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!res) {
-    return [];
-  }
-
-  const transformedCart = res.items.map((item) => ({
-    ...item.product,
-    quantity: item.quantity,
-  }));
-
-  return transformedCart;
-}
-
 export async function getCartQuantity() {
   const cartId = getCartIdCookie();
   if (!cartId) return;
@@ -215,6 +178,9 @@ export async function addItemToCart({
   const { sessionId, userId, cartId } = sessionData;
   const { productId, quantity } = product;
 
+  console.log('SESSION ID: ', sessionId);
+  console.log('USER ID: ', userId);
+
   const selectedCartId = cartId || (await createCart(sessionId, userId));
 
   await db
@@ -247,6 +213,7 @@ function getCartIdCookie() {
 
 export async function createCart(sessionId: string, userId?: string | null) {
   const cartId = generateId();
+  console.log(sessionId);
   await db.insert(cart).values({ id: cartId, sessionId, userId });
   return cartId;
 }

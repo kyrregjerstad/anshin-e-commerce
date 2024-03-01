@@ -5,6 +5,7 @@ import { generateId } from '../auth/utils';
 import { db } from '../db';
 import { sessions } from '../tables';
 import { createCart } from './cartService';
+
 import {
   DatabaseSession,
   SessionWithUser,
@@ -80,12 +81,26 @@ export async function getSessionById(
 }
 
 export async function getSessionDetails(
-  sessionId: string
+  sessionId: string | null
 ): Promise<ValidateSessionResult> {
+  if (!sessionId) {
+    const emptySession = getEmptySessionDetails();
+
+    return {
+      ...emptySession,
+      session: await createGuestSession(),
+    };
+  }
+
   const sessionData = await getSessionById(sessionId);
 
   if (!sessionData) {
-    return getEmptySessionDetails();
+    const emptySession = getEmptySessionDetails();
+
+    return {
+      ...emptySession,
+      session: await createGuestSession(),
+    };
   }
 
   if (sessionData.user) {
@@ -160,5 +175,21 @@ export async function createUserSession(userId: string) {
     throw new Error('Failed to create user session.');
   } finally {
     return userSession;
+  }
+}
+
+export async function createGuestSession() {
+  const id = generateId({ guest: true });
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+
+  try {
+    await db.insert(sessions).values({
+      id,
+      expiresAt,
+    });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    return { id, expiresAt };
   }
 }

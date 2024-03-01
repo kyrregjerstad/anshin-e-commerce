@@ -26,7 +26,7 @@ export default async function Home() {
                   product={product}
                   cartItems={cart}
                   sessionData={{
-                    sessionId: session?.id || '',
+                    sessionId: session.id,
                     userId: user?.id ?? null,
                     cartId: cartId,
                   }}

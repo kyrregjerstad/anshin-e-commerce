@@ -14,7 +14,7 @@ export type ValidateSessionResult = {
   session: {
     id: string;
     expiresAt: Date;
-  } | null;
+  };
   cart: Array<Cart>;
   cartId: string | null;
 };

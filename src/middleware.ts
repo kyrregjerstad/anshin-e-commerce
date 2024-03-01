@@ -5,7 +5,7 @@ import {
   createSessionCookie,
   sessionCookieName,
 } from './lib/server/auth/cookies';
-import { createGuestSession } from './lib/server/auth/sessions';
+import { createGuestSession } from './lib/server/services/sessionService';
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
@@ -14,11 +14,11 @@ export async function middleware(request: NextRequest) {
 
   if (!sessionCookie) {
     console.log('No session cookie found, creating a new one');
-    const { sessionId, cartId } = await createGuestSession();
+    const { id: sessionId } = await createGuestSession();
     const guestSessionCookie = createSessionCookie(sessionId);
 
     response.cookies.set(guestSessionCookie.name, guestSessionCookie.value);
-    response.cookies.set('cartId', cartId);
+    // response.cookies.set('cartId', cartId);
   } else {
     // console.log('Session cookie found:', sessionCookie);
   }
