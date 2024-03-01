@@ -30,14 +30,14 @@ const AnimatedCartCounter = ({
   if (!cartAmount) return null;
 
   return (
-    <div className="pointer-events-none absolute left-0 top-0 flex aspect-square w-full items-center justify-center overflow-hidden text-center">
+    <div className="pointer-events-none absolute left-0 top-0 flex aspect-square w-full items-center justify-center overflow-hidden text-center text-sm">
       <LazyMotion features={domAnimation}>
         <AnimatePresence mode="wait">
           {cartAmount > 0 && (
             <m.div
               key={cartAmount}
               initial={{ x: 0, y: 40, opacity: 0 }}
-              animate={{ x: 0, y: 7, opacity: 1 }}
+              animate={{ x: 0, y: 6, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ type: 'tween', duration: 0.2 }}
             >
@@ -53,7 +53,7 @@ const AnimatedCartCounter = ({
 const IconSvg = ({ cartAmount }: { cartAmount: number | undefined }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={40}
+    width={30}
     fill={cn(
       cartAmount
         ? 'oklch(89.50% 0.07 121.34 / 1)'

@@ -29,7 +29,7 @@ export const GridItem = ({ sessionData, product, cartItems }: Props) => {
 
   const isInCart = cartItems.some((item) => item.id === product.id);
 
-  const coverImageUrl = images[0].url;
+  const coverImageUrl = images[0]?.url;
   return (
     <Card className="flex flex-col">
       <CardHeader>
