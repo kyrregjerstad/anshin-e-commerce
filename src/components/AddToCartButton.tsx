@@ -7,9 +7,14 @@ import { Product } from '@/lib/server/productService';
 import { addItemToCart } from '@/lib/server/services/cartService';
 
 type Props = {
+  sessionData: {
+    sessionId: string;
+    userId: string | null;
+    cartId: string | null;
+  };
   product: Product;
 };
-export const AddToCartButton = ({ product }: Props) => {
+export const AddToCartButton = ({ sessionData, product }: Props) => {
   const { addItem } = useCartStore();
 
   return (
@@ -19,7 +24,13 @@ export const AddToCartButton = ({ product }: Props) => {
           ...product,
           quantity: 1,
         });
-        await addItemToCart(product.id, 1);
+        await addItemToCart({
+          sessionData,
+          product: {
+            productId: product.id,
+            quantity: 1,
+          },
+        });
       }}
     >
       <Button>Add to Cart</Button>

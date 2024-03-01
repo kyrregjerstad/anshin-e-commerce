@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 import { z } from 'zod';
+import { validateRequest } from '@/lib/auth';
 
 const paramsSchema = z.object({
   id: z.string().length(36),
@@ -46,7 +47,7 @@ const ProductPage = async ({ params }: Props) => {
     return notFound();
   }
 
-  const cart = await getCart();
+  const { user, cart, cartId, session } = await validateRequest();
 
   const isInCart = cart.some((item) => item.id === product.id);
 
@@ -91,9 +92,16 @@ const ProductPage = async ({ params }: Props) => {
         </div>
         <div className="flex space-x-4">
           {isInCart ? (
-            <RemoveFromCartButton id={productId} />
+            <RemoveFromCartButton id={productId} sessionData={{ cartId }} />
           ) : (
-            <AddToCartButton product={product} />
+            <AddToCartButton
+              product={product}
+              sessionData={{
+                cartId,
+                sessionId: session?.id ?? '',
+                userId: user?.id ?? null,
+              }}
+            />
           )}
         </div>
       </Card>

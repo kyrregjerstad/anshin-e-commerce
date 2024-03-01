@@ -170,8 +170,11 @@ export async function getCartQuantity() {
   return total;
 }
 
-export async function removeItemFromCart(itemId: string) {
-  const cartId = getCartIdCookie();
+export async function removeItemFromCart(
+  cartId: string | null,
+  itemId: string
+) {
+  // const cartId = getCartIdCookie();
   if (!cartId) return;
 
   await db
@@ -193,16 +196,31 @@ export async function updateItemQuantity(itemId: string, quantity: number) {
   revalidatePath('/cart');
 }
 
-export async function addItemToCart(productId: string, quantity: number) {
-  const cartId = getCartIdCookie();
-  if (!cartId) return;
+type AddItemToCartParams = {
+  sessionData: {
+    sessionId: string;
+    userId: string | null;
+    cartId: string | null;
+  };
+  product: {
+    productId: string;
+    quantity: number;
+  };
+};
 
-  const isGuestCart = cartId.startsWith('guest-');
+export async function addItemToCart({
+  sessionData,
+  product,
+}: AddItemToCartParams) {
+  const { sessionId, userId, cartId } = sessionData;
+  const { productId, quantity } = product;
+
+  const selectedCartId = cartId || (await createCart(sessionId, userId));
 
   await db
     .insert(cartItems)
     .values({
-      cartId,
+      cartId: selectedCartId,
       productId: productId,
       quantity: quantity,
     })
@@ -227,7 +245,7 @@ function getCartIdCookie() {
   return cartIdCookie;
 }
 
-export async function createCart(sessionId: string, userId?: string) {
+export async function createCart(sessionId: string, userId?: string | null) {
   const cartId = generateId();
   await db.insert(cart).values({ id: cartId, sessionId, userId });
   return cartId;

@@ -3,7 +3,7 @@ import { GridItem } from '@/components/GridItem';
 import { validateRequest } from '@/lib/auth';
 
 export default async function Home() {
-  const { user, cart } = await validateRequest();
+  const { user, cart, cartId, session } = await validateRequest();
   const allProducts = await getAllProducts();
 
   return (
@@ -21,7 +21,16 @@ export default async function Home() {
           <section className="flex w-full flex-col">
             <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:grid-cols-5 2xl:gap-12">
               {allProducts.map((product) => (
-                <GridItem key={product.id} product={product} cartItems={cart} />
+                <GridItem
+                  key={product.id}
+                  product={product}
+                  cartItems={cart}
+                  sessionData={{
+                    sessionId: session?.id || '',
+                    userId: user?.id ?? null,
+                    cartId: cartId,
+                  }}
+                />
               ))}
             </div>
           </section>

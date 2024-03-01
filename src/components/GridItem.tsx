@@ -17,9 +17,14 @@ import { buttonVariants } from './ui/button';
 type Props = {
   product: Product;
   cartItems: CartItem[];
+  sessionData: {
+    sessionId: string;
+    userId: string | null;
+    cartId: string | null;
+  };
 };
 
-export const GridItem = ({ product, cartItems }: Props) => {
+export const GridItem = ({ sessionData, product, cartItems }: Props) => {
   const { title, description, images } = product;
 
   const isInCart = cartItems.some((item) => item.id === product.id);
@@ -43,9 +48,9 @@ export const GridItem = ({ product, cartItems }: Props) => {
       <div className="flex-1" />
       <CardFooter className="flex justify-between">
         {isInCart ? (
-          <RemoveFromCartButton id={product.id} />
+          <RemoveFromCartButton id={product.id} sessionData={sessionData} />
         ) : (
-          <AddToCartButton product={product} />
+          <AddToCartButton product={product} sessionData={sessionData} />
         )}
         <Link
           href={`/product/${product.id}`}
