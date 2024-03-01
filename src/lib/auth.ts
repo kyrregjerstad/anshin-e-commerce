@@ -1,27 +1,27 @@
 'use server';
 
-import { cookies } from 'next/headers';
 import { cache } from 'react';
-import { validateSession } from './server/auth/authService';
+import { getSessionDetails } from './server/services/sessionService';
 import {
   createBlankSessionCookie,
   createSessionCookie,
   getSessionCookie,
 } from './server/auth/cookies';
+import { Cart } from './server/services/types';
 
 export const validateRequest = cache(async () => {
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
-    console.log('No session cookie found');
     return {
       user: null,
       session: null,
-      cart: [],
+      cart: [] as Cart[],
+      cartId: null,
     };
   }
 
-  const result = await validateSession(sessionId);
+  const result = await getSessionDetails(sessionId);
 
   try {
     if (result.session) {

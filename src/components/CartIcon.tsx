@@ -1,5 +1,5 @@
 'use client';
-import { CartItem } from '@/lib/server/cartService';
+import { CartItem } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/stores/useCartStore';
 import { cn } from '@/lib/utils';
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';

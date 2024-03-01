@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CartItem } from '@/lib/server/cartService';
+import { CartItem } from '@/lib/server/services/cartService';
 import { Product } from '@/lib/server/productService';
 import Image from 'next/image';
 import Link from 'next/link';

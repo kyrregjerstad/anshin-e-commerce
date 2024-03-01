@@ -4,7 +4,7 @@ import { useCartStore } from '@/lib/stores/useCartStore';
 import React from 'react';
 import { Button } from './ui/button';
 import { Product } from '@/lib/server/productService';
-import { addItemToCart } from '@/lib/server/cartService';
+import { addItemToCart } from '@/lib/server/services/cartService';
 
 type Props = {
   product: Product;

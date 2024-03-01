@@ -1,6 +1,9 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { CartItem, updateItemQuantity } from '@/lib/server/cartService';
+import {
+  CartItem,
+  updateItemQuantity,
+} from '@/lib/server/services/cartService';
 import { CartAction } from './CartItems';
 
 export const QuantitySelector = ({

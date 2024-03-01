@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card';
 import { QuantitySelector } from './QuantitySelector';
 import { RemoveFromCartButton } from './RemoveFromCartButton';
-import { type CartItem as CartItemType } from '@/lib/server/cartService';
+import { type CartItem as CartItemType } from '@/lib/server/services/cartService';
 import { useOptimistic } from 'react';
 
 type Props = {
@@ -19,6 +19,10 @@ type Props = {
 
 export const CartItems = ({ cartItems, cartId }: Props) => {
   const [optimisticCart, dispatch] = useOptimistic(cartItems, cartReducer);
+
+  if (optimisticCart.length === 0) {
+    return <p>Your cart is empty</p>;
+  }
 
   return (
     <div>

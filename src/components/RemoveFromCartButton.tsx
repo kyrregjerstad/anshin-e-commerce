@@ -1,6 +1,6 @@
 'use client';
 
-import { removeItemFromCart } from '@/lib/server/cartService';
+import { removeItemFromCart } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/stores/useCartStore';
 import { Button } from './ui/button';
 

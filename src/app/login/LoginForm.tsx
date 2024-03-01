@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginActionResult } from '@/lib/server/auth/authService';
+import { LoginActionResult } from '@/lib/server/services/authService';
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 

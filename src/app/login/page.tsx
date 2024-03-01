@@ -1,5 +1,5 @@
 import { validateRequest } from '@/lib/auth';
-import { login } from '@/lib/server/auth/authService';
+import { login } from '@/lib/server/services/authService';
 import { redirect } from 'next/navigation';
 import { LoginForm } from './LoginForm';
 

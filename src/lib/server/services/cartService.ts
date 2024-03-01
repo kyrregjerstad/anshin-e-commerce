@@ -1,15 +1,83 @@
 'use server';
 
 import { and, asc, desc, eq } from 'drizzle-orm';
-import { db } from './db';
-import { cart, cartItems } from './tables';
+import { db } from '../db';
+import { cart, cartItems } from '../tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import { generateId } from './auth/utils';
+import { generateId } from '../auth/utils';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.id, cartId),
+    with: {
+      items: {
+        columns: {
+          quantity: true,
+        },
+        with: {
+          product: {
+            columns: {
+              id: true,
+              title: true,
+              priceInCents: true,
+              discountInCents: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!res) {
+    return [];
+  }
+
+  const transformedCart = res.items.map((item) => ({
+    ...item.product,
+    quantity: item.quantity,
+  }));
+
+  return transformedCart;
+}
+
+export async function getCartBySessionId(sessionId: string) {
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.sessionId, sessionId),
+    with: {
+      items: {
+        columns: {
+          quantity: true,
+        },
+        with: {
+          product: {
+            columns: {
+              id: true,
+              title: true,
+              priceInCents: true,
+              discountInCents: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!res) {
+    return [];
+  }
+
+  const transformedCart = res.items.map((item) => ({
+    ...item.product,
+    quantity: item.quantity,
+  }));
+
+  return transformedCart;
+}
+
+export async function getCartByUserId(userId: string) {
+  const res = await db.query.cart.findFirst({
+    where: eq(cart.userId, userId),
     with: {
       items: {
         columns: {

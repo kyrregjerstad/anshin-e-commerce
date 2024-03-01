@@ -6,17 +6,17 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
 import { ZodError } from 'zod';
-import { db } from '../db';
-import { cart, sessions, users } from '../tables';
 import {
   createBlankCartCookie,
   createBlankSessionCookie,
   createCartCookie,
   createSessionCookie,
   getSessionCookie,
-} from './cookies';
-import { generateId } from './utils';
-import { createCart, getOrCreateCart } from '../cartService';
+} from '../auth/cookies';
+import { db } from '../db';
+import { cart, sessions, users } from '../tables';
+import { getCartBySessionId, getOrCreateCart } from './cartService';
+import { createUserSession, getSessionDetails } from './sessionService';
 
 export type LoginActionResult =
   | {
@@ -61,6 +61,17 @@ export async function login(
     const session = await createUserSession(userId);
     const cartId = await getOrCreateCart(session.id, userId);
 
+    const guestSessionId = getSessionCookie();
+
+    if (guestSessionId) {
+      const guestSessionCartItems = await getCartBySessionId(guestSessionId);
+      const currentSessionCartItems = await getCartBySessionId(guestSessionId);
+
+      // Merge the guest cart with the current cart
+
+      await db.update(cart).set({}).where(eq(cart.id, cartId));
+    }
+
     const sessionCookie = createSessionCookie(session.id);
     const cartCookie = createCartCookie(cartId);
 
@@ -95,7 +106,7 @@ export async function logOut() {
 
   if (!sessionId) return;
 
-  const { session } = await validateSession(sessionId);
+  const { session } = await getSessionDetails(sessionId);
 
   if (!session) {
     return {
@@ -112,106 +123,4 @@ export async function logOut() {
   cookies().delete(cartCookie.name);
 
   revalidatePath('/');
-}
-
-async function createUserSession(userId: string) {
-  const userSession = {
-    id: generateId(),
-    userId,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
-  };
-
-  try {
-    await db.insert(sessions).values(userSession);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    return userSession;
-  }
-}
-
-export async function validateSession(sessionId: string) {
-  console.log(sessionId);
-  const res = await db.query.sessions.findFirst({
-    where: eq(sessions.id, sessionId),
-    columns: {
-      id: true,
-      expiresAt: true,
-    },
-    with: {
-      user: {
-        columns: {
-          id: true,
-          name: true,
-        },
-        with: {
-          cart: true,
-        },
-      },
-
-      cart: {
-        columns: {
-          id: true,
-        },
-        with: {
-          items: {
-            columns: {
-              quantity: true,
-            },
-            with: {
-              product: {
-                columns: {
-                  id: true,
-                  title: true,
-                  priceInCents: true,
-                  discountInCents: true,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  });
-
-  const transformedCart =
-    res?.cart?.items.map((item) => ({
-      ...item.product,
-      quantity: item.quantity,
-    })) ?? [];
-
-  console.log(res);
-
-  if (!res) {
-    return {
-      user: null,
-      session: null,
-      guest: true,
-      cart: transformedCart,
-    };
-  }
-
-  const session = {
-    id: res.id,
-    userId: res.user?.id ?? null,
-    expiresAt: res.expiresAt,
-    cartId: res.cart?.id,
-  };
-
-  if (!res.user) {
-    return {
-      user: null,
-      session,
-      guest: true,
-      cart: transformedCart,
-    };
-  }
-
-  const user = {
-    id: res.user.id,
-    name: res.user.name,
-    cartId: res.cart?.id ?? null,
-  };
-
-  return { user, session, guest: false, cart: transformedCart };
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CartIcon } from '@/components/CartIcon';
 import Link from 'next/link';
-import { getCart } from '@/lib/server/cartService';
+import { getCart } from '@/lib/server/services/cartService';
 
 import { LogOutButton } from './LogOutButton';
 import { DatabaseUser } from '@/lib/server/tables';
