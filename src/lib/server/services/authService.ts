@@ -14,10 +14,15 @@ import {
   getSessionCookie,
 } from '../auth/cookies';
 import { db } from '../db';
-import { cart, sessions, users } from '../tables';
-import { getCartBySessionId, getOrCreateCart } from './cartService';
+import { cart, cartItems, sessions, users } from '../tables';
+import {
+  getCartBySessionId,
+  getCartByUserId,
+  getOrCreateCart,
+} from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
 import { redirect } from 'next/navigation';
+import { CartItem } from './types';
 
 export type LoginActionResult =
   | {
@@ -34,6 +39,82 @@ export type LoginActionResult =
     }
   | null;
 
+async function verifyUserCredentials(email: string, password: string) {
+  const existingUser = await db.query.users.findFirst({
+    where: eq(users.email, email),
+  });
+
+  const validPassword = await new Argon2id().verify(
+    existingUser?.hashedPassword ?? '',
+    password
+  );
+
+  return { existingUser, validPassword };
+}
+
+async function clearGuestCart(guestSessionId: string) {
+  await db.transaction(async (tx) => {
+    await tx.delete(cart).where(eq(cart.id, guestSessionId));
+    await tx.delete(cartItems).where(eq(cartItems.cartId, guestSessionId));
+  });
+}
+
+async function mergeCarts(
+  guestSessionId: string,
+  userId: string,
+  cartId: string,
+  guestSessionCartItems: {
+    id: string;
+    title: string;
+    quantity: number;
+    priceInCents: number;
+    discountInCents: number;
+  }[]
+) {
+  const userCart = await getCartByUserId(userId);
+  const mergedCart = guestSessionCartItems.reduce(
+    (acc, guestItem) => {
+      const itemIndex = acc.findIndex((item) => item.id === guestItem.id);
+
+      if (itemIndex !== -1) {
+        acc[itemIndex].quantity += guestItem.quantity;
+      } else {
+        acc.push(guestItem);
+      }
+
+      return acc;
+    },
+    [...userCart]
+  );
+
+  const mergedCartItems = mergedCart.map((item) => ({
+    cartId,
+    productId: item.id,
+    quantity: item.quantity,
+  }));
+
+  await db.transaction(async (tx) => {
+    await tx.delete(cartItems).where(eq(cartItems.cartId, cartId));
+    await tx.insert(cartItems).values(mergedCartItems);
+    await tx.delete(cart).where(eq(cart.id, guestSessionId));
+    await tx.delete(cartItems).where(eq(cartItems.cartId, guestSessionId));
+  });
+}
+
+async function handleGuestCart(
+  guestSessionId: string,
+  userId: string,
+  cartId: string
+) {
+  const guestSessionCartItems = await getCartBySessionId(guestSessionId);
+
+  if (guestSessionCartItems.length === 0) {
+    await clearGuestCart(guestSessionId);
+  } else {
+    await mergeCarts(guestSessionId, userId, cartId, guestSessionCartItems);
+  }
+}
+
 export async function login(
   _prevState: LoginActionResult | null,
   data: FormData
@@ -41,12 +122,8 @@ export async function login(
   try {
     const { email, password } = loginSchema.parse(data);
 
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-
-    const validPassword = await new Argon2id().verify(
-      existingUser?.hashedPassword ?? '',
+    const { existingUser, validPassword } = await verifyUserCredentials(
+      email,
       password
     );
 
@@ -64,43 +141,39 @@ export async function login(
 
     const guestSessionId = getSessionCookie();
 
-    console.log('session', session);
     if (guestSessionId) {
-      const guestSessionCartItems = await getCartBySessionId(guestSessionId);
-      const currentSessionCartItems = await getCartBySessionId(guestSessionId);
-
-      // Merge the guest cart with the current cart
-
-      // await db.update(cart).set({}).where(eq(cart.id, cartId));
+      await handleGuestCart(guestSessionId, userId, cartId);
     }
 
     const sessionCookie = createSessionCookie(session.id);
-    // const cartCookie = createCartCookie(cartId);
 
     cookies().set(sessionCookie.name, sessionCookie.value);
-    // cookies().set(cartCookie.name, cartCookie.value);
 
     return {
       status: 'success',
       message: 'Logged in successfully',
     };
   } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        status: 'error',
-        message: 'Invalid form data',
-        errors: error.issues.map((issue) => ({
-          path: issue.path.join('.'),
-          message: `server: ${issue.message}`,
-        })),
-      };
-    }
+    return handleError(error);
+  }
+}
 
+function handleError(error: any) {
+  if (error instanceof ZodError) {
     return {
       status: 'error',
-      message: 'Something went wrong. Please try again.',
-    };
+      message: 'Invalid form data',
+      errors: error.issues.map((issue) => ({
+        path: issue.path.join('.'),
+        message: `server: ${issue.message}`,
+      })),
+    } as const;
   }
+
+  return {
+    status: 'error',
+    message: 'Something went wrong. Please try again.',
+  } as const;
 }
 
 export async function logOut() {
