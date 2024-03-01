@@ -9,7 +9,6 @@ import { ZodError } from 'zod';
 import {
   createBlankCartCookie,
   createBlankSessionCookie,
-  createCartCookie,
   createSessionCookie,
   getSessionCookie,
 } from '../auth/cookies';
@@ -21,8 +20,6 @@ import {
   getOrCreateCart,
 } from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
-import { redirect } from 'next/navigation';
-import { CartItem } from './types';
 
 export type LoginActionResult =
   | {
@@ -38,6 +35,49 @@ export type LoginActionResult =
       }>;
     }
   | null;
+
+export async function login(
+  _prevState: LoginActionResult | null,
+  data: FormData
+): Promise<LoginActionResult> {
+  try {
+    const { email, password } = loginSchema.parse(data);
+
+    const { existingUser, validPassword } = await verifyUserCredentials(
+      email,
+      password
+    );
+
+    if (!validPassword || !existingUser) {
+      return {
+        status: 'error',
+        message: 'Incorrect email or password',
+      };
+    }
+
+    const { id: userId } = existingUser;
+
+    const session = await createUserSession(userId);
+    const cartId = await getOrCreateCart(session.id, userId);
+
+    const guestSessionId = getSessionCookie();
+
+    if (guestSessionId) {
+      await handleGuestCart(guestSessionId, userId, cartId);
+    }
+
+    const sessionCookie = createSessionCookie(session.id);
+
+    cookies().set(sessionCookie.name, sessionCookie.value);
+
+    return {
+      status: 'success',
+      message: 'Logged in successfully',
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
 
 async function verifyUserCredentials(email: string, password: string) {
   const existingUser = await db.query.users.findFirst({
@@ -112,49 +152,6 @@ async function handleGuestCart(
     await clearGuestCart(guestSessionId);
   } else {
     await mergeCarts(guestSessionId, userId, cartId, guestSessionCartItems);
-  }
-}
-
-export async function login(
-  _prevState: LoginActionResult | null,
-  data: FormData
-): Promise<LoginActionResult> {
-  try {
-    const { email, password } = loginSchema.parse(data);
-
-    const { existingUser, validPassword } = await verifyUserCredentials(
-      email,
-      password
-    );
-
-    if (!validPassword || !existingUser) {
-      return {
-        status: 'error',
-        message: 'Incorrect email or password',
-      };
-    }
-
-    const { id: userId } = existingUser;
-
-    const session = await createUserSession(userId);
-    const cartId = await getOrCreateCart(session.id, userId);
-
-    const guestSessionId = getSessionCookie();
-
-    if (guestSessionId) {
-      await handleGuestCart(guestSessionId, userId, cartId);
-    }
-
-    const sessionCookie = createSessionCookie(session.id);
-
-    cookies().set(sessionCookie.name, sessionCookie.value);
-
-    return {
-      status: 'success',
-      message: 'Logged in successfully',
-    };
-  } catch (error) {
-    return handleError(error);
   }
 }
 
