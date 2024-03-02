@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import { StarRating } from './StarRating';
 import { Button } from './ui/button';
+import Link from 'next/link';
 
 type Props = {
   product: Product;
@@ -17,38 +18,61 @@ type Props = {
 };
 
 export const GridItem = ({ sessionData, product, cartItems }: Props) => {
-  const { title, description, images } = product;
+  const { title, description, imageUrl, averageRating, onSale } = product;
 
   const isInCart = cartItems.some((item) => item.id === product.id);
 
-  const coverImageUrl = images[0]?.url;
   return (
-    <Card className="flex aspect-square flex-col overflow-hidden rounded-2xl">
+    <Card className="group flex aspect-square flex-col overflow-hidden rounded-2xl">
       <div className="relative aspect-square overflow-hidden">
-        <Image
-          src={coverImageUrl}
-          width={300}
-          height={300}
-          alt="test"
-          className="absolute h-full w-full object-cover"
-        />
+        <Link href={`/product/${product.id}`}>
+          <Image
+            src={imageUrl}
+            width={300}
+            height={300}
+            alt="test"
+            className="absolute h-full w-full object-cover"
+          />
+        </Link>
         <Button
-          className="absolute right-0 top-0 rounded-full opacity-20 transition-opacity duration-500 hover:opacity-100"
+          className="absolute left-0 top-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
           variant="ghost"
           size="icon"
         >
           <Heart />
         </Button>
+        <Button
+          size="icon"
+          variant="ghost"
+          className="absolute right-0 top-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        >
+          <AddToCartIcon />
+        </Button>
       </div>
       <div className="relative">
-        <div className="absolute top-0 -translate-y-1/2 rounded-r-md border-t bg-gradient-to-tr from-tea-100 to-tea-50 p-2">
-          <span className="font-medium">{title}</span>
+        <div className="absolute top-0 max-w-40 -translate-y-1/2 truncate rounded-r-md border-t bg-gradient-to-tr from-tea-100 to-tea-50 p-2">
+          <Link
+            href={`/product/${product.id}`}
+            className="font-medium hover:underline"
+          >
+            {title}
+          </Link>
         </div>
-        <div className="flex items-center justify-between p-2">
-          <StarRating rating={4} />
-          <Button size="icon" variant="ghost">
-            <AddToCartIcon />
-          </Button>
+        <div className="flex items-center justify-between p-2 pb-2 pt-4">
+          <StarRating rating={averageRating} />
+
+          <div className="relative flex flex-col text-end">
+            {onSale ? (
+              <>
+                <span className="absolute -top-3 right-0 text-xs line-through opacity-40">
+                  ${product.price}
+                </span>
+                <span className="font-bold">${product.discountPrice}</span>
+              </>
+            ) : (
+              <span className="font-bold">${product.price}</span>
+            )}
+          </div>
         </div>
       </div>
     </Card>
