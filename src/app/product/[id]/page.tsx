@@ -13,6 +13,7 @@ import { notFound } from 'next/navigation';
 
 import { z } from 'zod';
 import { validateRequest } from '@/lib/auth';
+import { StarRating } from '@/components/StarRating';
 
 const paramsSchema = z.object({
   id: z.string().length(36),
@@ -150,21 +151,5 @@ const ReviewCard = ({ review }: ReviewCardProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-};
-
-const StarRating = ({ rating }: { rating: number }) => {
-  return (
-    <div className="flex items-center gap-1">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <StarIcon
-          className={cn(
-            'size-4',
-            rating > index ? 'fill-primary' : 'fill-muted'
-          )}
-          key={index}
-        />
-      ))}
-    </div>
   );
 };
