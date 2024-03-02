@@ -19,7 +19,7 @@ export const RemoveFromCartButton = ({ itemId, dispatch }: Props) => {
           itemId,
         });
 
-        await removeItemFromCart(itemId);
+        // await removeItemFromCart(itemId);
       }}
     >
       <Button variant="ghost" type="submit">

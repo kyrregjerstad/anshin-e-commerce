@@ -10,10 +10,9 @@ export function transformCartItems(items: CartItem[] | null): Cart[] {
   }));
 }
 
-export function getEmptySessionDetails(): ValidateSessionResult {
+export function getEmptySessionDetails() {
   return {
     user: null,
-    session: null,
     cart: [],
     cartId: null,
   };
