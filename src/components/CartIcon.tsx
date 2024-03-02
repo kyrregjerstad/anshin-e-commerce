@@ -15,9 +15,11 @@ export const CartIcon = ({ cartItems }: { cartItems: CartItem[] }) => {
   const cartAmount = items.reduce((acc, { quantity }) => acc + quantity, 0);
 
   return (
-    <div className="relative">
-      <IconSvg cartAmount={cartAmount} />
-      <AnimatedCartCounter cartAmount={cartAmount} />
+    <div className="px-2">
+      <div className="relative">
+        <IconSvg cartAmount={cartAmount} />
+        <AnimatedCartCounter cartAmount={cartAmount} />
+      </div>
     </div>
   );
 };
@@ -36,8 +38,8 @@ const AnimatedCartCounter = ({
           {cartAmount > 0 && (
             <m.div
               key={cartAmount}
-              initial={{ x: 0, y: 40, opacity: 0 }}
-              animate={{ x: 0, y: 6, opacity: 1 }}
+              initial={{ x: 0, y: 30, opacity: 0 }}
+              animate={{ x: 0, y: 5, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ type: 'tween', duration: 0.2 }}
             >

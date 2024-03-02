@@ -3,9 +3,6 @@ import { devtools } from 'zustand/middleware';
 
 export type CartItem = {
   id: string;
-  title: string;
-  priceInCents: number;
-  discountInCents: number;
   quantity: number;
 };
 
