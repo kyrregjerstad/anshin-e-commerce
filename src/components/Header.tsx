@@ -16,7 +16,7 @@ type Props = {
 export const Header = async ({ user, cart }: Props) => {
   return (
     <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
-      <nav className="max-w- flex w-full items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
+      <nav className="flex w-full max-w-8xl items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
         <UserAccountMenu user={user}>
           <CircleUserRound />
         </UserAccountMenu>
