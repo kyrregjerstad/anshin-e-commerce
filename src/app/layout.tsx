@@ -22,7 +22,9 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Header user={user} cart={cart} />
-        {children}
+        <div className="flex flex-col items-center justify-center">
+          {children}
+        </div>
       </body>
     </html>
   );
