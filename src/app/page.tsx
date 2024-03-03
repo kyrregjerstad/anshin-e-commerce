@@ -16,7 +16,7 @@ export default async function Home() {
             All Products
           </h3>
           <section className="flex w-full flex-col">
-            <div className="grid w-full grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 xl:grid-cols-5 xl:gap-8 2xl:grid-cols-5 2xl:gap-12">
+            <div className="xs:grid-cols-2 grid w-full gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
               {allProducts.map((product) => (
                 <GridItem
                   key={product.id}

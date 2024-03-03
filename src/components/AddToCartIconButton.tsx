@@ -13,8 +13,12 @@ type Props = {
     cartId: string | null;
   };
   product: Product;
-};
-export const AddToCartIconButton = ({ sessionData, product }: Props) => {
+} & React.ComponentPropsWithoutRef<'form'>;
+export const AddToCartIconButton = ({
+  sessionData,
+  product,
+  ...props
+}: Props) => {
   const { addItem } = useCartStore();
 
   return (
@@ -32,12 +36,9 @@ export const AddToCartIconButton = ({ sessionData, product }: Props) => {
           },
         });
       }}
+      {...props}
     >
-      <Button
-        size="icon"
-        variant="ghost"
-        className="absolute right-0 top-0 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      >
+      <Button size="icon" variant="ghost" className="p-0">
         <AddToCartIcon />
         <span className="sr-only">Add to Cart</span>
       </Button>

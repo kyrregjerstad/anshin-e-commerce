@@ -18,6 +18,9 @@ const config = {
       },
     },
     extend: {
+      screens: {
+        xs: '400px',
+      },
       maxWidth: {
         '8xl': '88rem',
         '9xl': '105rem',
