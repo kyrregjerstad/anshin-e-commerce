@@ -142,10 +142,12 @@ export const cartRelations = relations(cart, ({ one, many }) => ({
 }));
 
 export const cartItems = mysqlTable('cart_items', {
-  cartId: varchar('id', { length: 64 }).references(() => cart.id, {
+  cartId: varchar('cart_id', { length: 64 }).references(() => cart.id, {
     onDelete: 'cascade',
   }),
   productId: varchar('product_id', { length: 36 })
+    .primaryKey()
+    .unique()
     .notNull()
     .references(() => products.id, { onDelete: 'cascade' }),
   quantity: smallint('quantity', { unsigned: true }).notNull(),

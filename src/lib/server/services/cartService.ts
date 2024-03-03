@@ -1,6 +1,6 @@
 'use server';
 
-import { and, asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { cart, cartItems } from '../tables';
 import { revalidatePath } from 'next/cache';
@@ -178,9 +178,6 @@ export async function addItemToCart({
   const { sessionId, userId, cartId } = sessionData;
   const { productId, quantity } = product;
 
-  console.log('SESSION ID: ', sessionId);
-  console.log('USER ID: ', userId);
-
   const selectedCartId = cartId || (await createCart(sessionId, userId));
 
   await db
@@ -192,7 +189,7 @@ export async function addItemToCart({
     })
     .onDuplicateKeyUpdate({
       set: {
-        quantity: quantity,
+        quantity: sql`${cartItems.quantity} + ${quantity}`,
       },
     });
 
