@@ -21,6 +21,7 @@ import { StarRating } from '@/components/StarRating';
 import { Review, getProductById } from '@/lib/server/productService';
 import { HeartIcon, StarIcon } from 'lucide-react';
 import Image from 'next/image';
+import { ProductInteractions } from './ProductInteractions';
 const paramsSchema = z.object({
   id: z.string().length(36),
 });
@@ -68,42 +69,18 @@ export default async function ProductDetailsPage({ params }: Props) {
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
-              <h1 className="text-3xl font-bold">{title}</h1>
-            </div>
+            <h1 className="text-3xl font-bold">{title}</h1>
             <StarRating rating={averageRating} />
             <p>{description}</p>
           </div>
-
-          <form className="grid gap-4 md:gap-10">
-            <div className="flex items-end gap-4">
-              <div>
-                <Label className="text-base" htmlFor="quantity">
-                  Quantity
-                </Label>
-                <Select defaultValue="1">
-                  <SelectTrigger className="w-24">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1</SelectItem>
-                    <SelectItem value="2">2</SelectItem>
-                    <SelectItem value="3">3</SelectItem>
-                    <SelectItem value="4">4</SelectItem>
-                    <SelectItem value="5">5</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="text-4xl font-bold">${price}</div>
-            </div>
-            <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Button size="lg">Add to cart</Button>
-              <Button size="lg" variant="outline">
-                <HeartIcon className="mr-2 h-4 w-4" />
-                Add to wishlist
-              </Button>
-            </div>
-          </form>
+          <ProductInteractions
+            {...product}
+            sessionData={{
+              sessionId: session.id,
+              cartId,
+              userId: user?.id || null,
+            }}
+          />
         </div>
         <Image
           alt="Product Image"
