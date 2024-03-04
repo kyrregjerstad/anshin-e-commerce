@@ -147,10 +147,11 @@ export async function removeItemFromCart(
   revalidatePath('/cart');
 }
 
-export async function updateItemQuantity(itemId: string, quantity: number) {
-  const cartId = getCartIdCookie();
-  if (!cartId) return;
-
+export async function updateItemQuantity(
+  cartId: string,
+  itemId: string,
+  quantity: number
+) {
   await db
     .update(cartItems)
     .set({ quantity })
