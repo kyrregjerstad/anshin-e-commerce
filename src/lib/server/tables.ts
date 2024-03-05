@@ -141,17 +141,23 @@ export const cartRelations = relations(cart, ({ one, many }) => ({
   }),
 }));
 
-export const cartItems = mysqlTable('cart_items', {
-  cartId: varchar('cart_id', { length: 64 }).references(() => cart.id, {
-    onDelete: 'cascade',
-  }),
-  productId: varchar('product_id', { length: 36 })
-    .primaryKey()
-    .unique()
-    .notNull()
-    .references(() => products.id, { onDelete: 'cascade' }),
-  quantity: smallint('quantity', { unsigned: true }).notNull(),
-});
+export const cartItems = mysqlTable(
+  'cart_items',
+  {
+    cartId: varchar('cart_id', { length: 64 })
+      .notNull()
+      .references(() => cart.id, {
+        onDelete: 'cascade',
+      }),
+    productId: varchar('product_id', { length: 36 })
+      .notNull()
+      .references(() => products.id, { onDelete: 'cascade' }),
+    quantity: smallint('quantity', { unsigned: true }).notNull(),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.cartId, table.productId] }),
+  })
+);
 
 export type InsertCartItems = InferInsertModel<typeof cartItems>;
 

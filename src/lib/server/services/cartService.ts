@@ -179,7 +179,9 @@ export async function addItemToCart({
   const { sessionId, userId, cartId } = sessionData;
   const { productId, quantity } = product;
 
-  const selectedCartId = cartId || (await createCart(sessionId, userId));
+  const selectedCartId = await getOrCreateCart(sessionId, userId);
+
+  console.log(selectedCartId, productId, quantity);
 
   await db
     .insert(cartItems)
@@ -211,12 +213,27 @@ function getCartIdCookie() {
 
 export async function createCart(sessionId: string, userId?: string | null) {
   const cartId = generateId();
-  console.log(sessionId);
   await db.insert(cart).values({ id: cartId, sessionId, userId });
   return cartId;
 }
 
-export async function getOrCreateCart(sessionId: string, userId: string) {
+export async function getOrCreateCart(
+  sessionId: string,
+  userId: string | null
+) {
+  if (!userId) {
+    const res = await db.query.cart.findFirst({
+      where: eq(cart.sessionId, sessionId),
+      orderBy: [desc(cart.updatedAt)],
+    });
+
+    if (!res) {
+      return createCart(sessionId, userId);
+    }
+
+    return res.id;
+  }
+
   const res = await db.query.cart.findFirst({
     where: eq(cart.userId, userId),
     orderBy: [desc(cart.updatedAt)],

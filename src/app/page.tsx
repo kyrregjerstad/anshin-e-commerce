@@ -5,6 +5,7 @@ import { HeroSection } from './HeroSection';
 
 export default async function Home() {
   const { user, cart, cartId, session } = await validateRequest();
+
   const allProducts = await getAllProducts();
 
   return (
@@ -16,7 +17,7 @@ export default async function Home() {
             All Products
           </h3>
           <section className="flex w-full flex-col">
-            <div className="xs:grid-cols-2 grid w-full gap-4 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
+            <div className="grid w-full gap-4 xs:grid-cols-2 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
               {allProducts.map((product) => (
                 <GridItem
                   key={product.id}
