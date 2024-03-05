@@ -32,7 +32,9 @@ export const UserAccountMenu = ({ children, user }: Props) => {
           <>
             <DropdownMenuLabel>Hi, {user.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Account</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/account">Account</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>My Orders</DropdownMenuItem>
             <DropdownMenuItem>Help</DropdownMenuItem>
             <DropdownMenuSeparator />

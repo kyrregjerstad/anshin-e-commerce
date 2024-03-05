@@ -25,9 +25,9 @@ export default async function RootLayout({
       <Analytics />
       <body className={inter.className}>
         <Header user={user} cart={cart} />
-        <div className="flex flex-col items-center justify-center">
+        <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 sm:p-8">
           {children}
-        </div>
+        </main>
         <div className="py-12" />
         <Footer />
       </body>

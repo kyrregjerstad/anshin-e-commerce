@@ -1,26 +1,14 @@
-import { Label } from '@/components/ui/label';
-import {
-  SelectValue,
-  SelectTrigger,
-  SelectItem,
-  SelectContent,
-  Select,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { AvatarImage, AvatarFallback, Avatar } from '@/components/ui/avatar';
-import { CardContent, Card } from '@/components/ui/card';
+import { StarRating } from '@/components/StarRating';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
 import { validateRequest } from '@/lib/auth';
-import { db } from '@/lib/server/db';
-import { products, images, reviews } from '@/lib/server/tables';
-import { eq, sql } from 'drizzle-orm';
+import { Review, getProductById } from '@/lib/server/productService';
+import { StarIcon } from 'lucide-react';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
-import { StarRating } from '@/components/StarRating';
-import { Review, getProductById } from '@/lib/server/productService';
-import { HeartIcon, StarIcon } from 'lucide-react';
-import Image from 'next/image';
 import { ProductInteractions } from './ProductInteractions';
 const paramsSchema = z.object({
   id: z.string().length(36),
