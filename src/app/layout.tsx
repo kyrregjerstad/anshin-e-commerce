@@ -4,6 +4,7 @@ import './globals.css';
 import { Header } from '@/components/Header';
 import { validateRequest } from '@/lib/auth';
 import { Analytics } from '@/components/Analytics';
+import Link from 'next/link';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -27,7 +28,24 @@ export default async function RootLayout({
         <div className="flex flex-col items-center justify-center">
           {children}
         </div>
+        <div className="py-12" />
+        <Footer />
       </body>
     </html>
   );
 }
+
+const Footer = () => {
+  const currentYear = new Date().getFullYear();
+  return (
+    <footer className="flex min-h-20 w-full flex-col items-center justify-center bg-card p-4">
+      <span className="flex flex-col items-center">
+        <span>Made with ❤️</span>
+        <Link href="https://kyrre.dev" className="hover:underline">
+          Kyrre Gjerstad
+        </Link>
+        Anshin &copy; {currentYear}
+      </span>
+    </footer>
+  );
+};
