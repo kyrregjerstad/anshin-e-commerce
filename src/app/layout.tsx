@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/Header';
 import { validateRequest } from '@/lib/auth';
+import { Analytics } from '@/components/Analytics';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,6 +21,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <Analytics />
       <body className={inter.className}>
         <Header user={user} cart={cart} />
         <div className="flex flex-col items-center justify-center">
