@@ -1,19 +1,14 @@
 'use client';
 
-import Link from 'next/link';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { Button } from '@/components/ui/button';
 import {
-  CardTitle,
-  CardHeader,
+  Card,
   CardContent,
   CardFooter,
-  Card,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
-import { ErrorMessage } from '@hookform/error-message';
-import { Button } from '@/components/ui/button';
-import { useFormState, useFormStatus } from 'react-dom';
-import React, { useEffect } from 'react';
-import { type FieldPath, useForm, UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
 import {
   Form,
   FormControl,
@@ -23,29 +18,39 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { registerSchema } from '@/lib/schema/registerSchema';
 import { LoginActionResult } from '@/lib/server/services/authService';
-import { loginSchema } from '@/lib/schema/loginSchema';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { ErrorMessage } from '@hookform/error-message';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
+import { UseFormReturn, useForm, type FieldPath } from 'react-hook-form';
+import { z } from 'zod';
 
-type FormValues = z.infer<typeof loginSchema>;
+type FormValues = z.infer<typeof registerSchema>;
 
 type Props = {
-  loginFn: (prevState: any, formData: FormData) => Promise<LoginActionResult>;
+  registerFn: (
+    prevState: any,
+    formData: FormData
+  ) => Promise<LoginActionResult>;
 };
-export const LoginForm = ({ loginFn }: Props) => {
+export const RegisterForm = ({ registerFn }: Props) => {
   const [state, formAction] = useFormState<LoginActionResult, FormData>(
-    loginFn,
+    registerFn,
     null
   );
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(registerSchema),
     criteriaMode: 'all',
     defaultValues: {
+      name: '',
       email: '',
       password: '',
+      repeatPassword: '',
     },
   });
 
@@ -55,6 +60,8 @@ export const LoginForm = ({ loginFn }: Props) => {
     if (!state) {
       return;
     }
+
+    console.log(state);
     if (state.status === 'error') {
       state.errors?.forEach((error) => {
         setError(error.path as FieldPath<FormValues>, {
@@ -71,7 +78,7 @@ export const LoginForm = ({ loginFn }: Props) => {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>User Login</CardTitle>
+        <CardTitle>Register</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -81,9 +88,9 @@ export const LoginForm = ({ loginFn }: Props) => {
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col items-center">
-        <span className="text-sm">Don't have an account?</span>
-        <Link className="text-sm font-medium" href="/register">
-          Sign up
+        <span className="text-sm">Already have an account?</span>
+        <Link className="text-sm font-medium" href="/login">
+          Log in
         </Link>
       </CardFooter>
     </Card>
@@ -103,6 +110,21 @@ export const FormContent = ({ form }: FormContentProps) => {
 
   return (
     <>
+      <FormField
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel htmlFor="name">Name</FormLabel>
+            <FormControl>
+              <Input placeholder="your name" {...field} />
+            </FormControl>
+            <FormMessage>
+              <ErrorMessage errors={errors} name="name" />
+            </FormMessage>
+          </FormItem>
+        )}
+      />
       <FormField
         control={control}
         name="email"
@@ -133,8 +155,23 @@ export const FormContent = ({ form }: FormContentProps) => {
           </FormItem>
         )}
       />
+      <FormField
+        control={control}
+        name="repeatPassword"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel htmlFor="repeatPassword">Repeat Password</FormLabel>
+            <FormControl>
+              <Input type="password" placeholder="repeat password" {...field} />
+            </FormControl>
+            <FormMessage>
+              <ErrorMessage errors={errors} name="repeatPassword" />
+            </FormMessage>
+          </FormItem>
+        )}
+      />
       <Button type="submit">
-        {pending ? <LoadingSpinner /> : <span>Login</span>}
+        {pending ? <LoadingSpinner /> : <span>Register</span>}
       </Button>
     </>
   );

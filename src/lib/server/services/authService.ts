@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
-import { ZodError } from 'zod';
+import { ZodError, ZodIssueCode } from 'zod';
 import {
   createBlankCartCookie,
   createBlankSessionCookie,
@@ -20,6 +20,8 @@ import {
   getOrCreateCart,
 } from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
+import { registerSchema } from '@/lib/schema/registerSchema';
+import { generateId } from '../auth/utils';
 
 export type LoginActionResult =
   | {
@@ -73,6 +75,83 @@ export async function login(
     return {
       status: 'success',
       message: 'Logged in successfully',
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+type RegisterActionResult =
+  | {
+      status: 'success';
+      message: string;
+    }
+  | {
+      status: 'error';
+      message: string;
+      errors?: Array<{
+        path: string;
+        message: string;
+      }>;
+    }
+  | null;
+
+export async function register(
+  _prevState: LoginActionResult | null,
+  data: FormData
+): Promise<RegisterActionResult> {
+  try {
+    const { name, email, password, repeatPassword } =
+      registerSchema.parse(data);
+
+    if (password !== repeatPassword) {
+      return {
+        status: 'error',
+        message: 'Passwords do not match',
+      };
+    }
+
+    const existingUser = await db.query.users.findFirst({
+      where: eq(users.email, email),
+    });
+
+    if (existingUser) {
+      const error = new ZodError([]);
+      error.addIssue({
+        code: ZodIssueCode.custom,
+        message: 'User already exists',
+        path: ['email'],
+      });
+
+      throw error;
+    }
+
+    const newUserId = generateId();
+    const hashedPassword = await new Argon2id().hash(password);
+
+    await db.insert(users).values({
+      id: newUserId,
+      name,
+      email,
+      hashedPassword,
+    });
+
+    const session = await createUserSession(newUserId);
+    const cartId = await getOrCreateCart(session.id, newUserId);
+
+    const guestSessionId = getSessionCookie();
+
+    if (guestSessionId) {
+      await handleGuestCart(guestSessionId, newUserId, cartId);
+    }
+
+    const sessionCookie = createSessionCookie(session.id);
+
+    cookies().set(sessionCookie.name, sessionCookie.value);
+
+    return {
+      status: 'success',
+      message: 'Registered and logged in successfully',
     };
   } catch (error) {
     return handleError(error);
@@ -162,7 +241,7 @@ function handleError(error: any) {
       message: 'Invalid form data',
       errors: error.issues.map((issue) => ({
         path: issue.path.join('.'),
-        message: `server: ${issue.message}`,
+        message: `${issue.message}`,
       })),
     } as const;
   }
