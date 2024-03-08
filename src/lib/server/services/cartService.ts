@@ -2,10 +2,12 @@
 
 import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { db } from '../db';
-import { cart, cartItems } from '../tables';
+import { cart, cartItems, sessions, users } from '../tables';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { generateId } from '../auth/utils';
+import { getSessionCookie } from '../auth/cookies';
+import { Product } from '../productService';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
@@ -161,27 +163,29 @@ export async function updateItemQuantity(
 }
 
 type AddItemToCartParams = {
-  sessionData: {
-    sessionId: string;
-    userId: string | null;
-    cartId: string | null;
-  };
-  product: {
-    productId: string;
-    quantity: number;
-  };
+  productId: string;
+  quantity: number;
 };
 
 export async function addItemToCart({
-  sessionData,
-  product,
+  productId,
+  quantity,
 }: AddItemToCartParams) {
-  const { sessionId, userId, cartId } = sessionData;
-  const { productId, quantity } = product;
+  const sessionId = getSessionCookie();
 
-  const selectedCartId = await getOrCreateCart(sessionId, userId);
+  // TODO: handle this better
+  if (!sessionId) {
+    throw new Error('Session not found');
+  }
 
-  console.log(selectedCartId, productId, quantity);
+  const session = await getSessionDetails(sessionId);
+
+  // TODO: handle this better
+  if (!session) {
+    throw new Error('Session not found');
+  }
+
+  const selectedCartId = await getOrCreateCart(session);
 
   await db
     .insert(cartItems)
@@ -201,6 +205,31 @@ export async function addItemToCart({
 
 export type CartItem = Awaited<ReturnType<typeof getCartById>>[number];
 
+async function getSessionDetails(sessionId: string) {
+  return await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+    with: {
+      user: {
+        columns: {
+          id: true,
+        },
+        with: {
+          cart: {
+            columns: {
+              id: true,
+            },
+          },
+        },
+      },
+      cart: {
+        columns: {
+          id: true,
+        },
+      },
+    },
+  });
+}
+
 function getCartIdCookie() {
   const cartIdCookie = cookies().get('cartId')?.value;
 
@@ -212,40 +241,70 @@ function getCartIdCookie() {
 }
 
 export async function createCart(sessionId: string, userId?: string | null) {
-  const cartId = generateId();
-  await db.insert(cart).values({ id: cartId, sessionId, userId });
+  const cartId = generateId({ guest: !userId });
+  await db.insert(cart).values({ id: cartId, sessionId, userId }).execute();
   return cartId;
 }
 
-export async function getOrCreateCart(
-  sessionId: string,
-  userId: string | null
-) {
-  if (!userId) {
-    const res = await db.query.cart.findFirst({
-      where: eq(cart.sessionId, sessionId),
-      orderBy: [desc(cart.updatedAt)],
-    });
-
-    if (!res) {
-      return createCart(sessionId, userId);
-    }
-
-    return res.id;
+type Session = {
+  id: string;
+  cart: {
+    id: string;
+  } | null;
+  user: {
+    id: string;
+    cart: {
+      id: string | undefined;
+    };
+  } | null;
+};
+export async function getOrCreateCart(session: Session) {
+  if (session.cart?.id) {
+    return session.cart.id;
   }
 
-  const res = await db.query.cart.findFirst({
-    where: eq(cart.userId, userId),
-    orderBy: [desc(cart.updatedAt)],
+  if (session.user?.cart.id) {
+    return session.user.cart.id;
+  }
+
+  const newCart = await createCart(session.id, session.user?.id);
+
+  return newCart;
+}
+
+export async function checkForItemsInCart(
+  allProducts: Product[],
+  sessionId: string | null
+) {
+  if (!sessionId) {
+    return allProducts.map((product) => ({
+      ...product,
+      inCart: false,
+    }));
+  }
+
+  const sessionCart = await db.query.cart.findFirst({
+    where: eq(cart.sessionId, sessionId),
+    columns: {
+      userId: false,
+      id: false,
+      createdAt: false,
+      updatedAt: false,
+      sessionId: false,
+    },
+    with: {
+      items: {
+        columns: {
+          productId: true,
+        },
+      },
+    },
   });
 
-  if (!res) {
-    return createCart(sessionId, userId);
-  }
+  const sessionCartItems = sessionCart?.items || [];
 
-  if (res.sessionId !== sessionId) {
-    await db.update(cart).set({ sessionId }).where(eq(cart.id, res.id));
-  }
-
-  return res.id;
+  return allProducts.map((product) => ({
+    ...product,
+    inCart: sessionCartItems.some(({ productId }) => productId === product.id),
+  }));
 }

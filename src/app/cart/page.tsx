@@ -13,6 +13,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { QuantitySelector } from './QuantitySelector.1';
+import { formatUSD } from './utils';
 
 export type CartItem = {
   title: string;
@@ -68,7 +69,7 @@ const CartPage = async () => {
               >
                 {item.title}
               </Link>
-              <QuantitySelector cartId={cartId} item={item} />
+              {/* <QuantitySelector cartId={cartId} item={item} /> */}
               <span className="font-bold">{formatUSD(item.totalPrice)}</span>
             </CardContent>
           </Card>
@@ -160,11 +161,4 @@ async function getCustomerCart(cartId: string) {
   }
 
   return customerCart[0];
-}
-
-export function formatUSD(value: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(value);
 }

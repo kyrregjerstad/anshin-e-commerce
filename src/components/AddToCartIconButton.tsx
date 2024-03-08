@@ -1,24 +1,15 @@
 'use client';
 
+import { Product } from '@/lib/server/productService';
+import { addItemToCart } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/stores/useCartStore';
 import React from 'react';
 import { Button } from './ui/button';
-import { Product } from '@/lib/server/productService';
-import { addItemToCart } from '@/lib/server/services/cartService';
 
 type Props = {
-  sessionData: {
-    sessionId: string;
-    userId: string | null;
-    cartId: string | null;
-  };
   product: Product;
 } & React.ComponentPropsWithoutRef<'form'>;
-export const AddToCartIconButton = ({
-  sessionData,
-  product,
-  ...props
-}: Props) => {
+export const AddToCartIconButton = ({ product, ...props }: Props) => {
   const { addItem } = useCartStore();
 
   return (
@@ -29,11 +20,8 @@ export const AddToCartIconButton = ({
           quantity: 1,
         });
         await addItemToCart({
-          sessionData,
-          product: {
-            productId: product.id,
-            quantity: 1,
-          },
+          productId: product.id,
+          quantity: 1,
         });
       }}
       {...props}

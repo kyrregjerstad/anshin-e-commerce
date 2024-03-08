@@ -1,27 +1,19 @@
 import { Card } from '@/components/ui/card';
 import { Product } from '@/lib/server/productService';
-import { CartItem } from '@/lib/server/services/cartService';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
-import { StarRating } from './StarRating';
-import { Button } from './ui/button';
 import Link from 'next/link';
 import { AddToCartIconButton } from './AddToCartIconButton';
+import { StarRating } from './StarRating';
+import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 type Props = {
-  product: Product;
-  cartItems: CartItem[];
-  sessionData: {
-    sessionId: string;
-    userId: string | null;
-    cartId: string | null;
-  };
+  product: Product & { inCart: boolean };
 };
 
-export const GridItem = ({ sessionData, product, cartItems }: Props) => {
-  const { title, description, imageUrl, averageRating, onSale } = product;
-
-  const isInCart = cartItems.some((item) => item.id === product.id);
+export const GridItem = async ({ product }: Props) => {
+  const { title, imageUrl, averageRating, onSale, inCart } = product;
 
   return (
     <Card className="group flex flex-col overflow-hidden rounded-2xl sm:aspect-square">
@@ -44,9 +36,11 @@ export const GridItem = ({ sessionData, product, cartItems }: Props) => {
         </Button>
 
         <AddToCartIconButton
-          sessionData={sessionData}
           product={product}
-          className="absolute right-0 top-0 hidden rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block"
+          className={cn(
+            'absolute right-0 top-0 hidden rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block',
+            inCart && 'opacity-100'
+          )}
         />
       </div>
       <div className="relative">
@@ -74,7 +68,6 @@ export const GridItem = ({ sessionData, product, cartItems }: Props) => {
               )}
             </div>
             <AddToCartIconButton
-              sessionData={sessionData}
               product={product}
               className="translate-x-3 translate-y-1 self-end p-0 sm:hidden"
             />

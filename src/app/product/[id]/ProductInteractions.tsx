@@ -17,15 +17,11 @@ import { useFormStatus } from 'react-dom';
 export const ProductInteractions = ({
   id,
   price,
-  sessionData,
+  inCart,
 }: {
   id: string;
   price: number;
-  sessionData: {
-    sessionId: string;
-    userId: string | null;
-    cartId: string | null;
-  };
+  inCart: boolean;
 }) => {
   const { addItem } = useCartStore();
 
@@ -39,20 +35,17 @@ export const ProductInteractions = ({
           quantity,
         });
         await addItemToCart({
-          sessionData,
-          product: {
-            productId: id,
-            quantity,
-          },
+          productId: id,
+          quantity,
         });
       }}
     >
-      <FormContent price={price} />
+      <FormContent price={price} inCart={inCart} />
     </form>
   );
 };
 
-const FormContent = ({ price }: { price: number }) => {
+const FormContent = ({ price, inCart }: { price: number; inCart: boolean }) => {
   const { pending } = useFormStatus();
 
   return (
@@ -79,7 +72,7 @@ const FormContent = ({ price }: { price: number }) => {
       </div>
       <div className="flex flex-col gap-2 min-[400px]:flex-row">
         <Button size="lg" type="submit" disabled={pending}>
-          {pending ? 'Adding...' : 'Add to cart'}
+          {inCart ? 'Update Cart' : 'Add to Cart'}
         </Button>
         <Button size="lg" variant="outline">
           <HeartIcon className="mr-2 h-4 w-4" />

@@ -1,11 +1,21 @@
 'use server';
 
-import { count, eq, sql, avg, DriverValueDecoder } from 'drizzle-orm';
+import { avg, eq, sql } from 'drizzle-orm';
 import { db } from './db';
-import { images, products, reviews } from './tables';
+import { cart, images, products, reviews } from './tables';
 
-export async function getAllProducts() {
-  return await db
+export type Product = {
+  id: string;
+  title: string;
+  price: number;
+  discountPrice: number;
+  onSale: boolean;
+  imageUrl: string | null;
+  averageRating: number;
+};
+
+export async function getAllProducts(sessionId: string | null) {
+  const allProducts = await db
     .select({
       id: products.id,
       title: products.title,
@@ -17,7 +27,6 @@ export async function getAllProducts() {
         sql<boolean>`(${products.discountInCents} < ${products.priceInCents})`.mapWith(
           Boolean
         ),
-      description: products.description,
       imageUrl: images.url,
       averageRating: sql<number>`avg(${reviews.rating})`.mapWith(Number),
     })
@@ -26,9 +35,72 @@ export async function getAllProducts() {
     .leftJoin(reviews, eq(products.id, reviews.itemId))
     .groupBy(products.id, images.url)
     .limit(100);
+
+  return await checkForItemsInCart(allProducts, sessionId);
 }
 
-export type Product = Awaited<ReturnType<typeof getAllProducts>>[number];
+async function checkForItemsInCart(
+  allProducts: Product[],
+  sessionId: string | null
+) {
+  if (!sessionId) {
+    return allProducts.map((product) => ({
+      ...product,
+      inCart: false,
+    }));
+  }
+
+  const sessionCart = await db.query.cart.findFirst({
+    where: eq(cart.sessionId, sessionId),
+    columns: {
+      userId: false,
+      id: false,
+      createdAt: false,
+      updatedAt: false,
+      sessionId: false,
+    },
+    with: {
+      items: {
+        columns: {
+          productId: true,
+        },
+      },
+    },
+  });
+
+  const sessionCartItems = sessionCart?.items || [];
+
+  return allProducts.map((product) => ({
+    ...product,
+    inCart: sessionCartItems.some(({ productId }) => productId === product.id),
+  }));
+}
+
+async function checkForItemInCart(productId: string, sessionId: string | null) {
+  if (!sessionId) return false;
+
+  const sessionCart = await db.query.cart.findFirst({
+    where: eq(cart.sessionId, sessionId),
+    columns: {
+      userId: false,
+      id: false,
+      createdAt: false,
+      updatedAt: false,
+      sessionId: false,
+    },
+    with: {
+      items: {
+        columns: {
+          productId: true,
+        },
+      },
+    },
+  });
+
+  const sessionCartItems = sessionCart?.items || [];
+
+  return sessionCartItems.some((item) => item.productId === productId);
+}
 
 export type Review = {
   id: string;
@@ -42,7 +114,7 @@ type Image = {
   alt: string;
 };
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string, sessionId: string | null) {
   const res = await db
     .select({
       id: products.id,
@@ -91,6 +163,7 @@ export async function getProductById(id: string) {
   return {
     ...singleProduct,
     ratingPercentages,
+    inCart: await checkForItemInCart(id, sessionId),
   };
 }
 

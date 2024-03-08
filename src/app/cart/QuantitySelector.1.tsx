@@ -1,8 +1,9 @@
 'use client';
 import { Input } from '@/components/ui/input';
-import { CartItem, formatUSD } from './page';
+import { CartItem } from './page';
 import { CartAction } from './CartItems';
 import { updateItemQuantity } from '@/lib/server/services/cartService';
+import { formatUSD } from './utils';
 
 export const QuantitySelector = ({
   cartId,

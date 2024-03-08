@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { ProductInteractions } from './ProductInteractions';
+import { getSessionCookie } from '@/lib/server/auth/cookies';
 const paramsSchema = z.object({
   id: z.string().length(36),
 });
@@ -27,30 +28,16 @@ export default async function ProductDetailsPage({ params }: Props) {
   if (!result.success) {
     return notFound();
   }
-
-  const { id } = result.data;
-
-  const product = await getProductById(id);
+  const { id: productId } = result.data;
+  const sessionId = getSessionCookie();
+  const product = await getProductById(productId, sessionId);
 
   if (!product) {
     return notFound();
   }
 
-  const { user, cart, cartId, session } = await validateRequest();
-
-  const isInCart = cart.some((item) => item.id === product.id);
-
-  const {
-    title,
-    description,
-    price,
-    discountPrice,
-    onSale,
-    images,
-    averageRating,
-    ratingPercentages,
-    id: productId,
-  } = product;
+  const { title, description, images, averageRating, ratingPercentages } =
+    product;
 
   return (
     <div className="flex max-w-6xl flex-col gap-8 p-8">
@@ -61,14 +48,7 @@ export default async function ProductDetailsPage({ params }: Props) {
             <StarRating rating={averageRating} />
             <p>{description}</p>
           </div>
-          <ProductInteractions
-            {...product}
-            sessionData={{
-              sessionId: session.id,
-              cartId,
-              userId: user?.id || null,
-            }}
-          />
+          <ProductInteractions {...product} />
         </div>
         <Image
           alt="Product Image"

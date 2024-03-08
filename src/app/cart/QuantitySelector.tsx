@@ -25,7 +25,7 @@ export const QuantitySelector = ({
             quantity: newQuantity,
           });
 
-          await updateItemQuantity(item.id, newQuantity);
+          // await updateItemQuantity(item.id, newQuantity);
         }}
       >
         <Button size="sm" type="submit">
@@ -43,7 +43,7 @@ export const QuantitySelector = ({
             quantity: newQuantity,
           });
 
-          await updateItemQuantity(item.id, newQuantity);
+          // await updateItemQuantity(item.id, newQuantity);
         }}
       >
         <Button size="sm" type="submit">

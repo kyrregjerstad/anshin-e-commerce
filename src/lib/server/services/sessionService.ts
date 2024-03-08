@@ -149,7 +149,7 @@ export async function handleGuestSession(sessionData: SessionWithoutUser) {
       user: null,
       session,
       cart: [],
-      cartId: await createCart(sessionData.id),
+      cartId: null,
     };
   }
 

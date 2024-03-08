@@ -60,13 +60,13 @@ export async function login(
     const { id: userId } = existingUser;
 
     const session = await createUserSession(userId);
-    const cartId = await getOrCreateCart(session.id, userId);
+    // const cartId = await getOrCreateCart(session);
 
     const guestSessionId = getSessionCookie();
 
-    if (guestSessionId) {
-      await handleGuestCart(guestSessionId, userId, cartId);
-    }
+    // if (guestSessionId) {
+    //   await handleGuestCart(guestSessionId, userId, cartId);
+    // }
 
     const sessionCookie = createSessionCookie(session.id);
 
@@ -137,13 +137,13 @@ export async function register(
     });
 
     const session = await createUserSession(newUserId);
-    const cartId = await getOrCreateCart(session.id, newUserId);
+    // const cartId = await getOrCreateCart(session.id, newUserId);
 
-    const guestSessionId = getSessionCookie();
+    // const guestSessionId = getSessionCookie();
 
-    if (guestSessionId) {
-      await handleGuestCart(guestSessionId, newUserId, cartId);
-    }
+    // if (guestSessionId) {
+    //   await handleGuestCart(guestSessionId, newUserId, cartId);
+    // }
 
     const sessionCookie = createSessionCookie(session.id);
 
