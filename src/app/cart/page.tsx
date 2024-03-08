@@ -69,7 +69,7 @@ const CartPage = async () => {
               >
                 {item.title}
               </Link>
-              {/* <QuantitySelector cartId={cartId} item={item} /> */}
+              <QuantitySelector cartId={cartId} item={item} />
               <span className="font-bold">{formatUSD(item.totalPrice)}</span>
             </CardContent>
           </Card>

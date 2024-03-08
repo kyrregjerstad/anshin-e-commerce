@@ -1,8 +1,15 @@
 'use client';
-import { Input } from '@/components/ui/input';
-import { CartItem } from './page';
-import { CartAction } from './CartItems';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { updateItemQuantity } from '@/lib/server/services/cartService';
+import { CartAction } from './CartItems';
+import { CartItem } from './page';
 import { formatUSD } from './utils';
 
 export const QuantitySelector = ({
@@ -30,15 +37,26 @@ export const QuantitySelector = ({
       }}
     >
       <span className="flex items-center gap-1 font-light">
-        <Input
-          type="number"
-          value={item.quantity}
-          className="w-16"
-          name="quantity"
-          min="0"
-          max="99"
-        />
-        &times; {formatUSD(item.price)}
+        <div>
+          <Label className="sr-only text-base" htmlFor="quantity">
+            Quantity
+          </Label>
+          <div className="flex items-center justify-center gap-2">
+            <Select defaultValue={`${item.quantity}`} name="quantity">
+              <SelectTrigger className="w-16">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...Array(10).keys()].map((i) => (
+                  <SelectItem key={i} value={`${i + 1}`}>
+                    {i + 1}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div>&times; {formatUSD(item.price)}</div>
+          </div>
+        </div>
       </span>
     </form>
   );
