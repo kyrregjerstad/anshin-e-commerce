@@ -113,7 +113,7 @@ const SummaryCard = ({
         <p className="font-bold">Total: {formatUSD(totalPrice)}</p>
       </CardContent>
       <CardFooter>
-        <Link href="/checkout" className={`${buttonVariants()} w-full`}>
+        <Link href="/checkout/address" className={`${buttonVariants()} w-full`}>
           Checkout
         </Link>
       </CardFooter>

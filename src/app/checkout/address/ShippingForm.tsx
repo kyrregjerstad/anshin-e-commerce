@@ -31,40 +31,43 @@ import { useFormState, useFormStatus } from 'react-dom';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const shippingAddressSchema = z.object({
+const addressSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
-  address: z.string().min(5).max(100),
+  streetAddress1: z.string().min(5).max(100),
+  streetAddress2: z.string().min(2).max(100),
   city: z.string().min(2).max(50),
-  zip: z.string().min(2).max(20),
+  state: z.string().min(2).max(50),
+  postalCode: z.string().min(2).max(20),
   country: z.string().min(2).max(50),
+  type: z.enum(['shipping', 'billing']),
 });
 
-type FormValues = z.infer<typeof shippingAddressSchema>;
+type Address = z.infer<typeof addressSchema>;
 
 type Props = {
-  submitFn: (
-    prevState: any,
-    formData: FormData
-  ) => Promise<ShippingActionResult>;
+  shippingAddress: Address | null;
 };
 
-export const ShippingForm = ({ submitFn }: Props) => {
+export const ShippingForm = ({ shippingAddress }: Props) => {
   const [state, formAction] = useFormState<ShippingActionResult, FormData>(
-    submitFn,
+    () => null,
     null
   );
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(shippingAddressSchema),
+  const form = useForm<Address>({
+    resolver: zodResolver(addressSchema),
     criteriaMode: 'all',
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      address: '',
-      city: '',
-      zip: '',
-      country: '',
+      firstName: shippingAddress?.firstName ?? '',
+      lastName: shippingAddress?.lastName ?? '',
+      streetAddress1: shippingAddress?.streetAddress1 ?? '',
+      streetAddress2: shippingAddress?.streetAddress2 ?? '',
+      city: shippingAddress?.city ?? '',
+      state: shippingAddress?.state ?? '',
+      postalCode: shippingAddress?.postalCode ?? '',
+      country: shippingAddress?.country ?? '',
+      type: 'shipping',
     },
   });
 
@@ -95,7 +98,7 @@ export const ShippingForm = ({ submitFn }: Props) => {
 };
 
 type FormContentProps = {
-  form: UseFormReturn<FormValues>;
+  form: UseFormReturn<Address>;
 };
 
 const FormContent = ({ form }: FormContentProps) => {
@@ -140,7 +143,7 @@ const FormContent = ({ form }: FormContentProps) => {
         />
         <FormField
           control={control}
-          name="address"
+          name="streetAddress1"
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="address">Address</FormLabel>
@@ -148,7 +151,22 @@ const FormContent = ({ form }: FormContentProps) => {
                 <Input placeholder="Address" {...field} />
               </FormControl>
               <FormMessage>
-                <ErrorMessage errors={errors} name="address" />
+                <ErrorMessage errors={errors} name="streetAddress1" />
+              </FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="streetAddress2"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="address2">Address 2</FormLabel>
+              <FormControl>
+                <Input placeholder="Address 2" {...field} />
+              </FormControl>
+              <FormMessage>
+                <ErrorMessage errors={errors} name="streetAddress2" />
               </FormMessage>
             </FormItem>
           )}
@@ -170,7 +188,7 @@ const FormContent = ({ form }: FormContentProps) => {
         />
         <FormField
           control={control}
-          name="zip"
+          name="postalCode"
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="zip">Zip</FormLabel>
@@ -178,7 +196,22 @@ const FormContent = ({ form }: FormContentProps) => {
                 <Input placeholder="Zip" {...field} />
               </FormControl>
               <FormMessage>
-                <ErrorMessage errors={errors} name="zip" />
+                <ErrorMessage errors={errors} name="postalCode" />
+              </FormMessage>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="state">State</FormLabel>
+              <FormControl>
+                <Input placeholder="State" {...field} />
+              </FormControl>
+              <FormMessage>
+                <ErrorMessage errors={errors} name="state" />
               </FormMessage>
             </FormItem>
           )}
