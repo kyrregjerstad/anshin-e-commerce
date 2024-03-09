@@ -45,6 +45,37 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
 }));
 
+export const address = mysqlTable('address', {
+  id: varchar('id', { length: 64 }).primaryKey(),
+  userId: varchar('user_id', { length: 64 })
+    .notNull()
+    .references(() => users.id, {
+      onDelete: 'cascade',
+    }),
+  firstName: varchar('first_name', { length: 255 }).notNull(),
+  lastName: varchar('last_name', { length: 255 }).notNull(),
+  streetAddress1: varchar('street_address_1', { length: 255 }).notNull(),
+  streetAddress2: varchar('street_address_2', { length: 255 }),
+  city: varchar('city', { length: 255 }),
+  state: varchar('state', { length: 255 }),
+  postalCode: varchar('postal_code', { length: 255 }).notNull(),
+  country: varchar('country', { length: 255 }).notNull(),
+  type: mysqlEnum('type', ['shipping', 'billing']).notNull(),
+});
+
+export type InsertAddress = InferInsertModel<typeof address>;
+
+export const addressRelations = relations(address, ({ one, many }) => ({
+  user: one(users, {
+    fields: [address.userId],
+    references: [users.id],
+    relationName: 'user_address',
+  }),
+  orders: many(orders, {
+    relationName: 'address_orders',
+  }),
+}));
+
 export const sessions = mysqlTable('sessions', {
   id: varchar('id', { length: 64 }).primaryKey(),
   userId: varchar('user_id', { length: 64 }).references(() => users.id, {
@@ -86,6 +117,11 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   }),
   items: many(orderItems, {
     relationName: 'order_items',
+  }),
+  address: one(address, {
+    fields: [orders.id],
+    references: [address.id],
+    relationName: 'order_address',
   }),
 }));
 

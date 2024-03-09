@@ -3,6 +3,7 @@ import { Argon2id } from 'oslo/password';
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/planetscale-serverless';
 import {
+  seedAddressesData,
   seedCartsData,
   seedImagesData,
   seedItemsToCartsData,
@@ -33,6 +34,7 @@ const main = async () => {
     await seedProducts(tx);
     await seedImages(tx);
     await seedUsers(tx);
+    await seedAddresses(tx);
     await seedSessions(tx);
     await seedCarts(tx);
     await seedItemsToCarts(tx);
@@ -71,6 +73,12 @@ async function seedUsers(db: DB) {
 
   await db.insert(schema.users).values(users).execute();
   console.log('🫅 Seeded users');
+}
+
+async function seedAddresses(db: DB) {
+  await db.insert(schema.address).values(seedAddressesData).execute();
+
+  console.log('🏠 Seeded addresses');
 }
 
 async function seedCarts(db: DB) {

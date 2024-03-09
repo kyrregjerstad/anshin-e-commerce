@@ -1,5 +1,6 @@
 import {
   Image,
+  InsertAddress,
   InsertCart,
   InsertCartItems,
   InsertProduct,
@@ -577,6 +578,33 @@ export const seedUsersData = [
     hashedPassword: '',
   },
 ];
+
+export const seedAddressesData = [
+  {
+    id: 'a',
+    userId: 'a',
+    firstName: 'Demo',
+    lastName: 'User 1',
+    streetAddress1: '123 Demo St',
+    streetAddress2: 'apt 1',
+    city: 'Demo City',
+    postalCode: '12345',
+    country: 'Demo Country',
+    type: 'shipping',
+  },
+  {
+    id: 'b',
+    userId: 'a',
+    firstName: 'Demo',
+    lastName: 'User 1',
+    streetAddress1: '123 Demo billing St',
+    streetAddress2: 'apt 1',
+    city: 'Demo City',
+    postalCode: '12345',
+    country: 'Demo Country',
+    type: 'billing',
+  },
+] satisfies InsertAddress[];
 
 export const seedCartsData = [
   {
