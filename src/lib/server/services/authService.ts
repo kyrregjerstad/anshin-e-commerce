@@ -1,6 +1,7 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
 'use server';
 import { loginSchema } from '@/lib/schema/loginSchema';
+import { registerSchema } from '@/lib/schema/registerSchema';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -12,16 +13,11 @@ import {
   createSessionCookie,
   getSessionCookie,
 } from '../auth/cookies';
+import { generateId } from '../auth/utils';
 import { db } from '../db';
 import { cart, cartItems, sessions, users } from '../tables';
-import {
-  getCartBySessionId,
-  getCartByUserId,
-  getOrCreateCart,
-} from './cartService';
+import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
-import { registerSchema } from '@/lib/schema/registerSchema';
-import { generateId } from '../auth/utils';
 
 export type LoginActionResult =
   | {

@@ -1,20 +1,19 @@
-import { validateRequest } from '@/lib/auth';
-import { CartItems } from './CartItems';
-import Link from 'next/link';
 import { Button, buttonVariants } from '@/components/ui/button';
-import { db } from '@/lib/server/db';
-import { cart, cartItems, images, products } from '@/lib/server/tables';
-import { eq, sql } from 'drizzle-orm';
-import Image from 'next/image';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { validateRequest } from '@/lib/auth';
+import { db } from '@/lib/server/db';
+import { cart, cartItems, images, products } from '@/lib/server/tables';
+import { eq, sql } from 'drizzle-orm';
+import Image from 'next/image';
+import Link from 'next/link';
 import { QuantitySelector } from './QuantitySelector.1';
-import { formatUSD } from './utils';
 import { RemoveFromCartButton } from './RemoveFromCartButton.1';
+import { formatUSD } from './utils';
 
 export type CartItem = {
   title: string;

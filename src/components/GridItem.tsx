@@ -16,7 +16,7 @@ export const GridItem = async ({ product }: Props) => {
   const { title, imageUrl, averageRating, onSale, inCart } = product;
 
   return (
-    <Card className="group flex flex-col overflow-hidden rounded-2xl sm:aspect-square">
+    <Card className="group flex flex-col justify-between overflow-hidden rounded-2xl sm:aspect-square">
       <div className="relative aspect-square overflow-hidden">
         <Link href={`/product/${product.id}`}>
           <Image
@@ -37,8 +37,9 @@ export const GridItem = async ({ product }: Props) => {
 
         <AddToCartIconButton
           product={product}
+          inCart={inCart}
           className={cn(
-            'absolute right-0 top-0 hidden rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block',
+            'group absolute right-0 top-0 hidden rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block',
             inCart && 'opacity-100'
           )}
         />
@@ -69,6 +70,7 @@ export const GridItem = async ({ product }: Props) => {
             </div>
             <AddToCartIconButton
               product={product}
+              inCart={inCart}
               className="translate-x-3 translate-y-1 self-end p-0 sm:hidden"
             />
           </div>

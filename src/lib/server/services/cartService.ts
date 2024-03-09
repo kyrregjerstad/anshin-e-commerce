@@ -1,13 +1,13 @@
 'use server';
 
-import { and, asc, desc, eq, sql } from 'drizzle-orm';
-import { db } from '../db';
-import { cart, cartItems, sessions, users } from '../tables';
+import { and, eq, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
-import { generateId } from '../auth/utils';
 import { getSessionCookie } from '../auth/cookies';
+import { generateId } from '../auth/utils';
+import { db } from '../db';
 import { Product } from '../productService';
+import { cart, cartItems, sessions } from '../tables';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
@@ -135,12 +135,20 @@ export async function getCartQuantity() {
   return total;
 }
 
-export async function removeItemFromCart(
-  cartId: string | null,
-  itemId: string
-) {
-  // const cartId = getCartIdCookie();
-  if (!cartId) return;
+export async function handleRemoveFromCart(itemId: string) {
+  const sessionId = getSessionCookie();
+  if (!sessionId) {
+    throw new Error('Session not found');
+  }
+  const session = await getSessionDetails(sessionId);
+  if (!session) {
+    throw new Error('Session not found');
+  }
+  const cartId = session.cart?.id || session.user?.cart.id;
+
+  if (!cartId) {
+    throw new Error('Cart not found');
+  }
 
   await db
     .delete(cartItems)
@@ -167,7 +175,7 @@ type AddItemToCartParams = {
   quantity: number;
 };
 
-export async function addItemToCart({
+export async function handleAddToCart({
   productId,
   quantity,
 }: AddItemToCartParams) {
@@ -178,14 +186,7 @@ export async function addItemToCart({
     throw new Error('Session not found');
   }
 
-  const session = await getSessionDetails(sessionId);
-
-  // TODO: handle this better
-  if (!session) {
-    throw new Error('Session not found');
-  }
-
-  const selectedCartId = await getOrCreateCart(session);
+  const selectedCartId = await getOrCreateCart(sessionId);
 
   await db
     .insert(cartItems)
@@ -258,7 +259,13 @@ type Session = {
     };
   } | null;
 };
-export async function getOrCreateCart(session: Session) {
+export async function getOrCreateCart(sessionId: string) {
+  const session = await getSessionDetails(sessionId);
+
+  if (!session) {
+    throw new Error('Invalid session id');
+  }
+
   if (session.cart?.id) {
     return session.cart.id;
   }

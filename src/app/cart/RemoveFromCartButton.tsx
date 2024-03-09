@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
-import { removeItemFromCart } from '@/lib/server/services/cartService';
+import { handleRemoveFromCart } from '@/lib/server/services/cartService';
 import { CartAction } from './CartItems';
 
 type Props = {

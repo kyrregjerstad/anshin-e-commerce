@@ -1,6 +1,6 @@
 'use client';
 
-import { removeItemFromCart } from '@/lib/server/services/cartService';
+import { handleRemoveFromCart } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/stores/useCartStore';
 import { Button } from './ui/button';
 
@@ -17,7 +17,7 @@ export const RemoveFromCartButton = ({ sessionData, id }: Props) => {
     <form
       action={async () => {
         removeItem(id);
-        await removeItemFromCart(sessionData.cartId, id);
+        await handleRemoveFromCart(sessionData.cartId, id);
       }}
     >
       <Button>Remove</Button>

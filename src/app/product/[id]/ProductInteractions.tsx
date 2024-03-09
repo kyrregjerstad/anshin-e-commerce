@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { HeartIcon } from 'lucide-react';
-import { addItemToCart } from '@/lib/server/services/cartService';
+import { handleAddToCart } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/stores/useCartStore';
 import { useFormStatus } from 'react-dom';
 
@@ -34,7 +34,7 @@ export const ProductInteractions = ({
           id,
           quantity,
         });
-        await addItemToCart({
+        await handleAddToCart({
           productId: id,
           quantity,
         });
