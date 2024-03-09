@@ -40,15 +40,17 @@ export default async function ProductDetailsPage({ params }: Props) {
     product;
 
   return (
-    <div className="flex max-w-6xl flex-col gap-8 p-8">
+    <div className="flex max-w-6xl flex-col items-center gap-8 px-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col justify-between gap-8">
-          <div className="flex flex-col gap-4">
-            <h1 className="text-3xl font-bold">{title}</h1>
-            <StarRating rating={averageRating} />
+          <div className="flex flex-col gap-8">
+            <div>
+              <h1 className="text-3xl font-bold">{title}</h1>
+              <StarRating rating={averageRating} />
+            </div>
+            <ProductInteractions {...product} />
             <p>{description}</p>
           </div>
-          <ProductInteractions {...product} />
         </div>
         <Image
           alt="Product Image"
@@ -58,19 +60,22 @@ export default async function ProductDetailsPage({ params }: Props) {
           width={600}
         />
       </div>
-      <Separator />
-      <div>
-        <h2 className="pb-4 pt-8 text-xl font-bold">Product Reviews</h2>
-        <ReviewBarChart ratingPercentages={ratingPercentages} />
-      </div>
-      <div>
-        <h2 className="pb-4 pt-8 text-xl font-bold">User Reviews</h2>
-        <div className="flex flex-col gap-4">
-          {product.reviews.map((review) => (
-            <UserReview key={review.id} review={review} />
-          ))}
+      <Separator className="my-6" />
+      <section className="flex w-full flex-1 flex-col gap-4">
+        <h2 className="text-xl font-bold">Reviews</h2>
+        <div className="flex w-full flex-1 gap-8">
+          <div className="flex-1">
+            <div className="flex flex-col gap-4">
+              {product.reviews.map((review) => (
+                <UserReview key={review.id} review={review} />
+              ))}
+            </div>
+          </div>
+          <div className="flex-1">
+            <ReviewBarChart ratingPercentages={ratingPercentages} />
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

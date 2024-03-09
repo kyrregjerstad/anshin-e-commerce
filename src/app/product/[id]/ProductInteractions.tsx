@@ -50,34 +50,36 @@ const FormContent = ({ price, inCart }: { price: number; inCart: boolean }) => {
 
   return (
     <>
-      <div className="flex items-end gap-4">
-        <div>
-          <Label className="text-base" htmlFor="quantity">
-            Quantity
-          </Label>
-          <Select defaultValue="1" name="quantity">
-            <SelectTrigger className="w-24">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1</SelectItem>
-              <SelectItem value="2">2</SelectItem>
-              <SelectItem value="3">3</SelectItem>
-              <SelectItem value="4">4</SelectItem>
-              <SelectItem value="5">5</SelectItem>
-            </SelectContent>
-          </Select>
+      <div className="flex flex-col gap-4">
+        <div className="flex items-end gap-4">
+          <div>
+            <Label className="text-base" htmlFor="quantity">
+              Quantity
+            </Label>
+            <Select defaultValue="1" name="quantity">
+              <SelectTrigger className="w-24">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1</SelectItem>
+                <SelectItem value="2">2</SelectItem>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="4">4</SelectItem>
+                <SelectItem value="5">5</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="text-4xl font-bold">${price}</div>
         </div>
-        <div className="text-4xl font-bold">${price}</div>
-      </div>
-      <div className="flex flex-col gap-2 min-[400px]:flex-row">
-        <Button size="lg" type="submit" disabled={pending}>
-          {inCart ? 'Update Cart' : 'Add to Cart'}
-        </Button>
-        <Button size="lg" variant="outline">
-          <HeartIcon className="mr-2 h-4 w-4" />
-          Add to wishlist
-        </Button>
+        <div className="flex flex-col gap-2 min-[400px]:flex-row">
+          <Button size="lg" type="submit" disabled={pending}>
+            {inCart ? 'Update Cart' : 'Add to Cart'}
+          </Button>
+          <Button size="lg" variant="outline">
+            <HeartIcon className="mr-2 h-4 w-4" />
+            Add to wishlist
+          </Button>
+        </div>
       </div>
     </>
   );
