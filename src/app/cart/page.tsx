@@ -1,7 +1,7 @@
 import { validateRequest } from '@/lib/auth';
 import { CartItems } from './CartItems';
 import Link from 'next/link';
-import { buttonVariants } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { db } from '@/lib/server/db';
 import { cart, cartItems, images, products } from '@/lib/server/tables';
 import { eq, sql } from 'drizzle-orm';
@@ -58,22 +58,32 @@ const CartPage = async () => {
                 />
               </div>
             </CardHeader>
-            <CardContent className="col-span-2 flex w-full flex-col gap-2 px-0 py-4">
-              <Link
-                href={`product/${item.id}`}
-                className="font-bold hover:underline"
-              >
-                {item.title}
-              </Link>
-              <QuantitySelector cartId={cartId} item={item} />
-              <span className="font-bold">{formatUSD(item.totalPrice)}</span>
+            <CardContent className="col-span-2 flex w-full flex-col justify-between py-4 pl-0 pr-4">
+              <div className="flex w-full justify-between">
+                <Link
+                  href={`product/${item.id}`}
+                  className="text-xl font-bold hover:underline"
+                >
+                  {item.title}
+                </Link>
+                <Button variant="ghost" size="smIcon" className="text-xl">
+                  x
+                </Button>
+              </div>
+              <div className="flex items-center gap-4">
+                <QuantitySelector cartId={cartId} item={item} />
+                <span className="font-bold">{formatUSD(item.totalPrice)}</span>
+              </div>
+              <Button className="self-start" variant="outline">
+                Move to wishlist
+              </Button>
             </CardContent>
           </Card>
         ))}
       </div>
-      <Card className="flex flex-col justify-between">
+      <Card className="flex flex-col justify-between self-start">
         <CardHeader>
-          <h1>Summary</h1>
+          <h1 className="text-2xl font-bold">Summary</h1>
         </CardHeader>
         <CardContent>
           <div>

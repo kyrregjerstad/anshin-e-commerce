@@ -46,7 +46,6 @@ export const QuantitySelector = ({
                 ))}
               </SelectContent>
             </Select>
-            <div>&times; {formatUSD(item.price)}</div>
           </div>
         </div>
       </span>
