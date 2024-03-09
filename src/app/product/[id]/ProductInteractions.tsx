@@ -69,7 +69,7 @@ const FormContent = ({ price, inCart }: { price: number; inCart: boolean }) => {
               </SelectContent>
             </Select>
           </div>
-          <div className="text-4xl font-bold">${price}</div>
+          <div className="text-2xl font-bold">${price}</div>
         </div>
         <div className="flex flex-col gap-2 min-[400px]:flex-row">
           <Button size="lg" type="submit" disabled={pending}>

@@ -45,7 +45,7 @@ export default async function ProductDetailsPage({ params }: Props) {
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-col gap-8">
             <div>
-              <h1 className="text-3xl font-bold">{title}</h1>
+              <h1 className="text-4xl font-bold">{title}</h1>
               <StarRating rating={averageRating} />
             </div>
             <ProductInteractions {...product} />
