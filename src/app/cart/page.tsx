@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { QuantitySelector } from './QuantitySelector.1';
 import { formatUSD } from './utils';
+import { RemoveFromCartButton } from './RemoveFromCartButton.1';
 
 export type CartItem = {
   title: string;
@@ -42,8 +43,13 @@ const CartPage = async () => {
     );
   }
 
+  const totalQuantity = customerCart.items.reduce(
+    (acc, item) => acc + item.quantity,
+    0
+  );
+
   return (
-    <section className="grid w-full max-w-6xl grid-cols-2 gap-4 p-4">
+    <section className="grid w-full max-w-5xl grid-cols-2 gap-4 p-4">
       <div className="flex flex-col gap-4">
         {customerCart.items.map((item) => (
           <Card className="grid grid-cols-3 gap-1">
@@ -58,7 +64,7 @@ const CartPage = async () => {
                 />
               </div>
             </CardHeader>
-            <CardContent className="col-span-2 flex w-full flex-col justify-between py-4 pl-0 pr-4">
+            <CardContent className="col-span-2 flex w-full flex-col justify-between gap-2 py-4 pl-0 pr-4">
               <div className="flex w-full justify-between">
                 <Link
                   href={`product/${item.id}`}
@@ -66,9 +72,7 @@ const CartPage = async () => {
                 >
                   {item.title}
                 </Link>
-                <Button variant="ghost" size="smIcon" className="text-xl">
-                  x
-                </Button>
+                <RemoveFromCartButton itemId={item.id} cartId={cartId} />
               </div>
               <div className="flex items-center gap-4">
                 <QuantitySelector cartId={cartId} item={item} />
@@ -81,29 +85,42 @@ const CartPage = async () => {
           </Card>
         ))}
       </div>
-      <Card className="flex flex-col justify-between self-start">
-        <CardHeader>
-          <h1 className="text-2xl font-bold">Summary</h1>
-        </CardHeader>
-        <CardContent>
-          <div>
-            <p>Items: {customerCart.items.length}</p>
-          </div>
-          <p className="font-bold">
-            Total: {formatUSD(customerCart.totalPrice)}
-          </p>
-        </CardContent>
-        <CardFooter>
-          <Link href="/checkout" className={`${buttonVariants()} w-full`}>
-            Checkout
-          </Link>
-        </CardFooter>
-      </Card>
+      <SummaryCard
+        totalQuantity={totalQuantity}
+        totalPrice={customerCart.totalPrice}
+      />
     </section>
   );
 };
 
 export default CartPage;
+
+const SummaryCard = ({
+  totalQuantity,
+  totalPrice,
+}: {
+  totalQuantity: number;
+  totalPrice: number;
+}) => {
+  return (
+    <Card className="flex flex-col justify-between self-start">
+      <CardHeader>
+        <h1 className="text-2xl font-bold">Summary</h1>
+      </CardHeader>
+      <CardContent>
+        <div>
+          <p>Items: {totalQuantity}</p>
+        </div>
+        <p className="font-bold">Total: {formatUSD(totalPrice)}</p>
+      </CardContent>
+      <CardFooter>
+        <Link href="/checkout" className={`${buttonVariants()} w-full`}>
+          Checkout
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+};
 
 async function getCustomerCart(cartId: string) {
   const itemSubquery = db
