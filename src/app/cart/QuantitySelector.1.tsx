@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/select';
 import { updateItemQuantity } from '@/lib/server/services/cartService';
 
+import { useRef } from 'react';
 import { CartItem } from './page';
-import { formatUSD } from './utils';
 
 export const QuantitySelector = ({
   cartId,
@@ -19,12 +19,18 @@ export const QuantitySelector = ({
   cartId: string;
   item: CartItem;
 }) => {
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleChange = () => {
+    formRef.current?.requestSubmit();
+  };
+
   return (
     <form
+      ref={formRef}
       action={async (formData) => {
         const newQuantity =
           parseInt(formData.get('quantity') as string, 10) || 0;
-
         await updateItemQuantity(cartId, item.id, newQuantity);
       }}
     >
@@ -34,7 +40,11 @@ export const QuantitySelector = ({
             Quantity
           </Label>
           <div className="flex items-center justify-center gap-2">
-            <Select defaultValue={`${item.quantity}`} name="quantity">
+            <Select
+              defaultValue={`${item.quantity}`}
+              name="quantity"
+              onValueChange={handleChange}
+            >
               <SelectTrigger className="w-16">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
@@ -52,6 +62,3 @@ export const QuantitySelector = ({
     </form>
   );
 };
-
-const increment = (quantity: number) => quantity + 1;
-const decrement = (quantity: number) => Math.max(0, quantity - 1);
