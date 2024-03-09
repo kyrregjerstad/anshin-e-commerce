@@ -1,26 +1,7 @@
 'use server';
-import { loginSchema } from '@/lib/schema/loginSchema';
 import { eq } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
-import { Argon2id } from 'oslo/password';
-import { ZodError, ZodIssueCode } from 'zod';
-import {
-  createBlankCartCookie,
-  createBlankSessionCookie,
-  createSessionCookie,
-  getSessionCookie,
-} from '../auth/cookies';
 import { db } from '../db';
-import { cart, cartItems, sessions, users } from '../tables';
-import {
-  getCartBySessionId,
-  getCartByUserId,
-  getOrCreateCart,
-} from './cartService';
-import { createUserSession, getSessionDetails } from './sessionService';
-import { registerSchema } from '@/lib/schema/registerSchema';
-import { generateId } from '../auth/utils';
+import { sessions, users } from '../tables';
 
 export async function getUserById(userId: string) {
   const res = await db.query.users.findFirst({
@@ -49,6 +30,9 @@ export async function getUserBySessionId(sessionId: string) {
           name: true,
           email: true,
         },
+        with: {
+          addresses: true,
+        },
       },
     },
   });
@@ -57,5 +41,13 @@ export async function getUserBySessionId(sessionId: string) {
     return null;
   }
 
-  return res.user;
+  return {
+    id: res.user.id,
+    name: res.user.name,
+    email: res.user.email,
+    shippingAddress:
+      res.user.addresses.find((a) => a.type === 'shipping') || null,
+    billingAddress:
+      res.user.addresses.find((a) => a.type === 'billing') || null,
+  };
 }

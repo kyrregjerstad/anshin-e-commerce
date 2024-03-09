@@ -1,13 +1,10 @@
 import { InferInsertModel, relations } from 'drizzle-orm';
 import {
-  bigint,
   datetime,
-  decimal,
   int,
   mysqlEnum,
   mysqlTableCreator,
   primaryKey,
-  serial,
   smallint,
   timestamp,
   tinyint,
@@ -42,6 +39,9 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   sessions: many(sessions, {
     relationName: 'user_session',
+  }),
+  addresses: many(address, {
+    relationName: 'user_address',
   }),
 }));
 

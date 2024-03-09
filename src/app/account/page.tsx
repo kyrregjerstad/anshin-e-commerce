@@ -31,6 +31,8 @@ export default async function AccountPage() {
     return redirect('/login');
   }
 
+  const { shippingAddress, billingAddress } = user;
+
   return (
     <>
       <section className="flex w-full flex-col gap-8 pt-8">
@@ -63,6 +65,35 @@ export default async function AccountPage() {
                 </Link>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card variant="neutral">
+          <CardHeader>
+            <CardTitle>Addresses</CardTitle>
+            <CardDescription>
+              Manage your shipping and billing addresses.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-2">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Shipping</TableHead>
+                  <TableHead>Billing</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <DisplayAddress address={shippingAddress} />
+                  </TableCell>
+                  <TableCell>
+                    <DisplayAddress address={billingAddress} />
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
 
@@ -159,3 +190,38 @@ export default async function AccountPage() {
     </>
   );
 }
+type Address = {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  streetAddress1: string;
+  streetAddress2: string | null;
+  city: string | null;
+  state: string | null;
+  postalCode: string;
+  country: string;
+  type: 'shipping' | 'billing';
+};
+const DisplayAddress = ({ address }: { address: Address | null }) => {
+  if (!address) {
+    return (
+      <div>
+        <div className="font-medium">No address on file</div>
+      </div>
+    );
+  }
+  return (
+    <div>
+      <div className="font-medium">
+        {address.firstName} {address.lastName}
+      </div>
+      <div>{address.streetAddress1}</div>
+      <div>{address.streetAddress2}</div>
+      <div>
+        {address.city}, {address.state} {address.postalCode}
+      </div>
+      <div>{address.country}</div>
+    </div>
+  );
+};
