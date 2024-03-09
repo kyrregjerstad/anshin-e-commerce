@@ -26,13 +26,9 @@ export type CartItem = {
 };
 
 const CartPage = async () => {
-  const { user, session, cartId } = await validateRequest();
+  const { cartId } = await validateRequest();
 
   if (!cartId) {
-    return null;
-  }
-
-  if (!session) {
     return null;
   }
 

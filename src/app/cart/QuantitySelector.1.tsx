@@ -8,30 +8,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { updateItemQuantity } from '@/lib/server/services/cartService';
-import { CartAction } from './CartItems';
+
 import { CartItem } from './page';
 import { formatUSD } from './utils';
 
 export const QuantitySelector = ({
   cartId,
   item,
-  dispatch,
 }: {
   cartId: string;
   item: CartItem;
-  dispatch: (action: CartAction) => void;
 }) => {
   return (
     <form
       action={async (formData) => {
         const newQuantity =
           parseInt(formData.get('quantity') as string, 10) || 0;
-
-        dispatch({
-          type: 'UPDATE_QUANTITY',
-          itemId: item.id,
-          quantity: newQuantity,
-        });
 
         await updateItemQuantity(cartId, item.id, newQuantity);
       }}
