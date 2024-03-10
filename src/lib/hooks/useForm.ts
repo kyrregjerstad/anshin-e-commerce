@@ -4,11 +4,11 @@ import { useFormState } from 'react-dom';
 import {
   UseFormReturn,
   useForm as useHookForm,
+  type DefaultValues,
   type FieldPath,
   type FieldValues,
-  type DefaultValues,
 } from 'react-hook-form';
-import { ZodSchema, z } from 'zod';
+import { ZodSchema } from 'zod';
 
 export type SubmitFn = (
   prevState: any,
@@ -44,7 +44,6 @@ export const useFormWithValidation = <TFormValues extends FieldValues>({
   const status = state?.status;
 
   useEffect(() => {
-    console.log(status);
     if (!status) {
       return;
     }

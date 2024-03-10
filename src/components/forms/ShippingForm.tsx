@@ -30,7 +30,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { UseFormReturn } from 'react-hook-form';
-import { Address, addressSchema } from '../../lib/schema/addressSchema';
+import { Address, addressSchema } from '@/lib/schema/addressSchema';
 
 type Props = {
   addressType: 'shipping' | 'billing';
