@@ -14,7 +14,7 @@
     "knip": "knip"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=18.17.0"
   },
   "dependencies": {
     "@hookform/error-message": "^2.0.1",
