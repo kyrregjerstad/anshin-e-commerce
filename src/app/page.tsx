@@ -1,7 +1,7 @@
 import { GridItem } from '@/components/GridItem';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
-import { getAllProducts } from '@/lib/server/productService';
-import { HeroSection } from './HeroSection';
+import { getAllProducts } from '@/lib/server/services/productService';
+import { HeroSection } from '../components/HeroSection';
 
 export default async function Home() {
   const sessionId = getSessionCookie();

@@ -1,5 +1,5 @@
 import { Card } from '@/components/ui/card';
-import { Product } from '@/lib/server/productService';
+import { Product } from '@/lib/server/services/productService';
 import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';

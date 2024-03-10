@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { validateRequest } from '@/lib/auth';
-import { Review, getProductById } from '@/lib/server/productService';
+import { Review, getProductById } from '@/lib/server/services/productService';
 import { StarIcon } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';

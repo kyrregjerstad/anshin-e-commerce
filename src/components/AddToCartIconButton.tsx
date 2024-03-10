@@ -1,6 +1,6 @@
 'use client';
 
-import { Product } from '@/lib/server/productService';
+import { Product } from '@/lib/server/services/productService';
 import {
   handleAddToCart,
   handleRemoveFromCart,

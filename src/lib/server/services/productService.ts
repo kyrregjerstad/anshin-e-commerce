@@ -1,8 +1,8 @@
 'use server';
 
 import { avg, eq, sql } from 'drizzle-orm';
-import { db } from './db';
-import { cart, images, products, reviews } from './tables';
+import { db } from '../db';
+import { cart, images, products, reviews } from '../tables';
 
 export type Product = {
   id: string;

@@ -1,9 +1,9 @@
 'use client';
 
-import { useCartStore } from '@/lib/stores/useCartStore';
+import { useCartStore } from '@/lib/hooks/useCartStore';
 import React from 'react';
 import { Button } from './ui/button';
-import { Product } from '@/lib/server/productService';
+import { Product } from '@/lib/server/services/productService';
 import { handleAddToCart } from '@/lib/server/services/cartService';
 
 type Props = {

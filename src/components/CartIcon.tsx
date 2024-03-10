@@ -1,6 +1,6 @@
 'use client';
 import { CartItem } from '@/lib/server/services/cartService';
-import { useCartStore } from '@/lib/stores/useCartStore';
+import { useCartStore } from '@/lib/hooks/useCartStore';
 import { cn } from '@/lib/utils';
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { useEffect } from 'react';

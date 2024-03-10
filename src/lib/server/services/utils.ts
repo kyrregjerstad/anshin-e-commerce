@@ -1,4 +1,4 @@
-import { Cart, CartItem, ValidateSessionResult } from './types';
+import { Cart, CartItem } from './types';
 
 export function transformCartItems(items: CartItem[] | null): Cart[] {
   if (!items) {

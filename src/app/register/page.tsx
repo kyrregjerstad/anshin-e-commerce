@@ -1,4 +1,4 @@
-import { RegisterForm } from './RegisterForm';
+import { RegisterForm } from '@/components/forms/RegisterForm';
 import { register } from '@/lib/server/services/authService';
 
 const RegisterPage = async () => {

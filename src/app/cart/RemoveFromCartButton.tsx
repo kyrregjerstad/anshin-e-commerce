@@ -1,30 +1,37 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
 import { handleRemoveFromCart } from '@/lib/server/services/cartService';
-import { CartAction } from './CartItems';
+import { useRef } from 'react';
+import { useFormStatus } from 'react-dom';
 
-type Props = {
+export const RemoveFromCartButton = ({
+  itemId,
+}: {
   itemId: string;
-  dispatch: (action: CartAction) => void;
-};
-
-export const RemoveFromCartButton = ({ itemId, dispatch }: Props) => {
+  cartId: string;
+}) => {
   return (
     <form
       action={async () => {
-        dispatch({
-          type: 'REMOVE_ITEM',
-          itemId,
-        });
-
-        // await removeItemFromCart(itemId);
+        await handleRemoveFromCart(itemId);
       }}
     >
-      <Button variant="ghost" type="submit">
-        <X />
-      </Button>
+      <SubmitButton />
     </form>
+  );
+};
+
+const SubmitButton = () => {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button
+      variant="ghost"
+      size="smIcon"
+      className="text-xl"
+      disabled={pending}
+    >
+      x
+    </Button>
   );
 };

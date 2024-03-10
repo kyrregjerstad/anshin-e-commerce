@@ -1,7 +1,7 @@
 'use client';
 
 import { handleRemoveFromCart } from '@/lib/server/services/cartService';
-import { useCartStore } from '@/lib/stores/useCartStore';
+import { useCartStore } from '@/lib/hooks/useCartStore';
 import { Button } from './ui/button';
 
 type Props = {

@@ -12,8 +12,6 @@ import { Cart } from './server/services/types';
 export const validateRequest = cache(async () => {
   const sessionId = getSessionCookie();
 
-  console.log('sessionId from cookie: ', sessionId);
-
   const result = await getSessionDetails(sessionId);
 
   try {

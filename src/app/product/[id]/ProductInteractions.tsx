@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/select';
 import { HeartIcon } from 'lucide-react';
 import { handleAddToCart } from '@/lib/server/services/cartService';
-import { useCartStore } from '@/lib/stores/useCartStore';
+import { useCartStore } from '@/lib/hooks/useCartStore';
 import { useFormStatus } from 'react-dom';
 
 export const ProductInteractions = ({

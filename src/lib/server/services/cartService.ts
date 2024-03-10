@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 import { getSessionCookie } from '../auth/cookies';
 import { generateId } from '../auth/utils';
 import { db } from '../db';
-import { Product } from '../productService';
+import { Product } from './productService';
 import { cart, cartItems, sessions } from '../tables';
 
 export async function getCartById(cartId: string) {

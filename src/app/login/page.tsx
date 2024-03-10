@@ -1,5 +1,5 @@
 import { login } from '@/lib/server/services/authService';
-import { LoginForm } from './LoginForm';
+import { LoginForm } from '../../components/forms/LoginForm';
 
 export default async function LoginPage() {
   return (
