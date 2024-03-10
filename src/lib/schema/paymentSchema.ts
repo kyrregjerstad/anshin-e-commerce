@@ -9,7 +9,7 @@ export const paymentSchema = z
     name: z.string().min(1, 'Name is required'),
     cardNumber: z.string().refine(isCreditCard, {
       message:
-        'Card number is invalid. \n\n Tip: You can use the following test card number: 4242 4242 4242 4242',
+        'Card number is invalid. Tip: You can use the following test card number: 4242 4242 4242 4242',
     }),
     month: z
       .string()
