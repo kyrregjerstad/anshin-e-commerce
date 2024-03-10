@@ -33,15 +33,24 @@ export default async function CheckoutPage() {
     return redirect('/checkout/edit-address');
   }
 
+  // If the shipping and billing addresses are the same, we don't need to show the billing address form
+  // if the billing address is undefined, we use the shipping address as the default
+
+  const sameAddress =
+    !billingAddress || isEqual(shippingAddress, billingAddress);
+
+  const showBillingAddressForm = !sameAddress || !billingAddress;
+
   return (
     <section className="flex w-full max-w-2xl flex-col gap-8">
       <h1 className="mb-4 text-3xl font-semibold">Address</h1>
       <div className="grid gap-6 md:grid-cols-2 md:gap-8">
         {shippingAddress && <AddressCard address={shippingAddress} />}
-        {billingAddress && (
+
+        {showBillingAddressForm && (
           <AddressCard
-            address={billingAddress}
-            isSameAddress={isEqual(shippingAddress, billingAddress)}
+            address={billingAddress ?? shippingAddress}
+            isSameAddress={sameAddress}
           />
         )}
       </div>
@@ -64,7 +73,7 @@ const AddressCard = ({
 }) => {
   const type = address.type === 'shipping' ? 'shipping' : 'billing';
   return (
-    <Card variant="neutral" className="w-full">
+    <Card variant="neutral" className="flex w-full flex-col justify-between">
       {isSameAddress ? (
         <>
           <CardHeader>
@@ -77,7 +86,9 @@ const AddressCard = ({
           </CardContent>
           <div className="flex-1"></div>
           <CardFooter>
-            <Button>Edit</Button>
+            <Link href={`/checkout/edit-address?type=billing`}>
+              <Button>Edit</Button>
+            </Link>
           </CardFooter>
         </>
       ) : (

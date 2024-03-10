@@ -34,6 +34,8 @@ export async function upsertAddress(
 
     const address = addressSchema.parse(formData);
 
+    console.log(address);
+
     const sessionId = getSessionCookie();
 
     if (!sessionId) {
@@ -57,17 +59,35 @@ export async function upsertAddress(
       };
     }
 
-    const res = await db
-      .update(addressTable)
-      .set({
-        ...address,
-      })
-      .where(
-        and(
-          eq(addressTable.userId, currentUser.userId),
-          eq(addressTable.type, address.type)
-        )
-      );
+    const existingAddress = await db.query.address.findFirst({
+      where: and(
+        eq(addressTable.userId, currentUser.userId),
+        eq(addressTable.type, address.type)
+      ),
+    });
+
+    if (!existingAddress) {
+      await db
+        .insert(addressTable)
+        .values({
+          ...address,
+          id: generateId(),
+          userId: currentUser.userId,
+        })
+        .execute();
+    } else {
+      await db
+        .update(addressTable)
+        .set({
+          ...address,
+        })
+        .where(
+          and(
+            eq(addressTable.userId, currentUser.userId),
+            eq(addressTable.type, address.type)
+          )
+        );
+    }
 
     revalidatePath('/checkout/address');
 
