@@ -9,7 +9,7 @@ import {
   Tag,
 } from './server/tables';
 
-export const seedData = [
+const seedData = [
   {
     id: '109566af-c5c2-4f87-86cb-76f36fb8d378',
     title: 'Vanilla Perfume',

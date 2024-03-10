@@ -1,7 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { handleRemoveFromCart } from '@/lib/server/services/cartService';
-import { useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 
 export const RemoveFromCartButton = ({

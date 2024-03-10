@@ -71,7 +71,7 @@ type FormContentProps = {
   form: UseFormReturn<FormValues>;
 };
 
-export const FormContent = ({ form }: FormContentProps) => {
+const FormContent = ({ form }: FormContentProps) => {
   const { pending } = useFormStatus();
   const {
     control,
