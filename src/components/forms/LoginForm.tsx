@@ -32,9 +32,10 @@ type FormValues = z.infer<typeof loginSchema>;
 
 type Props = {
   loginFn: SubmitFn;
+  callbackUrl: string | undefined;
 };
 
-export const LoginForm = ({ loginFn }: Props) => {
+export const LoginForm = ({ loginFn, callbackUrl }: Props) => {
   const { form, formAction } = useFormWithValidation<FormValues>({
     schema: loginSchema,
     defaultValues: {
@@ -42,7 +43,7 @@ export const LoginForm = ({ loginFn }: Props) => {
       password: '',
     },
     submitFn: loginFn,
-    onSuccess: () => redirect('/'),
+    onSuccess: () => redirect(callbackUrl ?? '/'),
   });
 
   return (

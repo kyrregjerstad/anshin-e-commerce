@@ -23,7 +23,7 @@ export default async function CheckoutPage() {
   const user = await getUserBySessionId(sessionId);
 
   if (!user) {
-    return redirect('/login');
+    return redirect('/login?callbackUrl=/checkout/address');
   }
 
   const { shippingAddress, billingAddress } = user;

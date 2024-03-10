@@ -44,6 +44,7 @@ export const useFormWithValidation = <TFormValues extends FieldValues>({
   const status = state?.status;
 
   useEffect(() => {
+    console.log(status);
     if (!status) {
       return;
     }
