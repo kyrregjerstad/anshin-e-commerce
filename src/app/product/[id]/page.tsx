@@ -3,14 +3,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
-import { validateRequest } from '@/lib/auth';
+import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { Review, getProductById } from '@/lib/server/services/productService';
 import { StarIcon } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { z } from 'zod';
 import { ProductInteractions } from './ProductInteractions';
-import { getSessionCookie } from '@/lib/server/auth/cookies';
+import { Metadata, ResolvingMetadata } from 'next';
+
 const paramsSchema = z.object({
   id: z.string().length(36),
 });
@@ -128,3 +129,29 @@ const ReviewBarChart = ({
     </div>
   );
 };
+
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const result = paramsSchema.safeParse(params);
+
+  // since we know that the id should contain a valid UUID, we can safely throw a 404 if it's shorter than 36 characters, which saves us a db query
+  if (!result.success) {
+    return notFound();
+  }
+  const { id: productId } = result.data;
+  const sessionId = getSessionCookie();
+  const product = await getProductById(productId, sessionId);
+
+  if (!product) {
+    return notFound();
+  }
+
+  const { title, description, images, averageRating } = product;
+
+  return {
+    title: `${title} | Anshin`,
+    description,
+  };
+}
