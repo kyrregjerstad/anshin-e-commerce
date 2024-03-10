@@ -1,40 +1,21 @@
 'use server';
-import { db } from '@/lib/server/db';
-import { ZodError } from 'zod';
-import { address as addressTable, sessions } from '@/lib/server/tables';
-import { generateId } from '@/lib/server/auth/utils';
-import { getSessionDetails } from '@/lib/server/services/sessionService';
+import { ActionResult } from '@/lib/hooks/useForm';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
+import { generateId } from '@/lib/server/auth/utils';
+import { db } from '@/lib/server/db';
+import { address as addressTable, sessions } from '@/lib/server/tables';
+import { handleErrors } from '@/lib/utils';
 import { and, eq } from 'drizzle-orm';
-import { addressSchema } from './addressSchema';
-import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-
-export type UpsertAddressActionResult =
-  | {
-      status: 'success';
-      message: string;
-    }
-  | {
-      status: 'error';
-      message: string;
-      errors?: Array<{
-        path: string;
-        message: string;
-      }>;
-    }
-  | null;
+import { addressSchema } from './addressSchema';
 
 export async function upsertAddress(
-  _prevState: UpsertAddressActionResult | null,
+  _prevState: ActionResult | null,
   data: FormData
-): Promise<UpsertAddressActionResult> {
+): Promise<ActionResult> {
   try {
     const formData = Object.fromEntries(data.entries());
-
     const address = addressSchema.parse(formData);
-
-    console.log(address);
 
     const sessionId = getSessionCookie();
 
@@ -96,25 +77,6 @@ export async function upsertAddress(
       message: 'Logged in successfully',
     };
   } catch (error) {
-    console.log(handleError(error));
-    return handleError(error);
+    return handleErrors(error);
   }
-}
-
-function handleError(error: any) {
-  if (error instanceof ZodError) {
-    return {
-      status: 'error',
-      message: 'Invalid form data',
-      errors: error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: `${issue.message}`,
-      })),
-    } as const;
-  }
-
-  return {
-    status: 'error',
-    message: 'Something went wrong. Please try again.',
-  } as const;
 }

@@ -1,3 +1,4 @@
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -5,14 +6,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ShippingForm } from '../edit-address/ShippingForm';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { getUserBySessionId } from '@/lib/server/services/userService';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import { Button, buttonVariants } from '@/components/ui/button';
-import isEqual from 'lodash/isEqual';
 import { InsertAddress } from '@/lib/server/tables';
+import isEqual from 'lodash/isEqual';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 export default async function CheckoutPage() {
   const sessionId = getSessionCookie();
@@ -32,9 +31,6 @@ export default async function CheckoutPage() {
   if (!shippingAddress) {
     return redirect('/checkout/edit-address');
   }
-
-  // If the shipping and billing addresses are the same, we don't need to show the billing address form
-  // if the billing address is undefined, we use the shipping address as the default
 
   const sameAddress =
     !billingAddress || isEqual(shippingAddress, billingAddress);

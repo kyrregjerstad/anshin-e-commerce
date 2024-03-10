@@ -24,24 +24,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
 import { ErrorMessage } from '@hookform/error-message';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
-import { FieldPath, UseFormReturn, useForm } from 'react-hook-form';
-import { UpsertAddressActionResult } from './upsertAddress';
-import { Address, addressSchema } from './addressSchema';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { revalidatePath, revalidateTag } from 'next/cache';
+import { useFormStatus } from 'react-dom';
+import { UseFormReturn } from 'react-hook-form';
+import { Address, addressSchema } from './addressSchema';
 
 type Props = {
   addressType: 'shipping' | 'billing';
   shippingAddress: Address | null;
-  submitFn: (
-    prevState: any,
-    formData: FormData
-  ) => Promise<UpsertAddressActionResult>;
+  submitFn: SubmitFn;
 };
 
 export const ShippingForm = ({
@@ -49,14 +43,8 @@ export const ShippingForm = ({
   addressType,
   submitFn,
 }: Props) => {
-  const [state, formAction] = useFormState<UpsertAddressActionResult, FormData>(
-    submitFn,
-    null
-  );
-
-  const form = useForm<Address>({
-    resolver: zodResolver(addressSchema),
-    criteriaMode: 'all',
+  const { form, formAction } = useFormWithValidation<Address>({
+    schema: addressSchema,
     defaultValues: {
       firstName: shippingAddress?.firstName ?? '',
       lastName: shippingAddress?.lastName ?? '',
@@ -68,27 +56,9 @@ export const ShippingForm = ({
       country: shippingAddress?.country ?? '',
       type: addressType,
     },
+    submitFn,
+    onSuccess: () => redirect('/checkout/address'),
   });
-
-  const { setError, reset } = form;
-
-  useEffect(() => {
-    if (!state) {
-      return;
-    }
-
-    if (state.status === 'error') {
-      state.errors?.forEach((error) => {
-        setError(error.path as FieldPath<Address>, {
-          message: error.message,
-        });
-      });
-    }
-
-    if (state.status === 'success') {
-      redirect('/checkout/address');
-    }
-  }, [state]);
 
   return (
     <Card variant="neutral">
@@ -118,8 +88,6 @@ const FormContent = ({ form }: FormContentProps) => {
     control,
     formState: { errors },
   } = form;
-
-  console.log(errors);
 
   return (
     <>

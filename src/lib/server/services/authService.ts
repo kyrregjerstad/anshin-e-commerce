@@ -1,7 +1,9 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
 'use server';
+import { ActionResult } from '@/lib/hooks/useForm';
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { registerSchema } from '@/lib/schema/registerSchema';
+import { handleErrors } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
@@ -19,25 +21,10 @@ import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createUserSession, getSessionDetails } from './sessionService';
 
-export type LoginActionResult =
-  | {
-      status: 'success';
-      message: string;
-    }
-  | {
-      status: 'error';
-      message: string;
-      errors?: Array<{
-        path: string;
-        message: string;
-      }>;
-    }
-  | null;
-
 export async function login(
-  _prevState: LoginActionResult | null,
+  _prevState: ActionResult | null,
   data: FormData
-): Promise<LoginActionResult> {
+): Promise<ActionResult> {
   try {
     const { email, password } = loginSchema.parse(data);
 
@@ -73,29 +60,14 @@ export async function login(
       message: 'Logged in successfully',
     };
   } catch (error) {
-    return handleError(error);
+    return handleErrors(error);
   }
 }
 
-type RegisterActionResult =
-  | {
-      status: 'success';
-      message: string;
-    }
-  | {
-      status: 'error';
-      message: string;
-      errors?: Array<{
-        path: string;
-        message: string;
-      }>;
-    }
-  | null;
-
 export async function register(
-  _prevState: LoginActionResult | null,
+  _prevState: ActionResult | null,
   data: FormData
-): Promise<RegisterActionResult> {
+): Promise<ActionResult> {
   try {
     const { name, email, password, repeatPassword } =
       registerSchema.parse(data);
@@ -150,7 +122,7 @@ export async function register(
       message: 'Registered and logged in successfully',
     };
   } catch (error) {
-    return handleError(error);
+    return handleErrors(error);
   }
 }
 
@@ -228,24 +200,6 @@ async function handleGuestCart(
   } else {
     await mergeCarts(guestSessionId, userId, cartId, guestSessionCartItems);
   }
-}
-
-function handleError(error: any) {
-  if (error instanceof ZodError) {
-    return {
-      status: 'error',
-      message: 'Invalid form data',
-      errors: error.issues.map((issue) => ({
-        path: issue.path.join('.'),
-        message: `${issue.message}`,
-      })),
-    } as const;
-  }
-
-  return {
-    status: 'error',
-    message: 'Something went wrong. Please try again.',
-  } as const;
 }
 
 export async function logOut() {

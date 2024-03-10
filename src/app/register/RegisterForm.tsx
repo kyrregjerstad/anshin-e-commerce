@@ -18,62 +18,33 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
 import { registerSchema } from '@/lib/schema/registerSchema';
-import { LoginActionResult } from '@/lib/server/services/authService';
+
 import { ErrorMessage } from '@hookform/error-message';
-import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
-import { UseFormReturn, useForm, type FieldPath } from 'react-hook-form';
+import { useFormStatus } from 'react-dom';
+import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 type FormValues = z.infer<typeof registerSchema>;
 
 type Props = {
-  registerFn: (
-    prevState: any,
-    formData: FormData
-  ) => Promise<LoginActionResult>;
+  registerFn: SubmitFn;
 };
 export const RegisterForm = ({ registerFn }: Props) => {
-  const [state, formAction] = useFormState<LoginActionResult, FormData>(
-    registerFn,
-    null
-  );
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(registerSchema),
-    criteriaMode: 'all',
+  const { form, formAction } = useFormWithValidation<FormValues>({
+    schema: registerSchema,
     defaultValues: {
       name: '',
       email: '',
       password: '',
       repeatPassword: '',
     },
+    submitFn: registerFn,
+    onSuccess: () => redirect('/'),
   });
-
-  const { setError, reset } = form;
-
-  useEffect(() => {
-    if (!state) {
-      return;
-    }
-
-    console.log(state);
-    if (state.status === 'error') {
-      state.errors?.forEach((error) => {
-        setError(error.path as FieldPath<FormValues>, {
-          message: error.message,
-        });
-      });
-    }
-    if (state.status === 'success') {
-      reset();
-      redirect('/');
-    }
-  }, [state, setError, reset]);
 
   return (
     <Card className="w-full max-w-md">

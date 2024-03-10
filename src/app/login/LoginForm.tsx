@@ -24,49 +24,32 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { LoginActionResult } from '@/lib/server/services/authService';
+
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { redirect } from 'next/navigation';
+import {
+  ActionResult,
+  SubmitFn,
+  useFormWithValidation,
+} from '@/lib/hooks/useForm';
 
 type FormValues = z.infer<typeof loginSchema>;
 
 type Props = {
-  loginFn: (prevState: any, formData: FormData) => Promise<LoginActionResult>;
+  loginFn: SubmitFn;
 };
-export const LoginForm = ({ loginFn }: Props) => {
-  const [state, formAction] = useFormState<LoginActionResult, FormData>(
-    loginFn,
-    null
-  );
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(loginSchema),
-    criteriaMode: 'all',
+export const LoginForm = ({ loginFn }: Props) => {
+  const { form, formAction } = useFormWithValidation<FormValues>({
+    schema: loginSchema,
     defaultValues: {
       email: '',
       password: '',
     },
+    submitFn: loginFn,
+    onSuccess: () => redirect('/'),
   });
-
-  const { setError, reset } = form;
-
-  useEffect(() => {
-    if (!state) {
-      return;
-    }
-    if (state.status === 'error') {
-      state.errors?.forEach((error) => {
-        setError(error.path as FieldPath<FormValues>, {
-          message: error.message,
-        });
-      });
-    }
-    if (state.status === 'success') {
-      reset();
-      redirect('/');
-    }
-  }, [state, setError, reset]);
 
   return (
     <Card className="w-full max-w-md">
