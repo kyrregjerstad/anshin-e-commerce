@@ -1,8 +1,8 @@
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { getUserBySessionId } from '@/lib/server/services/userService';
 import { redirect } from 'next/navigation';
-import { ShippingForm } from '../../../components/forms/ShippingForm';
-import { upsertAddress } from './upsertAddress';
+import { ShippingForm } from '@/components/forms/ShippingForm';
+import { upsertAddress } from '@/lib/server/services/addressService';
 
 type Props = {
   searchParams: {

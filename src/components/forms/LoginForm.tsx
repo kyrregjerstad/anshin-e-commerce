@@ -1,19 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 import {
-  CardTitle,
-  CardHeader,
+  Card,
   CardContent,
   CardFooter,
-  Card,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
-import { ErrorMessage } from '@hookform/error-message';
-import { Button } from '@/components/ui/button';
-import { useFormState, useFormStatus } from 'react-dom';
-import React, { useEffect } from 'react';
-import { type FieldPath, useForm, UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
 import {
   Form,
   FormControl,
@@ -23,16 +17,16 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { ErrorMessage } from '@hookform/error-message';
+import Link from 'next/link';
+import { useFormStatus } from 'react-dom';
+import { UseFormReturn } from 'react-hook-form';
+import { z } from 'zod';
 
-import { loginSchema } from '@/lib/schema/loginSchema';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
+import { loginSchema } from '@/lib/schema/loginSchema';
 import { redirect } from 'next/navigation';
-import {
-  ActionResult,
-  SubmitFn,
-  useFormWithValidation,
-} from '@/lib/hooks/useForm';
 
 type FormValues = z.infer<typeof loginSchema>;
 

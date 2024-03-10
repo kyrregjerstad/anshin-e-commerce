@@ -7,7 +7,7 @@ import { address as addressTable, sessions } from '@/lib/server/tables';
 import { handleErrors } from '@/lib/utils';
 import { and, eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
-import { addressSchema } from './addressSchema';
+import { addressSchema } from '../../../lib/schema/addressSchema';
 
 export async function upsertAddress(
   _prevState: ActionResult | null,
