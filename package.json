@@ -21,6 +21,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@lucia-auth/adapter-drizzle": "^1.0.2",
     "@node-rs/argon2": "^1.8.0",
+    "@node-rs/bcrypt": "^1.10.0",
     "@planetscale/database": "^1.16.0",
     "@radix-ui/react-aspect-ratio": "^1.0.3",
     "@radix-ui/react-avatar": "^1.0.4",
