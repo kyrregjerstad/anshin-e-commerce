@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -28,30 +28,29 @@ import { ErrorMessage } from '@hookform/error-message';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useFormState, useFormStatus } from 'react-dom';
-import { UseFormReturn, useForm } from 'react-hook-form';
-import { z } from 'zod';
-
-const addressSchema = z.object({
-  firstName: z.string().min(2).max(50),
-  lastName: z.string().min(2).max(50),
-  streetAddress1: z.string().min(5).max(100),
-  streetAddress2: z.string().min(2).max(100),
-  city: z.string().min(2).max(50),
-  state: z.string().min(2).max(50),
-  postalCode: z.string().min(2).max(20),
-  country: z.string().min(2).max(50),
-  type: z.enum(['shipping', 'billing']),
-});
-
-type Address = z.infer<typeof addressSchema>;
+import { FieldPath, UseFormReturn, useForm } from 'react-hook-form';
+import { UpsertAddressActionResult } from './upsertAddress';
+import { Address, addressSchema } from './addressSchema';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 type Props = {
+  addressType: 'shipping' | 'billing';
   shippingAddress: Address | null;
+  submitFn: (
+    prevState: any,
+    formData: FormData
+  ) => Promise<UpsertAddressActionResult>;
 };
 
-export const ShippingForm = ({ shippingAddress }: Props) => {
-  const [state, formAction] = useFormState<ShippingActionResult, FormData>(
-    () => null,
+export const ShippingForm = ({
+  shippingAddress,
+  addressType,
+  submitFn,
+}: Props) => {
+  const [state, formAction] = useFormState<UpsertAddressActionResult, FormData>(
+    submitFn,
     null
   );
 
@@ -67,7 +66,7 @@ export const ShippingForm = ({ shippingAddress }: Props) => {
       state: shippingAddress?.state ?? '',
       postalCode: shippingAddress?.postalCode ?? '',
       country: shippingAddress?.country ?? '',
-      type: 'shipping',
+      type: addressType,
     },
   });
 
@@ -77,6 +76,18 @@ export const ShippingForm = ({ shippingAddress }: Props) => {
     if (!state) {
       return;
     }
+
+    if (state.status === 'error') {
+      state.errors?.forEach((error) => {
+        setError(error.path as FieldPath<Address>, {
+          message: error.message,
+        });
+      });
+    }
+
+    if (state.status === 'success') {
+      redirect('/checkout/address');
+    }
   }, [state]);
 
   return (
@@ -84,7 +95,7 @@ export const ShippingForm = ({ shippingAddress }: Props) => {
       <CardHeader>
         <CardTitle>
           <h1 className="text-2xl font-semibold md:text-3xl">
-            Shipping Address
+            {addressType} address
           </h1>
         </CardTitle>
       </CardHeader>
@@ -108,9 +119,11 @@ const FormContent = ({ form }: FormContentProps) => {
     formState: { errors },
   } = form;
 
+  console.log(errors);
+
   return (
     <>
-      <CardContent className="grid gap-4 md:gap-8">
+      <CardContent className="grid gap-4 sm:grid-cols-2 md:gap-4">
         <FormField
           control={control}
           name="firstName"
@@ -163,7 +176,11 @@ const FormContent = ({ form }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="address2">Address 2</FormLabel>
               <FormControl>
-                <Input placeholder="Address 2" {...field} />
+                <Input
+                  placeholder="Address 2"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="streetAddress2" />
@@ -178,7 +195,11 @@ const FormContent = ({ form }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="city">City</FormLabel>
               <FormControl>
-                <Input placeholder="City" {...field} />
+                <Input
+                  placeholder="City"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="city" />
@@ -208,7 +229,11 @@ const FormContent = ({ form }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="state">State</FormLabel>
               <FormControl>
-                <Input placeholder="State" {...field} />
+                <Input
+                  placeholder="State"
+                  {...field}
+                  value={field.value ?? ''}
+                />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="state" />
@@ -222,25 +247,59 @@ const FormContent = ({ form }: FormContentProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel htmlFor="country">Country</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Country" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="United States">United States</SelectItem>
-                  <SelectItem value="Canada">Canada</SelectItem>
-                  <SelectItem value="Mexico">Mexico</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  {...field}
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Country" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="United States">United States</SelectItem>
+                    <SelectItem value="Canada">Canada</SelectItem>
+                    <SelectItem value="Mexico">Mexico</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="country" />
               </FormMessage>
             </FormItem>
           )}
         />
+        <FormField
+          control={control}
+          name="type"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel htmlFor="type">Type</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Type"
+                  {...field}
+                  value={field.value ?? ''}
+                />
+              </FormControl>
+              <FormMessage>
+                <ErrorMessage errors={errors} name="type" />
+              </FormMessage>
+            </FormItem>
+          )}
+        />
       </CardContent>
-      <CardFooter>
-        <Button type="submit">Continue to payment</Button>
+      <CardFooter className="flex gap-4">
+        <Button type="submit" disabled={pending}>
+          Save
+        </Button>
+        <Link
+          className={buttonVariants({ variant: 'outline' })}
+          href="/checkout/address"
+        >
+          Cancel
+        </Link>
       </CardFooter>
     </>
   );

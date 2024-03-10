@@ -121,7 +121,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   address: one(address, {
     fields: [orders.id],
     references: [address.id],
-    relationName: 'order_address',
+    relationName: 'address_orders',
   }),
 }));
 

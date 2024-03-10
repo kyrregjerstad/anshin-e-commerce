@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ShippingForm } from './ShippingForm';
+import { ShippingForm } from '../edit-address/ShippingForm';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { getUserBySessionId } from '@/lib/server/services/userService';
 import { redirect } from 'next/navigation';
@@ -29,15 +29,15 @@ export default async function CheckoutPage() {
 
   const { shippingAddress, billingAddress } = user;
 
+  if (!shippingAddress) {
+    return redirect('/checkout/edit-address');
+  }
+
   return (
     <section className="flex w-full max-w-2xl flex-col gap-8">
       <h1 className="mb-4 text-3xl font-semibold">Address</h1>
       <div className="grid gap-6 md:grid-cols-2 md:gap-8">
-        {shippingAddress ? (
-          <AddressCard address={shippingAddress} />
-        ) : (
-          <ShippingForm shippingAddress={shippingAddress} />
-        )}
+        {shippingAddress && <AddressCard address={shippingAddress} />}
         {billingAddress && (
           <AddressCard
             address={billingAddress}
@@ -62,6 +62,7 @@ const AddressCard = ({
   address: InsertAddress;
   isSameAddress?: boolean;
 }) => {
+  const type = address.type === 'shipping' ? 'shipping' : 'billing';
   return (
     <Card variant="neutral" className="w-full">
       {isSameAddress ? (
@@ -104,7 +105,9 @@ const AddressCard = ({
             </div>
           </CardContent>
           <CardFooter>
-            <Button>Edit</Button>
+            <Link href={`/checkout/edit-address?type=${type}`}>
+              <Button>Edit</Button>
+            </Link>
           </CardFooter>
         </>
       )}
