@@ -9,12 +9,11 @@ import {
 } from './lib/server/auth/cookies';
 import {
   createSession,
-  setRedisSession,
+  refreshRedisSessionExpiration,
   validateRefreshToken,
   validateSession,
 } from './lib/server/services/sessionService';
 
-// Three scenarios:
 // 1. If the sessionCookie is valid, proceed without database calls
 // 2. f the sessionCookie is expired, but the refreshToken is valid, generate a new sessionCookie and a new refresh token, updating the session expiry in the database
 // 3. If no tokens are present or valid, create a new guest session and set the sessionCookie
@@ -31,9 +30,16 @@ export async function middleware(request: NextRequest) {
     request.cookies.get(refreshTokenCookieName)?.value ?? null;
 
   if (sessionCookieToken) {
-    const isValidSession = await validateSession(sessionCookieToken);
+    const sessionType = await validateSession(sessionCookieToken);
 
-    if (isValidSession) {
+    if (sessionType) {
+      await refreshRedisSessionExpiration(sessionCookieToken);
+
+      response.cookies.set(
+        createSessionCookie(sessionCookieToken, {
+          guest: sessionType === 'guest',
+        })
+      );
       return response;
     }
   }
@@ -43,6 +49,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const userId = await validateRefreshToken(refreshCookieToken);
+
   if (userId) {
     const { id, refreshToken } = await createSession(userId);
 

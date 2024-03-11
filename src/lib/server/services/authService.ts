@@ -11,6 +11,7 @@ import { Argon2id } from 'oslo/password';
 import { ZodError, ZodIssueCode } from 'zod';
 import {
   createBlankSessionCookie,
+  createRefreshTokenCookie,
   createSessionCookie,
   getSessionCookie,
 } from '../auth/cookies';
@@ -44,8 +45,10 @@ export async function login(
     const session = await createSession(userId);
 
     const sessionCookie = createSessionCookie(session.id);
+    const refreshCookie = createRefreshTokenCookie(session.refreshToken);
 
     cookies().set(sessionCookie.name, sessionCookie.value);
+    cookies().set(refreshCookie.name, refreshCookie.value);
 
     return {
       status: 'success',

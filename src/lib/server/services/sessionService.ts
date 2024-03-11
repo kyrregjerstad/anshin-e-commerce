@@ -181,7 +181,7 @@ export async function createSession(
 
   try {
     await db.insert(sessions).values(session);
-    await setRedisSession(session.id);
+    await setRedisSession(session.id, guest);
   } catch (error) {
     console.error(error);
   } finally {
@@ -195,15 +195,24 @@ function getExpiresAt(guest: boolean) {
     : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days
 }
 
-export async function setRedisSession(sessionToken: string) {
-  await redis.set(`session:${sessionToken}`, 'valid', {
+export async function setRedisSession(sessionToken: string, guest = true) {
+  await redis.set(`session:${sessionToken}`, guest ? 'guest' : 'user', {
     ex: ONE_HOUR_IN_SECONDS,
   });
 }
 
 export async function validateSession(sessionToken: string) {
-  const sessionData = await redis.get(`session:${sessionToken}`);
-  return sessionData !== null;
+  const sessionType = (await redis.get(`session:${sessionToken}`)) as
+    | 'guest'
+    | 'user'
+    | null;
+
+  return sessionType;
+}
+
+export async function refreshRedisSessionExpiration(sessionId: string) {
+  const ttl = ONE_HOUR_IN_SECONDS;
+  await redis.expire(`session:${sessionId}`, ttl);
 }
 
 export async function validateRefreshToken(refreshToken: string) {
