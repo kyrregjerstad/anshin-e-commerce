@@ -91,7 +91,7 @@ export async function getSessionDetails(
 
     return {
       ...emptySession,
-      session: await createSession(null, { guest: true }),
+      session: null,
     };
   }
 
@@ -102,7 +102,7 @@ export async function getSessionDetails(
 
     return {
       ...emptySession,
-      session: await createSession(null, { guest: true }),
+      session: null,
     };
   }
 

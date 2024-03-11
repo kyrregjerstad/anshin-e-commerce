@@ -4,6 +4,10 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
+import { db } from '@/lib/server/db';
+import { eq } from 'drizzle-orm';
+import { sessions } from '@/lib/server/tables';
+import { validateRequest } from '@/lib/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,11 +21,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, cart } = await validateRequest();
   return (
     <html lang="en">
       <Analytics />
       <body className={inter.className}>
-        <Header user={null} cart={[]} />
+        <Header user={user} cart={cart} />
         <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 sm:p-8">
           {children}
         </main>
