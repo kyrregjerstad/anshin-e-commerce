@@ -1,7 +1,7 @@
 'use server';
 
 import { eq } from 'drizzle-orm';
-import { generateId } from '../auth/utils';
+import { generateId, generateRefreshToken } from '../auth/utils';
 import { db } from '../db';
 import { sessions } from '../tables';
 import { createCart } from './cartService';
@@ -13,6 +13,9 @@ import {
   ValidateSessionResult,
 } from './types';
 import { getEmptySessionDetails, transformCartItems } from './utils';
+import { redis } from '../redis';
+
+const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 export async function getSessionById(
   sessionId: string
@@ -88,7 +91,7 @@ export async function getSessionDetails(
 
     return {
       ...emptySession,
-      session: await createGuestSession(),
+      session: await createSession(null, { guest: true }),
     };
   }
 
@@ -99,7 +102,7 @@ export async function getSessionDetails(
 
     return {
       ...emptySession,
-      session: await createGuestSession(),
+      session: await createSession(null, { guest: true }),
     };
   }
 
@@ -161,35 +164,64 @@ export async function handleGuestSession(sessionData: SessionWithoutUser) {
   };
 }
 
-export async function createUserSession(userId: string) {
-  const userSession = {
-    id: generateId(),
+export async function createSession(
+  userId: string | null,
+  options?: {
+    guest: boolean;
+  }
+) {
+  const guest = options?.guest || false;
+
+  const session = {
+    id: generateId({ guest }),
     userId,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+    expiresAt: getExpiresAt(guest),
+    refreshToken: generateRefreshToken({ guest }),
   };
 
   try {
-    await db.insert(sessions).values(userSession);
+    await db.insert(sessions).values(session);
+    await setRedisSession(session.id);
   } catch (error) {
     console.error(error);
-    throw new Error('Failed to create user session.');
   } finally {
-    return userSession;
+    return session;
   }
 }
 
-export async function createGuestSession() {
-  const id = generateId({ guest: true });
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+function getExpiresAt(guest: boolean) {
+  return guest
+    ? new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 hours
+    : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days
+}
 
-  try {
-    await db.insert(sessions).values({
-      id,
-      expiresAt,
-    });
-  } catch (error) {
-    console.error(error);
-  } finally {
-    return { id, expiresAt };
+export async function setRedisSession(sessionToken: string) {
+  await redis.set(`session:${sessionToken}`, 'valid', {
+    ex: ONE_HOUR_IN_SECONDS,
+  });
+}
+
+export async function validateSession(sessionToken: string) {
+  const sessionData = await redis.get(`session:${sessionToken}`);
+  return sessionData !== null;
+}
+
+export async function validateRefreshToken(refreshToken: string) {
+  const session = await db.query.sessions.findFirst({
+    where: eq(sessions.refreshToken, refreshToken),
+    columns: {},
+    with: {
+      user: {
+        columns: {
+          id: true,
+        },
+      },
+    },
+  });
+
+  if (session?.user?.id) {
+    return session.user.id;
   }
+
+  return null;
 }

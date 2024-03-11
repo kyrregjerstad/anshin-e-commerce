@@ -1,10 +1,9 @@
+import { Analytics } from '@/components/Analytics';
+import { Header } from '@/components/Header';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import './globals.css';
-import { Header } from '@/components/Header';
-import { validateRequest } from '@/lib/auth';
-import { Analytics } from '@/components/Analytics';
 import Link from 'next/link';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,13 +17,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, cart } = await validateRequest();
-
   return (
     <html lang="en">
       <Analytics />
       <body className={inter.className}>
-        <Header user={user} cart={cart} />
+        <Header user={null} cart={[]} />
         <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 sm:p-8">
           {children}
         </main>

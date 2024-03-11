@@ -669,13 +669,15 @@ export const seedSessionsData = [
     id: 'a',
     userId: 'a',
     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+    refreshToken: 'a',
   },
   {
     id: 'b',
     userId: 'b',
     expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // 30 days
+    refreshToken: 'b',
   },
-] as InsertSession[];
+] satisfies InsertSession[];
 
 export const seedProductsData = [
   {

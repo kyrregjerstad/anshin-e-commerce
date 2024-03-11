@@ -10,7 +10,6 @@ import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
 import { ZodError, ZodIssueCode } from 'zod';
 import {
-  createBlankCartCookie,
   createBlankSessionCookie,
   createSessionCookie,
   getSessionCookie,
@@ -19,7 +18,7 @@ import { generateId } from '../auth/utils';
 import { db } from '../db';
 import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
-import { createUserSession, getSessionDetails } from './sessionService';
+import { createSession, getSessionDetails } from './sessionService';
 
 export async function login(
   _prevState: ActionResult | null,
@@ -42,14 +41,7 @@ export async function login(
 
     const { id: userId } = existingUser;
 
-    const session = await createUserSession(userId);
-    // const cartId = await getOrCreateCart(session);
-
-    const guestSessionId = getSessionCookie();
-
-    // if (guestSessionId) {
-    //   await handleGuestCart(guestSessionId, userId, cartId);
-    // }
+    const session = await createSession(userId);
 
     const sessionCookie = createSessionCookie(session.id);
 
@@ -104,14 +96,7 @@ export async function register(
       hashedPassword,
     });
 
-    const session = await createUserSession(newUserId);
-    // const cartId = await getOrCreateCart(session.id, newUserId);
-
-    // const guestSessionId = getSessionCookie();
-
-    // if (guestSessionId) {
-    //   await handleGuestCart(guestSessionId, newUserId, cartId);
-    // }
+    const session = await createSession(newUserId);
 
     const sessionCookie = createSessionCookie(session.id);
 
@@ -218,10 +203,8 @@ export async function logOut() {
   await db.delete(sessions).where(eq(sessions.id, sessionId));
 
   const sessionCookie = createBlankSessionCookie();
-  const cartCookie = createBlankCartCookie();
 
   cookies().delete(sessionCookie.name);
-  cookies().delete(cartCookie.name);
 
   revalidatePath('/');
 }

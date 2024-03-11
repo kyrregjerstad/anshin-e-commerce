@@ -81,6 +81,7 @@ export const sessions = mysqlTable('sessions', {
   userId: varchar('user_id', { length: 64 }).references(() => users.id, {
     onDelete: 'cascade',
   }),
+  refreshToken: varchar('refresh_token', { length: 255 }).notNull(),
   expiresAt: datetime('expires_at').notNull(),
 });
 

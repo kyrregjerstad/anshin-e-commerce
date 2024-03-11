@@ -5,7 +5,7 @@ import { HeroSection } from '../components/HeroSection';
 
 export default async function Home() {
   const sessionId = getSessionCookie();
-  const allProducts = await getAllProducts(sessionId);
+  const allProducts = await getAllProducts(sessionId); // session id is used here to check if the product is in the users cart
 
   return (
     <>

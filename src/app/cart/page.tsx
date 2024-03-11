@@ -8,12 +8,12 @@ import {
 import { validateRequest } from '@/lib/auth';
 import { db } from '@/lib/server/db';
 import { cart, cartItems, images, products } from '@/lib/server/tables';
+import { formatUSD } from '@/lib/utils';
 import { eq, sql } from 'drizzle-orm';
 import Image from 'next/image';
 import Link from 'next/link';
 import { QuantitySelector } from './QuantitySelector';
 import { RemoveFromCartButton } from './RemoveFromCartButton';
-import { formatUSD } from '@/lib/utils';
 
 const CartPage = async () => {
   const { cartId } = await validateRequest();
