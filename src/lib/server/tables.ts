@@ -1,5 +1,6 @@
 import { InferInsertModel, relations } from 'drizzle-orm';
 import {
+  boolean,
   datetime,
   int,
   mysqlEnum,
@@ -43,7 +44,57 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   addresses: many(address, {
     relationName: 'user_address',
   }),
+  wishlist: one(wishlist, {
+    fields: [users.id],
+    references: [wishlist.userId],
+    relationName: 'user_wishlist',
+  }),
 }));
+
+export const wishlist = mysqlTable('wishlist', {
+  id: varchar('id', { length: 64 }).primaryKey(),
+  userId: varchar('user_id', { length: 64 })
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  public: boolean('public').notNull().default(false),
+});
+export type InsertWishlist = InferInsertModel<typeof wishlist>;
+
+export const wishlistRelations = relations(wishlist, ({ one, many }) => ({
+  user: one(users, {
+    fields: [wishlist.userId],
+    references: [users.id],
+    relationName: 'user_wishlist',
+  }),
+  items: many(wishlistItems, {
+    relationName: 'wishlist_items',
+  }),
+}));
+
+export const wishlistItems = mysqlTable('wishlist_items', {
+  wishlistId: varchar('wishlist_id', { length: 64 })
+    .notNull()
+    .references(() => wishlist.id),
+  productId: varchar('product_id', { length: 36 })
+    .notNull()
+    .references(() => products.id),
+});
+
+export const wishlistItemsRelations = relations(
+  wishlistItems,
+  ({ one, many }) => ({
+    wishlist: one(wishlist, {
+      fields: [wishlistItems.wishlistId],
+      references: [wishlist.id],
+      relationName: 'wishlist_items',
+    }),
+    product: one(products, {
+      fields: [wishlistItems.productId],
+      references: [products.id],
+      relationName: 'wishlist_products',
+    }),
+  })
+);
 
 export const address = mysqlTable('address', {
   id: varchar('id', { length: 64 }).primaryKey(),
@@ -231,7 +282,11 @@ export const productsRelations = relations(products, ({ many }) => ({
   reviews: many(reviews, {
     relationName: 'reviews_product',
   }),
+  wishlist: many(wishlistItems, {
+    relationName: 'wishlist_products',
+  }),
 }));
+
 export const images = mysqlTable('images', {
   id: varchar('id', { length: 36 }).primaryKey(),
   url: varchar('url', { length: 255 }).notNull(),

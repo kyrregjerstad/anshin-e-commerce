@@ -6,6 +6,7 @@ import {
   InsertProduct,
   InsertReview,
   InsertSession,
+  InsertWishlist,
   Tag,
 } from './server/tables';
 
@@ -578,6 +579,13 @@ export const seedUsersData = [
     hashedPassword: '',
   },
 ];
+
+export const seedWishlistData = [
+  {
+    id: 'a',
+    userId: 'a',
+  },
+] satisfies InsertWishlist[];
 
 export const seedAddressesData = [
   {

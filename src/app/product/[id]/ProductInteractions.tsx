@@ -13,6 +13,7 @@ import { HeartIcon } from 'lucide-react';
 import { handleAddToCart } from '@/lib/server/services/cartService';
 import { useCartStore } from '@/lib/hooks/useCartStore';
 import { useFormStatus } from 'react-dom';
+import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
 
 export const ProductInteractions = ({
   id,
@@ -26,22 +27,37 @@ export const ProductInteractions = ({
   const { addItem } = useCartStore();
 
   return (
-    <form
-      className="grid gap-4 md:gap-10"
-      action={async (formData) => {
-        const quantity = parseInt(formData.get('quantity') as string, 10) || 1;
-        addItem({
-          id,
-          quantity,
-        });
-        await handleAddToCart({
-          productId: id,
-          quantity,
-        });
-      }}
-    >
-      <FormContent price={price} inCart={inCart} />
-    </form>
+    <div className="flex flex-col gap-2">
+      <form
+        className="grid gap-4 md:gap-10"
+        action={async (formData) => {
+          const quantity =
+            parseInt(formData.get('quantity') as string, 10) || 1;
+          addItem({
+            id: id,
+            quantity,
+          });
+          await handleAddToCart({
+            productId: id,
+            quantity,
+          });
+        }}
+      >
+        <FormContent price={price} inCart={inCart} />
+      </form>
+      <form
+        action={async () => {
+          await handleAddToWishlist({
+            productId: id,
+          });
+        }}
+      >
+        <Button size="lg" variant="outline">
+          <HeartIcon className="mr-2 h-4 w-4" />
+          Add to wishlist
+        </Button>
+      </form>
+    </div>
   );
 };
 
@@ -74,10 +90,6 @@ const FormContent = ({ price, inCart }: { price: number; inCart: boolean }) => {
         <div className="flex flex-col gap-2 min-[400px]:flex-row">
           <Button size="lg" type="submit" disabled={pending}>
             {inCart ? 'Update Cart' : 'Add to Cart'}
-          </Button>
-          <Button size="lg" variant="outline">
-            <HeartIcon className="mr-2 h-4 w-4" />
-            Add to wishlist
           </Button>
         </div>
       </div>

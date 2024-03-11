@@ -11,6 +11,7 @@ import {
   seedReviewData,
   seedSessionsData,
   seedUsersData,
+  seedWishlistData,
 } from '../seedData';
 import * as schema from './tables';
 
@@ -34,6 +35,7 @@ const main = async () => {
     await seedProducts(tx);
     await seedImages(tx);
     await seedUsers(tx);
+    await seedWishlists(tx);
     await seedAddresses(tx);
     await seedSessions(tx);
     await seedCarts(tx);
@@ -75,6 +77,12 @@ async function seedUsers(db: DB) {
   console.log('🫅 Seeded users');
 }
 
+async function seedWishlists(db: DB) {
+  await db.insert(schema.wishlist).values(seedWishlistData).execute();
+
+  console.log('🎁 Seeded wishlists');
+}
+
 async function seedAddresses(db: DB) {
   await db.insert(schema.address).values(seedAddressesData).execute();
 
@@ -109,12 +117,6 @@ async function seedProducts(db: DB) {
   await db.insert(schema.products).values(seedProductsData).execute();
 
   console.log('🤝 Seeded products');
-}
-
-async function deleteImages(db: DB) {
-  await db.delete(schema.images).execute();
-
-  console.log('🗑️  Deleted images');
 }
 
 async function seedImages(db: DB) {
