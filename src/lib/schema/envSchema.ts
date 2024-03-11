@@ -6,6 +6,9 @@ export const envVariables = z.object({
   DATABASE_USERNAME: z.string(),
   DATABASE_PASSWORD: z.string(),
   DEMO_PASSWORD: z.string(),
+  UPSTASH_REDIS_REST_URL: z.string(),
+  UPSTASH_REDIS_REST_TOKEN: z.string(),
+  SRH_TOKEN: z.string(),
 });
 
 envVariables.parse(process.env);
