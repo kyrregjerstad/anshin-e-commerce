@@ -48,5 +48,3 @@ const Footer = () => {
     </footer>
   );
 };
-
-export const runtime = 'edge';
