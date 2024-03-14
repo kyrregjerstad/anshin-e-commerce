@@ -1,13 +1,10 @@
 import { Analytics } from '@/components/Analytics';
 import { Header } from '@/components/Header';
+import { validateRequest } from '@/lib/auth';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
-import { db } from '@/lib/server/db';
-import { eq } from 'drizzle-orm';
-import { sessions } from '@/lib/server/tables';
-import { validateRequest } from '@/lib/auth';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -51,3 +48,5 @@ const Footer = () => {
     </footer>
   );
 };
+
+export const runtime = 'edge';
