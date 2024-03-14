@@ -2,7 +2,7 @@ import { CartIcon } from '@/components/CartIcon';
 import Link from 'next/link';
 
 import { Cart } from '@/lib/server/services/types';
-import { CircleUserRound } from 'lucide-react';
+import { CircleUserRound, HeartIcon } from 'lucide-react';
 import { UserAccountMenu } from './UserAccountMenu';
 import Logo from './Logo';
 
@@ -20,11 +20,16 @@ export const Header = async ({ user, cart }: Props) => {
         <UserAccountMenu user={user}>
           <CircleUserRound />
         </UserAccountMenu>
-        <ul className="flex w-full items-center justify-between gap-4">
-          <li></li>
-          <li>
+        <ul className="flex w-full items-center justify-between gap-2">
+          <li className="flex-1">
             <Link href="/">
               <Logo />
+            </Link>
+          </li>
+          <li className="">
+            <Link href="/wishlist" className='group'>
+              <span className="sr-only">wishlist</span>
+              <HeartIcon />
             </Link>
           </li>
           <li>

@@ -9,11 +9,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { HeartIcon } from 'lucide-react';
 import { handleAddToCart } from '@/lib/server/services/cartService';
-import { useCartStore } from '@/lib/hooks/useCartStore';
-import { useFormStatus } from 'react-dom';
 import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
+import { HeartIcon } from 'lucide-react';
+import { useFormStatus } from 'react-dom';
 
 export const ProductInteractions = ({
   id,
@@ -24,8 +23,6 @@ export const ProductInteractions = ({
   price: number;
   inCart: boolean;
 }) => {
-  const { addItem } = useCartStore();
-
   return (
     <div className="flex flex-col gap-2">
       <form
@@ -33,10 +30,6 @@ export const ProductInteractions = ({
         action={async (formData) => {
           const quantity =
             parseInt(formData.get('quantity') as string, 10) || 1;
-          addItem({
-            id: id,
-            quantity,
-          });
           await handleAddToCart({
             productId: id,
             quantity,
@@ -45,18 +38,19 @@ export const ProductInteractions = ({
       >
         <FormContent price={price} inCart={inCart} />
       </form>
-      <form
-        action={async () => {
-          await handleAddToWishlist({
+
+      <Button
+        size="lg"
+        variant="outline"
+        onClick={() =>
+          handleAddToWishlist({
             productId: id,
-          });
-        }}
+          })
+        }
       >
-        <Button size="lg" variant="outline">
-          <HeartIcon className="mr-2 h-4 w-4" />
-          Add to wishlist
-        </Button>
-      </form>
+        <HeartIcon className="mr-2 h-4 w-4" />
+        Add to wishlist
+      </Button>
     </div>
   );
 };

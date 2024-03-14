@@ -7,7 +7,6 @@ export default async function Home() {
   const sessionId = getSessionCookie();
   const allProducts = await getAllProducts(sessionId); // session id is used here to check if the product is in the users cart
 
-  // test
   return (
     <>
       <div className="flex w-full flex-col items-center">
