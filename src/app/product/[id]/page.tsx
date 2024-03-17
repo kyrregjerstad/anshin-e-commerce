@@ -41,22 +41,24 @@ export default async function ProductDetailsPage({ params }: Props) {
     product;
 
   return (
-    <div className="flex max-w-6xl flex-col items-center gap-8 px-6">
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="flex flex-col justify-between gap-8">
-          <div className="flex flex-1 flex-col gap-8">
-            <div>
-              <h1 className="text-4xl font-bold">{title}</h1>
+    <div className="flex w-full max-w-6xl flex-col items-center gap-8 sm:px-6">
+      <div className="grid w-full gap-4 md:grid-cols-2 lg:gap-8">
+        <div className="flex flex-col justify-between">
+          <div className="flex flex-1 flex-col">
+            <div className="flex flex-col gap-2">
+              <h1 className="text-2xl font-bold sm:text-4xl lg:text-5xl">
+                {title}
+              </h1>
               <StarRating rating={averageRating} />
             </div>
-            <p>{description}</p>
+            <p className="py-8">{description}</p>
             <div className="flex-1" />
             <ProductInteractions {...product} />
           </div>
         </div>
         <Image
           alt="Product Image"
-          className="-order-1 aspect-square w-full overflow-hidden rounded-lg border border-gray-200 object-cover dark:border-gray-800 sm:order-1"
+          className="-order-1 aspect-square w-full overflow-hidden rounded-lg border border-gray-200 object-cover dark:border-gray-800 md:order-1"
           height={600}
           src={images[0].url}
           width={600}
@@ -65,7 +67,7 @@ export default async function ProductDetailsPage({ params }: Props) {
       <Separator className="my-6" />
       <section className="flex w-full flex-1 flex-col gap-4">
         <h2 className="text-xl font-bold">Reviews</h2>
-        <div className="flex w-full flex-1 gap-8">
+        <div className="flex w-full flex-1 flex-col-reverse gap-8 lg:flex-row">
           <div className="flex-1">
             <div className="flex flex-col gap-4">
               {product.reviews.map((review) => (
@@ -85,9 +87,9 @@ export default async function ProductDetailsPage({ params }: Props) {
 const UserReview = ({ review }: { review: Review }) => {
   return (
     <Card>
-      <CardContent className="p-4">
-        <div className="flex items-start gap-4">
-          <Avatar>
+      <CardContent className="p-2 sm:p-4">
+        <div className="flex items-start gap-2 sm:gap-4">
+          <Avatar className="sm:size-12">
             <AvatarImage alt="User" src="/placeholder-avatar.jpg" />
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
