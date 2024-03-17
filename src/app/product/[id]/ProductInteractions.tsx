@@ -1,18 +1,9 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { handleAddToCart } from '@/lib/server/services/cartService';
 import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
 import { HeartIcon } from 'lucide-react';
-import { useFormStatus } from 'react-dom';
+
+import { QuantitySelect } from './QuantitySelect';
+import { SimpleForm } from './SimpleForm';
 
 export const ProductInteractions = ({
   id,
@@ -23,70 +14,45 @@ export const ProductInteractions = ({
   price: number;
   inCart: boolean;
 }) => {
+  const addToCartAction = async (formData: FormData) => {
+    'use server';
+    const quantity = parseInt(formData.get('quantity') as string, 10) || 1;
+    await handleAddToCart({
+      productId: id,
+      quantity,
+    });
+  };
+
+  const addToWishlistAction = async () => {
+    'use server';
+    await handleAddToWishlist({ productId: id });
+  };
+
   return (
     <div className="flex flex-col gap-2">
-      <form
-        className="grid gap-4 md:gap-10"
-        action={async (formData) => {
-          const quantity =
-            parseInt(formData.get('quantity') as string, 10) || 1;
-          await handleAddToCart({
-            productId: id,
-            quantity,
-          });
-        }}
-      >
-        <FormContent price={price} inCart={inCart} />
-      </form>
-
-      <Button
-        size="lg"
-        variant="outline"
-        onClick={() =>
-          handleAddToWishlist({
-            productId: id,
-          })
-        }
-      >
-        <HeartIcon className="mr-2 h-4 w-4" />
-        Add to wishlist
-      </Button>
-    </div>
-  );
-};
-
-const FormContent = ({ price, inCart }: { price: number; inCart: boolean }) => {
-  const { pending } = useFormStatus();
-
-  return (
-    <>
-      <div className="flex flex-col gap-4">
-        <div className="flex items-end gap-4">
-          <div>
-            <Label className="text-base" htmlFor="quantity">
-              Quantity
-            </Label>
-            <Select defaultValue="1" name="quantity">
-              <SelectTrigger className="w-24">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1</SelectItem>
-                <SelectItem value="2">2</SelectItem>
-                <SelectItem value="3">3</SelectItem>
-                <SelectItem value="4">4</SelectItem>
-                <SelectItem value="5">5</SelectItem>
-              </SelectContent>
-            </Select>
+      <SimpleForm
+        action={addToCartAction}
+        render={({ SubmitButton }) => (
+          <div className="flex flex-col gap-4">
+            <div className="flex items-end gap-4">
+              <QuantitySelect />
+              <div className="text-2xl font-bold">${price}</div>
+            </div>
+            <SubmitButton size="lg">
+              {inCart ? 'Update Cart' : 'Add to Cart'}
+            </SubmitButton>
           </div>
-          <div className="text-2xl font-bold">${price}</div>
-        </div>
-        <div className="flex flex-col gap-2 min-[400px]:flex-row">
-          <Button size="lg" type="submit" disabled={pending}>
-            {inCart ? 'Update Cart' : 'Add to Cart'}
-          </Button>
-        </div>
-      </div>
-    </>
+        )}
+      />
+      <SimpleForm
+        action={addToWishlistAction}
+        render={({ SubmitButton }) => (
+          <SubmitButton size="lg" variant="outline" className="w-full">
+            <HeartIcon className="mr-2 h-4 w-4" />
+            Add To Wishlist
+          </SubmitButton>
+        )}
+      />
+    </div>
   );
 };

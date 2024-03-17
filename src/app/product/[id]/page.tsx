@@ -44,13 +44,14 @@ export default async function ProductDetailsPage({ params }: Props) {
     <div className="flex max-w-6xl flex-col items-center gap-8 px-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col justify-between gap-8">
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-1 flex-col gap-8">
             <div>
               <h1 className="text-4xl font-bold">{title}</h1>
               <StarRating rating={averageRating} />
             </div>
-            <ProductInteractions {...product} />
             <p>{description}</p>
+            <div className="flex-1" />
+            <ProductInteractions {...product} />
           </div>
         </div>
         <Image
