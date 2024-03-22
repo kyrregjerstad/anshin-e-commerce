@@ -1,7 +1,8 @@
-import { connect } from '@planetscale/database';
-import { Argon2id } from 'oslo/password';
 import * as dotenv from 'dotenv';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { drizzle } from 'drizzle-orm/mysql2';
+import { Argon2id } from 'oslo/password';
+
+import mysql from 'mysql2/promise';
 import {
   seedAddressesData,
   seedCartsData,
@@ -18,15 +19,16 @@ import * as schema from './tables';
 dotenv.config();
 
 const main = async () => {
-  const connection = connect({
+  const connection = await mysql.createConnection({
     host: process.env.DATABASE_HOST,
-    username: process.env.DATABASE_USERNAME,
+    user: process.env.DATABASE_USERNAME,
     password: process.env.DATABASE_PASSWORD,
+    database: 'anshin',
   });
 
-  const db = drizzle(connection, { schema });
+  const db = drizzle(connection, { schema, mode: 'default' });
 
-  db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     await deleteProducts(tx);
     await deleteCarts(tx);
     await deleteSessions(tx);
@@ -42,6 +44,8 @@ const main = async () => {
     await seedItemsToCarts(tx);
     await seedReviews(tx);
   });
+
+  await connection.end();
 };
 
 main();

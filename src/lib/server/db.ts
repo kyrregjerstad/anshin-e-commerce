@@ -1,13 +1,14 @@
-import { Client } from '@planetscale/database';
 import { Logger } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { drizzle } from 'drizzle-orm/mysql2';
+import mysql from 'mysql2/promise';
 
 import * as schema from './tables';
 
-const client = new Client({
+const connection = await mysql.createConnection({
   host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
+  user: process.env.DATABASE_USERNAME,
   password: process.env.DATABASE_PASSWORD,
+  database: 'anshin',
 });
 
 class CustomLogger implements Logger {
@@ -16,4 +17,4 @@ class CustomLogger implements Logger {
   }
 }
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(connection, { schema, mode: 'default' });
