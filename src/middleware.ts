@@ -8,11 +8,9 @@ import {
   sessionCookieName,
 } from './lib/server/auth/cookies';
 import {
-  createSession,
   refreshRedisSessionExpiration,
-  validateRefreshToken,
   validateSession,
-} from './lib/server/services/sessionService';
+} from './lib/server/services/redisService';
 
 // 1. If the sessionCookie is valid, proceed without database calls
 // 2. f the sessionCookie is expired, but the refreshToken is valid, generate a new sessionCookie and a new refresh token, updating the session expiry in the database
@@ -44,28 +42,43 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  console.log('ding');
   if (!refreshCookieToken) {
-    return await handleGuestSession(response);
+    return await handleGuestSession(request, response);
   }
 
-  const userId = await validateRefreshToken(refreshCookieToken);
+  const url = new URL('/api/auth', request.url);
 
-  if (userId) {
-    const { id, refreshToken } = await createSession(userId);
+  const { id, refreshToken } = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refreshToken: refreshCookieToken }),
+  }).then((res) => res.json());
 
+  if (id && refreshToken) {
     response.cookies.set(createSessionCookie(id));
     response.cookies.set(createRefreshTokenCookie(refreshToken));
 
     return response;
   }
 
-  return await handleGuestSession(response);
+  return await handleGuestSession(request, response);
 }
 
-async function handleGuestSession(response: NextResponse) {
-  const { id, refreshToken } = await createSession(null, {
-    guest: true,
-  });
+async function handleGuestSession(
+  request: NextRequest,
+  response: NextResponse
+) {
+  const url = new URL('/api/auth', request.url);
+  const { id, refreshToken } = await fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refreshToken: null }),
+  }).then((res) => res.json());
 
   response.cookies.set(createSessionCookie(id, { guest: true }));
   response.cookies.set(createRefreshTokenCookie(refreshToken, { guest: true }));

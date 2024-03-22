@@ -201,20 +201,6 @@ export async function setRedisSession(sessionToken: string, guest = true) {
   });
 }
 
-export async function validateSession(sessionToken: string) {
-  const sessionType = (await redis.get(`session:${sessionToken}`)) as
-    | 'guest'
-    | 'user'
-    | null;
-
-  return sessionType;
-}
-
-export async function refreshRedisSessionExpiration(sessionId: string) {
-  const ttl = ONE_HOUR_IN_SECONDS;
-  await redis.expire(`session:${sessionId}`, ttl);
-}
-
 export async function validateRefreshToken(refreshToken: string) {
   const session = await db.query.sessions.findFirst({
     where: eq(sessions.refreshToken, refreshToken),
