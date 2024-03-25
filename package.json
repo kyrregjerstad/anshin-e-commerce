@@ -4,13 +4,19 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "docker": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "docker:init": "docker-compose down -v && docker-compose up -d",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
+    "db:generate": "drizzle-kit generate:mysql",
     "db:push": "drizzle-kit push:mysql",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "node --loader esbuild-register/loader -r esbuild-register ./src/lib/server/seed.ts",
+    "db:seed": "tsx ./src/lib/server/seed.ts",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:init": "pnpm db:migrate && pnpm db:seed",
     "knip": "knip"
   },
   "engines": {
@@ -37,6 +43,8 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@sentry/nextjs": "^7.105.0",
     "@tanstack/react-table": "^8.13.2",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
+    "@typescript-eslint/parser": "^7.3.1",
     "@upstash/redis": "^1.28.4",
     "card-validator": "^9.1.0",
     "class-variance-authority": "^0.7.0",
@@ -89,6 +97,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
     "tailwindcss": "^3.3.0",
+    "tsx": "^4.7.1",
     "typescript": "^5"
   }
 }

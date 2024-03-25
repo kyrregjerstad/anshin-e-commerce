@@ -41,7 +41,7 @@ const CartPage = async () => {
     <section className="grid w-full max-w-5xl gap-4 p-4 md:grid-cols-2">
       <div className="flex flex-col gap-4">
         {customerCart.items.map((item) => (
-          <Card className="grid grid-cols-3 gap-1 px-4 sm:px-0">
+          <Card className="grid grid-cols-3 gap-1 px-4 sm:px-0" key={item.id}>
             <CardHeader className="col-span-1 hidden p-4 sm:block">
               <div className="aspect-square overflow-hidden rounded-xl">
                 <Image

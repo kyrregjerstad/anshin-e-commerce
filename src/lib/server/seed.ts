@@ -1,7 +1,9 @@
-import { connect } from '@planetscale/database';
-import { Argon2id } from 'oslo/password';
+/* eslint-disable drizzle/enforce-delete-with-where */
 import * as dotenv from 'dotenv';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { drizzle } from 'drizzle-orm/mysql2';
+import { Argon2id } from 'oslo/password';
+
+import mysql from 'mysql2/promise';
 import {
   seedAddressesData,
   seedCartsData,
@@ -14,19 +16,16 @@ import {
   seedWishlistData,
 } from '../seedData';
 import * as schema from './tables';
+import { createDbConnection } from './dbConnection';
 
 dotenv.config();
 
 const main = async () => {
-  const connection = connect({
-    host: process.env.DATABASE_HOST,
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-  });
+  const connection = await createDbConnection();
 
-  const db = drizzle(connection, { schema });
+  const db = drizzle(connection, { schema, mode: 'default' });
 
-  db.transaction(async (tx) => {
+  await db.transaction(async (tx) => {
     await deleteProducts(tx);
     await deleteCarts(tx);
     await deleteSessions(tx);
@@ -42,6 +41,8 @@ const main = async () => {
     await seedItemsToCarts(tx);
     await seedReviews(tx);
   });
+
+  await connection.end();
 };
 
 main();

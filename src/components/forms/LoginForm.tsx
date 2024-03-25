@@ -59,7 +59,7 @@ export const LoginForm = ({ loginFn, callbackUrl }: Props) => {
         </Form>
       </CardContent>
       <CardFooter className="flex flex-col items-center">
-        <span className="text-sm">Don't have an account?</span>
+        <span className="text-sm">Don&apos;t have an account?</span>
         <Link className="text-sm font-medium" href="/register">
           Sign up
         </Link>

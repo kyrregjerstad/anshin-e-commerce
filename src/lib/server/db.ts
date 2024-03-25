@@ -1,14 +1,10 @@
-import { Client } from '@planetscale/database';
 import { Logger } from 'drizzle-orm/logger';
-import { drizzle } from 'drizzle-orm/planetscale-serverless';
+import { drizzle } from 'drizzle-orm/mysql2';
 
 import * as schema from './tables';
+import { createDbConnection } from './dbConnection';
 
-const client = new Client({
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-});
+const connection = await createDbConnection();
 
 class CustomLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {
@@ -16,4 +12,4 @@ class CustomLogger implements Logger {
   }
 }
 
-export const db = drizzle(client, { schema });
+export const db = drizzle(connection, { schema, mode: 'default' });

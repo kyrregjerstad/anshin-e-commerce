@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       .delete(sessions)
       .where(lt(sessions.expiresAt, new Date()));
 
-    console.log('Deleted expired sessions: ', res.rowsAffected);
+    console.log('Deleted expired sessions: ', res);
 
     return NextResponse.json({ ok: true });
   } catch (error) {
