@@ -24,7 +24,9 @@ const CartPage = async () => {
 
   const customerCart = await getCustomerCart(cartId);
 
-  if (!customerCart) {
+  console.log('items ', customerCart?.items);
+
+  if (!customerCart || customerCart.items.length === 0) {
     return (
       <section>
         <h1>Cart is empty</h1>
@@ -157,7 +159,7 @@ async function getCustomerCart(cartId: string) {
     .where(eq(cartItems.cartId, cartId))
     .as('items');
 
-  const customerCart = await db
+  const cartQuery = await db
     .select({
       cartId: cart.id,
       items: sql<CartItem[]>`JSON_ARRAYAGG(
@@ -178,9 +180,17 @@ async function getCustomerCart(cartId: string) {
     .groupBy(cart.id)
     .where(eq(cart.id, cartId));
 
-  if (!customerCart || !customerCart.length || !customerCart[0].items) {
+  const customerCart = cartQuery[0];
+
+  // the query returns an object with every field as null if the cart is empty
+  if (
+    !customerCart ||
+    !customerCart.items ||
+    customerCart.items.length === 0 ||
+    customerCart.items[0].id === null
+  ) {
     return null;
   }
 
-  return customerCart[0];
+  return customerCart;
 }
