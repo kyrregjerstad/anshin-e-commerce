@@ -1,3 +1,4 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { Argon2id } from 'oslo/password';

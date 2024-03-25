@@ -56,7 +56,7 @@ export const useFormWithValidation = <TFormValues extends FieldValues>({
       reset();
       onSuccess?.();
     }
-  }, [status, setError, reset]);
+  }, [status, setError, reset, onSuccess, state]);
 
   return { form, formAction };
 };
