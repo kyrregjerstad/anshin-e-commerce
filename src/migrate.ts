@@ -1,17 +1,12 @@
 import 'dotenv/config';
-import { migrate } from 'drizzle-orm/mysql2/migrator';
 import { drizzle } from 'drizzle-orm/mysql2';
+import { migrate } from 'drizzle-orm/mysql2/migrator';
 import * as schema from './lib/server/tables';
 
-import mysql from 'mysql2/promise';
+import { createDbConnection } from './lib/server/dbConnection';
 
 async function main() {
-  const connection = await mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: 'anshin',
-  });
+  const connection = await createDbConnection();
 
   const db = drizzle(connection, { schema, mode: 'default' });
   // This will run migrations on the database, skipping the ones already applied

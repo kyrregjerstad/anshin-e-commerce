@@ -4,6 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "docker": "docker-compose up -d",
+    "docker:stop": "docker-compose down",
+    "docker:init": "docker-compose down -v && docker-compose up -d",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -11,7 +14,9 @@
     "db:generate": "drizzle-kit generate:mysql",
     "db:push": "drizzle-kit push:mysql",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "node --loader esbuild-register/loader -r esbuild-register ./src/lib/server/seed.ts",
+    "db:seed": "tsx ./src/lib/server/seed.ts",
+    "db:migrate": "tsx src/migrate.ts",
+    "db:init": "pnpm db:migrate && pnpm db:seed",
     "knip": "knip"
   },
   "engines": {

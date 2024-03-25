@@ -42,20 +42,18 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  console.log('ding');
   if (!refreshCookieToken) {
     return await handleGuestSession(request, response);
   }
 
-  const url = new URL('/api/auth', request.url);
+  const { id, refreshToken, error } = await getRefreshToken(
+    request,
+    refreshCookieToken
+  );
 
-  const { id, refreshToken } = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken: refreshCookieToken }),
-  }).then((res) => res.json());
+  if (error) {
+    return response;
+  }
 
   if (id && refreshToken) {
     response.cookies.set(createSessionCookie(id));
@@ -71,17 +69,53 @@ async function handleGuestSession(
   request: NextRequest,
   response: NextResponse
 ) {
-  const url = new URL('/api/auth', request.url);
-  const { id, refreshToken } = await fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ refreshToken: null }),
-  }).then((res) => res.json());
+  const { id, refreshToken, error } = await getRefreshToken(
+    request,
+    request.cookies.get(refreshTokenCookieName)?.value ?? ''
+  );
+
+  if (error) {
+    return response;
+  }
 
   response.cookies.set(createSessionCookie(id, { guest: true }));
   response.cookies.set(createRefreshTokenCookie(refreshToken, { guest: true }));
 
   return response;
+}
+
+type RefreshTokenResponse =
+  | {
+      id: string;
+      refreshToken: string;
+      error?: false;
+    }
+  | {
+      id: null;
+      refreshToken: null;
+      error: true;
+    };
+
+// workaround since mysql2 does not work in edge functions
+// ideally we should just call the db directly if we were in a serverless function such as Planetscale
+async function getRefreshToken(
+  request: NextRequest,
+  refreshCookieToken: string
+): Promise<RefreshTokenResponse> {
+  const url = new URL('/api/auth', request.url);
+
+  try {
+    const { id, refreshToken } = (await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refreshToken: refreshCookieToken }),
+    }).then((res) => res.json())) as { id: string; refreshToken: string };
+
+    return { id, refreshToken };
+  } catch (error) {
+    console.error('Failed to get refresh token:', error);
+    return { id: null, refreshToken: null, error: true };
+  }
 }

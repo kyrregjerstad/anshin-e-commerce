@@ -15,16 +15,12 @@ import {
   seedWishlistData,
 } from '../seedData';
 import * as schema from './tables';
+import { createDbConnection } from './dbConnection';
 
 dotenv.config();
 
 const main = async () => {
-  const connection = await mysql.createConnection({
-    host: process.env.DATABASE_HOST,
-    user: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: 'anshin',
-  });
+  const connection = await createDbConnection();
 
   const db = drizzle(connection, { schema, mode: 'default' });
 
