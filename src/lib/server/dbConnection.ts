@@ -1,4 +1,6 @@
+'use server';
 import mysql from 'mysql2/promise';
+import { cache } from 'react';
 
 export async function createDbConnection() {
   return await mysql.createConnection({
@@ -12,3 +14,5 @@ export async function createDbConnection() {
     port: process.env.NODE_ENV === 'production' ? 3306 : 3307,
   });
 }
+
+export async function initAction() {}

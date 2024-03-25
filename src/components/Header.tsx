@@ -5,6 +5,7 @@ import { Cart } from '@/lib/server/services/types';
 import { CircleUserRound, HeartIcon } from 'lucide-react';
 import { UserAccountMenu } from './UserAccountMenu';
 import Logo from './Logo';
+import { logOut } from '@/lib/server/services/authService';
 
 type Props = {
   user: {
@@ -17,7 +18,7 @@ export const Header = async ({ user, cart }: Props) => {
   return (
     <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
       <nav className="flex w-full max-w-8xl items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
-        <UserAccountMenu user={user}>
+        <UserAccountMenu user={user} logOutAction={logOut}>
           <CircleUserRound />
         </UserAccountMenu>
         <ul className="flex w-full items-center justify-between gap-2">
@@ -27,7 +28,7 @@ export const Header = async ({ user, cart }: Props) => {
             </Link>
           </li>
           <li className="">
-            <Link href="/wishlist" className='group'>
+            <Link href="/wishlist" className="group">
               <span className="sr-only">wishlist</span>
               <HeartIcon />
             </Link>

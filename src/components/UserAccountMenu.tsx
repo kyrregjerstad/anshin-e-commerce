@@ -1,4 +1,8 @@
 'use client';
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import { SimpleForm } from './SimpleForm';
+import { Button } from './ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,18 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import { ReactNode } from 'react';
-import { Button } from './ui/button';
-import Link from 'next/link';
 
 type Props = {
   children: ReactNode;
+  logOutAction: () => void;
   user: {
     id: string;
     name: string;
   } | null;
 };
-export const UserAccountMenu = ({ children, user }: Props) => {
+export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -38,7 +40,14 @@ export const UserAccountMenu = ({ children, user }: Props) => {
             <DropdownMenuItem>My Orders</DropdownMenuItem>
             <DropdownMenuItem>Help</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem>
+              <SimpleForm
+                action={logOutAction}
+                render={({ SubmitButton }) => (
+                  <SubmitButton size="sm">Log Out</SubmitButton>
+                )}
+              />
+            </DropdownMenuItem>
           </>
         ) : (
           <>

@@ -59,5 +59,13 @@ export function createBlankSessionCookie() {
   };
 }
 
+export function createBlankRefreshTokenCookie() {
+  return {
+    name: refreshTokenCookieName,
+    value: '',
+    options: createDefaultCookieOptions(0),
+  };
+}
+
 export const getSessionCookie = () =>
   cookies().get(sessionCookieName)?.value ?? null;

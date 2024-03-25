@@ -1,4 +1,4 @@
-import { SubmitButton as Button } from './SubmitButton';
+import { SubmitButton as Button } from '../app/product/[id]/SubmitButton';
 
 type Props = {
   action: (formData: FormData) => void;

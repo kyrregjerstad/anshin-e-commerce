@@ -3,7 +3,7 @@ import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
 import { HeartIcon } from 'lucide-react';
 
 import { QuantitySelect } from './QuantitySelect';
-import { SimpleForm } from './SimpleForm';
+import { SimpleForm } from '@/components/SimpleForm';
 
 export const ProductInteractions = ({
   id,

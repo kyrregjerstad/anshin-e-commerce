@@ -5,11 +5,11 @@ import { loginSchema } from '@/lib/schema/loginSchema';
 import { registerSchema } from '@/lib/schema/registerSchema';
 import { handleErrors } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
-import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
 import { ZodError, ZodIssueCode } from 'zod';
 import {
+  createBlankRefreshTokenCookie,
   createBlankSessionCookie,
   createRefreshTokenCookie,
   createSessionCookie,
@@ -20,6 +20,7 @@ import { db } from '../db';
 import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
+import { revalidatePath } from 'next/cache';
 
 export async function login(
   _prevState: ActionResult | null,
@@ -206,8 +207,10 @@ export async function logOut() {
   await db.delete(sessions).where(eq(sessions.id, sessionId));
 
   const sessionCookie = createBlankSessionCookie();
+  const refreshCookie = createBlankRefreshTokenCookie();
 
   cookies().delete(sessionCookie.name);
+  cookies().delete(refreshCookie.name);
 
   revalidatePath('/');
 }
