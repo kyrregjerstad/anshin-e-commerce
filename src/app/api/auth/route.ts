@@ -5,7 +5,7 @@ import {
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest, _res: NextResponse) {
   const body = await req.json();
 
   const result = schema.safeParse(body);

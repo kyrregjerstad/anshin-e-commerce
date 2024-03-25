@@ -71,7 +71,7 @@ async function handleGuestSession(
 ) {
   const { id, refreshToken, error } = await getRefreshToken(
     request,
-    request.cookies.get(refreshTokenCookieName)?.value ?? ''
+    request.cookies.get(refreshTokenCookieName)?.value ?? null
   );
 
   if (error) {
@@ -100,7 +100,7 @@ type RefreshTokenResponse =
 // ideally we should just call the db directly if we were in a serverless function such as Planetscale
 async function getRefreshToken(
   request: NextRequest,
-  refreshCookieToken: string
+  refreshCookieToken: string | null
 ): Promise<RefreshTokenResponse> {
   const url = new URL('/api/auth', request.url);
 
