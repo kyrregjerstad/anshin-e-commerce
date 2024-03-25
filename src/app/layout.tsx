@@ -15,10 +15,15 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  searchParams,
 }: Readonly<{
   children: React.ReactNode;
+  searchParams?: {
+    q?: string;
+  };
 }>) {
   const { user, cart } = await validateRequest();
+
   return (
     <html lang="en">
       <Analytics />

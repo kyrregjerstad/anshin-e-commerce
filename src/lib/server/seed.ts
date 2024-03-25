@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { Argon2id } from 'oslo/password';
 
-import mysql from 'mysql2/promise';
 import {
   seedAddressesData,
   seedCartsData,
@@ -17,8 +16,20 @@ import {
 } from '../seedData';
 import * as schema from './tables';
 import { createDbConnection } from './dbConnection';
+import { Redis } from '@upstash/redis';
 
 dotenv.config();
+
+const productionEnv = process.env.NODE_ENV === 'production';
+
+export const redis = new Redis({
+  url: productionEnv
+    ? process.env.UPSTASH_REDIS_REST_URL
+    : 'http://localhost:8079',
+  token: productionEnv
+    ? process.env.UPSTASH_REDIS_REST_TOKEN
+    : process.env.SRH_TOKEN,
+});
 
 const main = async () => {
   const connection = await createDbConnection();
@@ -43,9 +54,21 @@ const main = async () => {
   });
 
   await connection.end();
+
+  await seedRedis();
 };
 
 main();
+
+async function seedRedis() {
+  await redis.flushall();
+
+  for (const product of seedProductsData) {
+    await redis.set(`product:${product.id}:title`, product.title);
+  }
+
+  console.log('🔥 Seeded Redis Product Data');
+}
 
 type DB = ReturnType<typeof drizzle>;
 

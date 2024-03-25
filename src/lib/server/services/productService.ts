@@ -1,6 +1,6 @@
 'use server';
 
-import { avg, eq, sql } from 'drizzle-orm';
+import { avg, eq, like, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { cart, images, products, reviews } from '../tables';
 
@@ -14,8 +14,8 @@ export type Product = {
   averageRating: number;
 };
 
-export async function getAllProducts(sessionId: string | null) {
-  const allProducts = await db
+const selectProductFields = () => {
+  return db
     .select({
       id: products.id,
       title: products.title,
@@ -33,10 +33,27 @@ export async function getAllProducts(sessionId: string | null) {
     .from(products)
     .leftJoin(images, eq(products.id, images.itemId))
     .leftJoin(reviews, eq(products.id, reviews.itemId))
-    .groupBy(products.id, images.url)
-    .limit(100);
+    .groupBy(products.id, images.url);
+};
 
+export async function getAllProducts(sessionId: string | null) {
+  const allProducts = await selectProductFields().limit(100);
   return await checkForItemsInCart(allProducts, sessionId);
+}
+
+export async function searchProductsByTitle(
+  sessionId: string | null,
+  productTitle: string | null
+) {
+  if (!productTitle) return [];
+  const searchPattern = `%${productTitle}%`;
+
+  const matchingProducts = await selectProductFields()
+    .where(like(products.title, searchPattern))
+    .limit(100)
+    .execute();
+
+  return await checkForItemsInCart(matchingProducts, sessionId);
 }
 
 async function checkForItemsInCart(
