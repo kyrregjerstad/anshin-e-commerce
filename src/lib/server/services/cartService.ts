@@ -8,6 +8,7 @@ import { generateId } from '../auth/utils';
 import { db } from '../db';
 import { Product } from './productService';
 import { cart, cartItems, sessions } from '../tables';
+import { createSession } from './sessionService';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
@@ -181,7 +182,6 @@ export async function handleAddToCart({
 }: AddItemToCartParams) {
   const sessionId = getSessionCookie();
 
-  // TODO: handle this better
   if (!sessionId) {
     throw new Error('Session not found');
   }
@@ -260,21 +260,30 @@ type Session = {
   } | null;
 };
 export async function getOrCreateCart(sessionId: string) {
-  const session = await getSessionDetails(sessionId);
+  const existingSession = await getSessionDetails(sessionId);
 
-  if (!session) {
-    throw new Error('Invalid session id');
+  // If session doesn't exist, create a new one - this can happen if the session is deleted in the db, but still exists in the user's cookies
+  if (!existingSession) {
+    const newSession = await createSession(null, { guest: true });
+    cookies().set('session_id', newSession.id);
+    return await createCart(newSession.id);
   }
 
-  if (session.cart?.id) {
-    return session.cart.id;
+  // If the session has a cart, return the cart id
+  if (existingSession.cart?.id) {
+    return existingSession.cart.id;
   }
 
-  if (session.user?.cart.id) {
-    return session.user.cart.id;
+  // If the user has a cart, return the cart id
+  if (existingSession.user?.cart.id) {
+    return existingSession.user.cart.id;
   }
 
-  const newCart = await createCart(session.id, session.user?.id);
+  // If the session doesn't have a cart, create a new cart
+  const newCart = await createCart(
+    existingSession.id,
+    existingSession.user?.id
+  );
 
   return newCart;
 }

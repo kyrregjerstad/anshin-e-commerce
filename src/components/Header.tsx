@@ -1,6 +1,5 @@
 import { CartIcon } from '@/components/CartIcon';
 import Link from 'next/link';
-
 import { Cart } from '@/lib/server/services/types';
 import { CircleUserRound, HeartIcon } from 'lucide-react';
 import { UserAccountMenu } from './UserAccountMenu';
