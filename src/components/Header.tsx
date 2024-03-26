@@ -6,6 +6,7 @@ import { CircleUserRound, HeartIcon } from 'lucide-react';
 import { UserAccountMenu } from './UserAccountMenu';
 import Logo from './Logo';
 import { logOut } from '@/lib/server/services/authService';
+import { SearchBar } from './SearchBar';
 
 type Props = {
   user: {
@@ -26,6 +27,9 @@ export const Header = async ({ user, cart }: Props) => {
             <Link href="/">
               <Logo />
             </Link>
+          </li>
+          <li>
+            <SearchBar />
           </li>
           <li className="">
             <Link href="/wishlist" className="group">

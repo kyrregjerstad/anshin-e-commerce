@@ -5,6 +5,7 @@ export const envVariables = z.object({
   DATABASE_HOST: z.string(),
   DATABASE_USERNAME: z.string(),
   DATABASE_PASSWORD: z.string(),
+  DATABASE_PORT: z.string(),
   DEMO_PASSWORD: z.string(),
   UPSTASH_REDIS_REST_URL: z.string(),
   UPSTASH_REDIS_REST_TOKEN: z.string(),

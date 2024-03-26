@@ -8,7 +8,7 @@ export async function createDbConnection() {
       user: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: 'anshin',
-      port: process.env.NODE_ENV === 'production' ? 3306 : 3307,
+      port: Number(process.env.DATABASE_PORT), // 3307 when using docker and 3306 for deployment
     });
   } catch (error) {
     const isDev = process.env.NODE_ENV === 'development';
