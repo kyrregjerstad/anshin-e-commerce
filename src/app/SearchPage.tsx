@@ -7,6 +7,18 @@ export const SearchPage = async ({ query }: { query: string }) => {
 
   const searchResults = await searchProductsByTitle(sessionId, query);
 
+  if (!searchResults || searchResults.length === 0) {
+    return (
+      <div className="flex w-full flex-col items-center">
+        <section className="flex w-full flex-col">
+          <div className="flex w-full flex-col items-center">
+            <h1 className="text-3xl font-bold">No results found</h1>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="flex w-full flex-col items-center">
       <section className="flex w-full flex-col">
