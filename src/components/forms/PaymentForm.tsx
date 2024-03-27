@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { SubmitFn } from '@/lib/hooks/useForm';
+
 import { paymentSchema } from '@/lib/schema/paymentSchema';
 import { ErrorMessage } from '@hookform/error-message';
 import { useFormStatus } from 'react-dom';
@@ -24,12 +24,13 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
+import { SubmitFn } from '@/lib/server/formAction';
 import { Form } from './Form';
 
 type FormValues = z.infer<typeof paymentSchema>;
 
 type Props = {
-  submitFn: SubmitFn;
+  submitFn: SubmitFn<FormValues>;
 };
 export const PaymentForm = ({ submitFn }: Props) => {
   const defaultValues = {

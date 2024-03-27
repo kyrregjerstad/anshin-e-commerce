@@ -1,13 +1,13 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
 'use server';
-import { ActionResult } from '@/lib/hooks/useForm';
+
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { registerSchema } from '@/lib/schema/registerSchema';
-import { handleErrors } from '@/lib/utils';
+import { SchemaKeys, createFormError, handleErrors, wait } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
-import { ZodError, ZodIssueCode } from 'zod';
+import { ZodError, ZodIssueCode, z } from 'zod';
 import {
   createBlankRefreshTokenCookie,
   createBlankSessionCookie,
@@ -21,99 +21,148 @@ import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
 import { revalidatePath } from 'next/cache';
+import { ActionResult, formAction } from '../formAction';
 
-export async function login(
-  _prevState: ActionResult | null,
-  data: FormData
-): Promise<ActionResult> {
-  try {
-    const { email, password } = loginSchema.parse(data);
+export const login = formAction(
+  loginSchema,
+  async ({ email, password }): Promise<ActionResult> => {
+    try {
+      const { existingUser, validPassword } = await verifyUserCredentials(
+        email,
+        password
+      );
 
-    const { existingUser, validPassword } = await verifyUserCredentials(
-      email,
-      password
-    );
+      if (!validPassword || !existingUser) {
+        return {
+          status: 'error',
+          message: 'Incorrect email or password',
+          errors: createFormError<SchemaKeys<typeof loginSchema>>([
+            { path: ['email'], message: 'Incorrect email or password' },
+          ]),
+        };
+      }
 
-    if (!validPassword || !existingUser) {
+      const { id: userId } = existingUser;
+
+      const session = await createSession(userId);
+
+      const sessionCookie = createSessionCookie(session.id);
+      const refreshCookie = createRefreshTokenCookie(session.refreshToken);
+
+      cookies().set(sessionCookie.name, sessionCookie.value);
+      cookies().set(refreshCookie.name, refreshCookie.value);
+
       return {
-        status: 'error',
-        message: 'Incorrect email or password',
+        status: 'success',
+        message: 'Logged in successfully',
       };
+    } catch (error) {
+      console.log('error', error);
+      return handleErrors(error);
     }
-
-    const { id: userId } = existingUser;
-
-    const session = await createSession(userId);
-
-    const sessionCookie = createSessionCookie(session.id);
-    const refreshCookie = createRefreshTokenCookie(session.refreshToken);
-
-    cookies().set(sessionCookie.name, sessionCookie.value);
-    cookies().set(refreshCookie.name, refreshCookie.value);
-
-    return {
-      status: 'success',
-      message: 'Logged in successfully',
-    };
-  } catch (error) {
-    return handleErrors(error);
   }
-}
+);
 
-export async function register(
-  _prevState: ActionResult | null,
-  data: FormData
-): Promise<ActionResult> {
-  try {
-    const { name, email, password, repeatPassword } =
-      registerSchema.parse(data);
-
-    if (password !== repeatPassword) {
-      return {
-        status: 'error',
-        message: 'Passwords do not match',
-      };
-    }
-
-    const existingUser = await db.query.users.findFirst({
-      where: eq(users.email, email),
-    });
-
-    if (existingUser) {
-      const error = new ZodError([]);
-      error.addIssue({
-        code: ZodIssueCode.custom,
-        message: 'User already exists',
-        path: ['email'],
+export const register = formAction(
+  registerSchema,
+  async ({ name, email, password }): Promise<ActionResult> => {
+    try {
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.email, email),
       });
 
-      throw error;
+      if (existingUser) {
+        const error = new ZodError([]);
+        error.addIssue({
+          code: ZodIssueCode.custom,
+          message: 'User already exists',
+          path: ['email'],
+        });
+
+        throw error;
+      }
+
+      const newUserId = generateId();
+      const hashedPassword = await new Argon2id().hash(password);
+
+      await db.insert(users).values({
+        id: newUserId,
+        name,
+        email,
+        hashedPassword,
+      });
+
+      const session = await createSession(newUserId);
+
+      const sessionCookie = createSessionCookie(session.id);
+      const refreshCookie = createRefreshTokenCookie(session.refreshToken);
+
+      cookies().set(sessionCookie.name, sessionCookie.value);
+      cookies().set(refreshCookie.name, refreshCookie.value);
+
+      return {
+        status: 'success',
+        message: 'Registered and logged in successfully',
+      };
+    } catch (error) {
+      return handleErrors(error);
     }
-
-    const newUserId = generateId();
-    const hashedPassword = await new Argon2id().hash(password);
-
-    await db.insert(users).values({
-      id: newUserId,
-      name,
-      email,
-      hashedPassword,
-    });
-
-    const session = await createSession(newUserId);
-
-    const sessionCookie = createSessionCookie(session.id);
-
-    cookies().set(sessionCookie.name, sessionCookie.value);
-
-    return {
-      status: 'success',
-      message: 'Registered and logged in successfully',
-    };
-  } catch (error) {
-    return handleErrors(error);
   }
-}
+);
+// export async function register(
+//   _prevState: ActionResult | null,
+//   data: FormData
+// ): Promise<ActionResult> {
+//   try {
+//     const { name, email, password, repeatPassword } =
+//       registerSchema.parse(data);
+
+//     if (password !== repeatPassword) {
+//       return {
+//         status: 'error',
+//         message: 'Passwords do not match',
+//       };
+//     }
+
+//     const existingUser = await db.query.users.findFirst({
+//       where: eq(users.email, email),
+//     });
+
+//     if (existingUser) {
+//       const error = new ZodError([]);
+//       error.addIssue({
+//         code: ZodIssueCode.custom,
+//         message: 'User already exists',
+//         path: ['email'],
+//       });
+
+//       throw error;
+//     }
+
+//     const newUserId = generateId();
+//     const hashedPassword = await new Argon2id().hash(password);
+
+//     await db.insert(users).values({
+//       id: newUserId,
+//       name,
+//       email,
+//       hashedPassword,
+//     });
+
+//     const session = await createSession(newUserId);
+
+//     const sessionCookie = createSessionCookie(session.id);
+
+//     cookies().set(sessionCookie.name, sessionCookie.value);
+
+//     return {
+//       status: 'success',
+//       message: 'Registered and logged in successfully',
+//     };
+//   } catch (error) {
+//     return handleErrors(error);
+//   }
+// }
 
 async function verifyUserCredentials(email: string, password: string) {
   const existingUser = await db.query.users.findFirst({
@@ -121,7 +170,9 @@ async function verifyUserCredentials(email: string, password: string) {
   });
 
   const validPassword = await new Argon2id().verify(
-    existingUser?.hashedPassword ?? '',
+    // default password to hash, so that the hashing function always try to hash a password
+    existingUser?.hashedPassword ??
+      '$argon2id$v=19$m=19456,t=2,p=1$juj2N0Frdb1BvKwHFfx3nw$/THeVkBkxDSSDA5AKpFEtMki9ffbRFc+SvvZVmuXMeU',
     password
   );
 

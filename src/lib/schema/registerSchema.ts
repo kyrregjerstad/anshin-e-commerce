@@ -1,8 +1,7 @@
-import { zfd } from 'zod-form-data';
 import { z } from 'zod';
 
-export const registerSchema = zfd
-  .formData({
+export const registerSchema = z
+  .object({
     name: z
       .string()
       .min(2, { message: 'Name must be at least 2 characters long' })

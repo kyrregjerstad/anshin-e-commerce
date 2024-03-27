@@ -12,7 +12,7 @@ export default async function LoginPage({ searchParams }: Props) {
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center p-6">
-      <LoginForm loginFn={login} callbackUrl={callbackUrl} />
+      <LoginForm submitFn={login} callbackUrl={callbackUrl} />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,7 +8,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -19,32 +17,28 @@ import {
 import { Input } from '@/components/ui/input';
 import { ErrorMessage } from '@hookform/error-message';
 import Link from 'next/link';
-import { useFormStatus } from 'react-dom';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
-import { LoadingSpinner } from '@/components/LoadingSpinner';
-import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { redirect } from 'next/navigation';
+import { LoadingSpinner } from '../LoadingSpinner';
+import { Button } from '../ui/button';
+import { Form } from './Form';
+import { SubmitFn } from '@/lib/server/formAction';
 
 type FormValues = z.infer<typeof loginSchema>;
 
 type Props = {
-  loginFn: SubmitFn;
+  submitFn: SubmitFn<FormValues>;
   callbackUrl: string | undefined;
 };
 
-export const LoginForm = ({ loginFn, callbackUrl }: Props) => {
-  const { form, formAction } = useFormWithValidation<FormValues>({
-    schema: loginSchema,
-    defaultValues: {
-      email: '',
-      password: '',
-    },
-    submitFn: loginFn,
-    onSuccess: () => redirect(callbackUrl ?? '/'),
-  });
+export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
+  const defaultValues = {
+    email: '',
+    password: '',
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -52,11 +46,15 @@ export const LoginForm = ({ loginFn, callbackUrl }: Props) => {
         <CardTitle>User Login</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form action={formAction} className="flex flex-col gap-3">
-            <FormContent form={form} />
-          </form>
-        </Form>
+        <Form
+          submitFn={submitFn}
+          schema={loginSchema}
+          defaultValues={defaultValues}
+          render={({ form, pending }) => (
+            <FormContent form={form} pending={pending} />
+          )}
+          onSuccess={() => redirect(callbackUrl ?? '/')}
+        />
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <span className="text-sm">Don&apos;t have an account?</span>
@@ -70,10 +68,10 @@ export const LoginForm = ({ loginFn, callbackUrl }: Props) => {
 
 type FormContentProps = {
   form: UseFormReturn<FormValues>;
+  pending: boolean;
 };
 
-const FormContent = ({ form }: FormContentProps) => {
-  const { pending } = useFormStatus();
+const FormContent = ({ form, pending }: FormContentProps) => {
   const {
     control,
     formState: { errors },

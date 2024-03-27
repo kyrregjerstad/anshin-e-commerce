@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -24,18 +23,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
+import { Address, addressSchema } from '@/lib/schema/addressSchema';
+import { SubmitFn } from '@/lib/server/formAction';
 import { ErrorMessage } from '@hookform/error-message';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useFormStatus } from 'react-dom';
 import { UseFormReturn } from 'react-hook-form';
-import { Address, addressSchema } from '@/lib/schema/addressSchema';
+import { z } from 'zod';
+import { Form } from './Form';
 
 type Props = {
   addressType: 'shipping' | 'billing';
   shippingAddress: Address | null;
-  submitFn: SubmitFn;
+  submitFn: SubmitFn<Address>;
 };
 
 export const ShippingForm = ({
@@ -43,22 +43,17 @@ export const ShippingForm = ({
   addressType,
   submitFn,
 }: Props) => {
-  const { form, formAction } = useFormWithValidation<Address>({
-    schema: addressSchema,
-    defaultValues: {
-      firstName: shippingAddress?.firstName ?? '',
-      lastName: shippingAddress?.lastName ?? '',
-      streetAddress1: shippingAddress?.streetAddress1 ?? '',
-      streetAddress2: shippingAddress?.streetAddress2 ?? '',
-      city: shippingAddress?.city ?? '',
-      state: shippingAddress?.state ?? '',
-      postalCode: shippingAddress?.postalCode ?? '',
-      country: shippingAddress?.country ?? '',
-      type: addressType,
-    },
-    submitFn,
-    onSuccess: () => redirect('/checkout/address'),
-  });
+  const defaultValues = {
+    firstName: shippingAddress?.firstName,
+    lastName: shippingAddress?.lastName,
+    streetAddress1: shippingAddress?.streetAddress1,
+    streetAddress2: shippingAddress?.streetAddress2,
+    city: shippingAddress?.city,
+    state: shippingAddress?.state,
+    postalCode: shippingAddress?.postalCode,
+    country: shippingAddress?.country,
+    type: addressType,
+  };
 
   return (
     <Card variant="neutral">
@@ -69,21 +64,25 @@ export const ShippingForm = ({
           </h1>
         </CardTitle>
       </CardHeader>
-      <Form {...form}>
-        <form action={formAction}>
-          <FormContent form={form} />
-        </form>
-      </Form>
+      <Form
+        submitFn={submitFn}
+        schema={addressSchema}
+        defaultValues={defaultValues}
+        onSuccess={() => redirect('/checkout/address')}
+        render={({ form, pending }) => (
+          <FormContent form={form} pending={pending} />
+        )}
+      ></Form>
     </Card>
   );
 };
 
 type FormContentProps = {
-  form: UseFormReturn<Address>;
+  form: UseFormReturn<z.infer<typeof addressSchema>>;
+  pending: boolean;
 };
 
-const FormContent = ({ form }: FormContentProps) => {
-  const { pending } = useFormStatus();
+const FormContent = ({ form, pending }: FormContentProps) => {
   const {
     control,
     formState: { errors },

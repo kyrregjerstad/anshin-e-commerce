@@ -1,28 +1,31 @@
 'use server';
 
-import { ActionResult } from '@/lib/hooks/useForm';
 import { paymentSchema } from '@/lib/schema/paymentSchema';
-import { handleErrors } from '@/lib/utils';
 import valid from 'card-validator';
+import { formAction } from '../formAction';
 
-export async function verifyPayment(
-  _prevState: ActionResult | null,
-  data: FormData
-): Promise<ActionResult> {
-  console.log(data);
-  try {
-    const formObject = Object.fromEntries(data.entries());
-    const result = paymentSchema.parse(formObject);
+export const verifyPayment = formAction(
+  paymentSchema,
+  async (validatedData) => {
+    const cardNumber = parseInt(validatedData.cardNumber);
+    const result = valid.number(cardNumber);
 
-    valid.number(parseInt(result.cardNumber));
-    console.log(result);
+    if (!result.isValid) {
+      return {
+        status: 'error',
+        message: 'Invalid card number',
+        errors: [
+          {
+            path: 'cardNumber',
+            message: 'Invalid card number',
+          },
+        ],
+      };
+    }
 
     return {
       status: 'success',
       message: 'Card verified successfully',
     };
-  } catch (error) {
-    console.log(handleErrors(error));
-    return handleErrors(error);
   }
-}
+);

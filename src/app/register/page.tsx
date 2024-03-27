@@ -1,10 +1,18 @@
 import { RegisterForm } from '@/components/forms/RegisterForm';
 import { register } from '@/lib/server/services/authService';
 
-const RegisterPage = async () => {
+type Props = {
+  searchParams: {
+    callbackUrl: string | undefined;
+  };
+};
+
+const RegisterPage = async ({ searchParams }: Props) => {
+  const { callbackUrl } = searchParams;
+
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center p-6">
-      <RegisterForm registerFn={register} />
+      <RegisterForm submitFn={register} callbackUrl={callbackUrl} />
     </div>
   );
 };

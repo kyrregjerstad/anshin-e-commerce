@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  Form,
   FormControl,
   FormField,
   FormItem,
@@ -18,33 +17,29 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { SubmitFn, useFormWithValidation } from '@/lib/hooks/useForm';
 import { registerSchema } from '@/lib/schema/registerSchema';
+import { SubmitFn } from '@/lib/server/formAction';
 
 import { ErrorMessage } from '@hookform/error-message';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { useFormStatus } from 'react-dom';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
+import { Form } from './Form';
 
 type FormValues = z.infer<typeof registerSchema>;
 
 type Props = {
-  registerFn: SubmitFn;
+  submitFn: SubmitFn<FormValues>;
+  callbackUrl: string | undefined;
 };
-export const RegisterForm = ({ registerFn }: Props) => {
-  const { form, formAction } = useFormWithValidation<FormValues>({
-    schema: registerSchema,
-    defaultValues: {
-      name: '',
-      email: '',
-      password: '',
-      repeatPassword: '',
-    },
-    submitFn: registerFn,
-    onSuccess: () => redirect('/'),
-  });
+export const RegisterForm = ({ submitFn, callbackUrl }: Props) => {
+  const defaultValues = {
+    name: '',
+    email: '',
+    password: '',
+    repeatPassword: '',
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -52,11 +47,18 @@ export const RegisterForm = ({ registerFn }: Props) => {
         <CardTitle>Register</CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}>
-          <form action={formAction} className="flex flex-col gap-3">
-            <FormContent form={form} />
-          </form>
-        </Form>
+        <Form
+          submitFn={submitFn}
+          schema={registerSchema}
+          defaultValues={defaultValues}
+          render={({ form, pending }) => (
+            <FormContent form={form} pending={pending} />
+          )}
+          onSuccess={() => redirect(callbackUrl ?? '/')}
+        />
+        {/* <form action={formAction} className="flex flex-col gap-3"> */}
+
+        {/* </form> */}
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <span className="text-sm">Already have an account?</span>
@@ -70,10 +72,10 @@ export const RegisterForm = ({ registerFn }: Props) => {
 
 type FormContentProps = {
   form: UseFormReturn<FormValues>;
+  pending: boolean;
 };
 
-const FormContent = ({ form }: FormContentProps) => {
-  const { pending } = useFormStatus();
+const FormContent = ({ form, pending }: FormContentProps) => {
   const {
     control,
     formState: { errors },
