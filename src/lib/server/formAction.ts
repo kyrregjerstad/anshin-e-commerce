@@ -1,4 +1,4 @@
-import { handleErrors, wait } from '@/lib/utils';
+import { handleErrors } from '@/lib/utils';
 import { FieldValues } from 'react-hook-form';
 
 import { ZodSchema } from 'zod';

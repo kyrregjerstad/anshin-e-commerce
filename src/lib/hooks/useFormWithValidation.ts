@@ -9,6 +9,7 @@ import {
 } from 'react-hook-form';
 import { ZodSchema } from 'zod';
 import { ActionError, SubmitFn } from '../server/formAction';
+import { redirect } from 'next/navigation';
 
 type Props<T extends FieldValues> = {
   schema: ZodSchema;
@@ -46,7 +47,8 @@ export const useFormWithValidation = <T extends FieldValues>({
     }
 
     if (res?.status === 'success') {
-      reset();
+      // reset();
+
       onSuccess?.();
     }
   };

@@ -42,6 +42,10 @@ export function formatUSD(value: number): string {
 }
 
 export async function wait(ms: number) {
+  if (process.env.NODE_ENV !== 'development') {
+    throw new Error('wait() should only be used in development');
+  }
+
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });

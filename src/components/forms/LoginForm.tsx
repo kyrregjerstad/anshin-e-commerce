@@ -21,11 +21,11 @@ import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 
 import { loginSchema } from '@/lib/schema/loginSchema';
-import { redirect } from 'next/navigation';
+import { SubmitFn } from '@/lib/server/formAction';
+import { useRouter } from 'next/navigation';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { Button } from '../ui/button';
 import { Form } from './Form';
-import { SubmitFn } from '@/lib/server/formAction';
 
 type FormValues = z.infer<typeof loginSchema>;
 
@@ -35,6 +35,7 @@ type Props = {
 };
 
 export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
+  const { push } = useRouter();
   const defaultValues = {
     email: '',
     password: '',
@@ -53,7 +54,7 @@ export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
           render={({ form, pending }) => (
             <FormContent form={form} pending={pending} />
           )}
-          onSuccess={() => redirect(callbackUrl ?? '/')}
+          onSuccess={() => push(callbackUrl || '/')}
         />
       </CardContent>
       <CardFooter className="flex flex-col items-center">

@@ -7,7 +7,7 @@ import { formAction } from '../formAction';
 export const verifyPayment = formAction(
   paymentSchema,
   async (validatedData) => {
-    const cardNumber = parseInt(validatedData.cardNumber);
+    const cardNumber = parseInt(validatedData.cardNumber.replace(/\s/g, '')); // Remove spaces
     const result = valid.number(cardNumber);
 
     if (!result.isValid) {
