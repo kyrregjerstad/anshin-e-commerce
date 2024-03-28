@@ -3,7 +3,7 @@
 import { eq } from 'drizzle-orm';
 import { generateId, generateRefreshToken } from '../auth/utils';
 import { db } from '../db';
-import { sessions } from '../tables';
+import { InsertSession, sessions } from '../tables';
 import { createCart } from './cartService';
 
 import {
@@ -177,7 +177,7 @@ export async function createSession(
     userId,
     expiresAt: getExpiresAt(guest),
     refreshToken: generateRefreshToken({ guest }),
-  };
+  } satisfies InsertSession;
 
   try {
     await db.insert(sessions).values(session);

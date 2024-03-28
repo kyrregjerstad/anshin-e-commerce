@@ -24,8 +24,6 @@ const CartPage = async () => {
 
   const customerCart = await getCustomerCart(cartId);
 
-  console.log('items ', customerCart?.items);
-
   if (!customerCart || customerCart.items.length === 0) {
     return (
       <section>
