@@ -1,23 +1,6 @@
-import { SimpleForm } from '@/components/SimpleForm';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
+import { buttonVariants } from '@/components/ui/button';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
-import { db } from '@/lib/server/db';
-import { createNewOrder } from '@/lib/server/services/orderService';
 import { getUserBySessionId } from '@/lib/server/services/userService';
-import { InsertAddress, users } from '@/lib/server/tables';
-import { formatUSD } from '@/lib/utils';
-import { eq } from 'drizzle-orm';
-import isEqual from 'lodash/isEqual';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 

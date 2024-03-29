@@ -59,13 +59,15 @@ export const GridItem = async ({ product }: Props) => {
             <div className="relative flex flex-col justify-end sm:text-end">
               {onSale ? (
                 <>
-                  <span className="-top-3 left-0 pt-2 text-xs line-through opacity-40 sm:absolute sm:left-auto sm:right-0 sm:pt-0">
+                  <span className="-top-3 left-0 pt-2 text-xs leading-snug line-through opacity-40 sm:absolute sm:left-auto sm:right-0 sm:pt-0">
                     ${product.price}
                   </span>
-                  <span className="font-bold">${product.discountPrice}</span>
+                  <span className="font-bold leading-snug">
+                    ${product.discountPrice}
+                  </span>
                 </>
               ) : (
-                <span className="font-bold">${product.price}</span>
+                <span className="font-bold leading-snug">${product.price}</span>
               )}
             </div>
             <AddToCartIconButton

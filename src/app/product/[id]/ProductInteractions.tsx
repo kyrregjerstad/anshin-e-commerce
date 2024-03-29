@@ -8,10 +8,12 @@ import { SimpleForm } from '@/components/SimpleForm';
 export const ProductInteractions = ({
   id,
   price,
+  discountPrice,
   inCart,
 }: {
   id: string;
   price: number;
+  discountPrice: number;
   inCart: boolean;
 }) => {
   const addToCartAction = async (formData: FormData) => {
@@ -28,6 +30,8 @@ export const ProductInteractions = ({
     await handleAddToWishlist({ productId: id });
   };
 
+  const onSale = discountPrice < price;
+
   return (
     <div className="flex flex-col gap-2">
       <SimpleForm
@@ -36,7 +40,20 @@ export const ProductInteractions = ({
           <div className="flex flex-col gap-4">
             <div className="flex items-end gap-4">
               <QuantitySelect />
-              <div className="text-2xl font-bold">${price}</div>
+              {onSale ? (
+                <div>
+                  <div className="text-end text-sm font-bold">
+                    Save {calculateDiscount(price, discountPrice)}%
+                  </div>
+
+                  <div className="text-end text-xl font-bold text-gray-500 line-through">
+                    ${price}
+                  </div>
+                  <div className="text-2xl font-bold">${discountPrice}</div>
+                </div>
+              ) : (
+                <div className="text-2xl font-bold">${price}</div>
+              )}
             </div>
             <SubmitButton size="lg">
               {inCart ? 'Update Cart' : 'Add to Cart'}
@@ -55,4 +72,9 @@ export const ProductInteractions = ({
       />
     </div>
   );
+};
+
+const calculateDiscount = (price: number, discountPrice: number) => {
+  const difference = price - discountPrice;
+  return Math.round((difference / price) * 100);
 };
