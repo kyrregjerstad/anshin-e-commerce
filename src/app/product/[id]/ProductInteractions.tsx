@@ -46,7 +46,7 @@ export const ProductInteractions = ({
                     Save {calculateDiscount(price, discountPrice)}%
                   </div>
 
-                  <div className="text-end text-xl font-bold text-gray-500 line-through">
+                  <div className="text-end text-lg font-bold text-gray-500 line-through">
                     ${price}
                   </div>
                   <div className="text-2xl font-bold">${discountPrice}</div>
