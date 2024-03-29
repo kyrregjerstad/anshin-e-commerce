@@ -1,9 +1,8 @@
 'use server';
 import { eq } from 'drizzle-orm';
 import { getSessionCookie } from '../auth/cookies';
-import { generateId } from '../auth/utils';
 import { db } from '../db';
-import { sessions, wishlist, wishlistItems } from '../tables';
+import { sessions, wishlistItems } from '../tables';
 
 export async function handleAddToWishlist({
   productId,

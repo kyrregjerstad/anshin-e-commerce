@@ -1,3 +1,4 @@
+import { SimpleForm } from '@/components/SimpleForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -10,7 +11,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
+import { generateId } from '@/lib/server/auth/utils';
 import { db } from '@/lib/server/db';
+import { createNewOrder } from '@/lib/server/services/orderService';
 import { getUserBySessionId } from '@/lib/server/services/userService';
 import { InsertAddress, users } from '@/lib/server/tables';
 import { formatUSD } from '@/lib/utils';
@@ -42,6 +45,28 @@ export default async function ReviewPage() {
   const sameAddress =
     !billingAddress || isEqual(shippingAddress, billingAddress);
 
+  const orderItems = cartItems.map(({ id, quantity }) => ({
+    productId: id,
+    quantity,
+  }));
+
+  const handleCompleteOrder = async () => {
+    'use server';
+    const orderId = generateId();
+    try {
+      await createNewOrder({
+        orderId: orderId,
+        userId: id,
+        cartId: cartItems[0].cartId,
+        items: orderItems,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      redirect(`/checkout/success?id=${orderId}`);
+    }
+  };
+
   return (
     <div className="flex w-full max-w-4xl flex-col gap-8">
       <h1 className="text-3xl font-semibold">Review</h1>
@@ -64,7 +89,14 @@ export default async function ReviewPage() {
         <Button className="flex-1" variant="secondary">
           Back
         </Button>
-        <Button className="flex-1">Complete Order</Button>
+        <SimpleForm
+          className="flex-1"
+          action={handleCompleteOrder}
+          spinner={true}
+          render={({ SubmitButton }) => (
+            <SubmitButton className="w-full">Complete Order</SubmitButton>
+          )}
+        />
       </div>
     </div>
   );
@@ -214,7 +246,9 @@ async function getCheckoutCart(userId: string) {
     columns: {},
     with: {
       cart: {
-        columns: {},
+        columns: {
+          id: true,
+        },
         with: {
           items: {
             columns: {
@@ -246,6 +280,7 @@ async function getCheckoutCart(userId: string) {
     discountPrice: item.product.discountInCents / 100,
     totalPrice: (item.product.priceInCents * item.quantity) / 100,
     quantity: item.quantity,
+    cartId: res.cart.id,
   }));
 
   return transformedCart;

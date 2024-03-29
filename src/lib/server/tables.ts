@@ -178,12 +178,16 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 }));
 
 export const orderItems = mysqlTable('order_items', {
-  orderId: varchar('order_id', { length: 36 }).references(() => orders.id),
-  productId: varchar('product_id', { length: 36 }).references(
-    () => products.id
-  ),
+  orderId: varchar('order_id', { length: 36 })
+    .notNull()
+    .references(() => orders.id),
+  productId: varchar('product_id', { length: 36 })
+    .notNull()
+    .references(() => products.id),
   quantity: smallint('quantity', { unsigned: true }).notNull(),
 });
+
+export type InsertOrderItem = InferInsertModel<typeof orderItems>;
 
 export const orderToItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {

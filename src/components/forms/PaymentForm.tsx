@@ -26,6 +26,7 @@ import {
 } from '../ui/form';
 import { SubmitFn } from '@/lib/server/formAction';
 import { Form } from './Form';
+import { redirect, useRouter } from 'next/navigation';
 
 type FormValues = z.infer<typeof paymentSchema>;
 
@@ -33,6 +34,7 @@ type Props = {
   submitFn: SubmitFn<FormValues>;
 };
 export const PaymentForm = ({ submitFn }: Props) => {
+  const { push } = useRouter();
   const defaultValues = {
     name: '',
     cardNumber: '',
@@ -55,7 +57,10 @@ export const PaymentForm = ({ submitFn }: Props) => {
           schema={paymentSchema}
           defaultValues={defaultValues}
           submitFn={submitFn}
-          render={({ form }) => <FormContent form={form} />}
+          onSuccess={() => push('/checkout/review')}
+          render={({ form, pending }) => (
+            <FormContent form={form} pending={pending} />
+          )}
         />
       </CardContent>
       <CardFooter />
@@ -64,10 +69,10 @@ export const PaymentForm = ({ submitFn }: Props) => {
 };
 type FormContentProps = {
   form: UseFormReturn<FormValues>;
+  pending: boolean;
 };
 
-const FormContent = ({ form }: FormContentProps) => {
-  const { pending } = useFormStatus();
+const FormContent = ({ form, pending }: FormContentProps) => {
   const {
     control,
     formState: { errors },
@@ -157,7 +162,7 @@ const FormContent = ({ form }: FormContentProps) => {
             )}
           />
         </div>
-        <Button type="submit" className="col-span-3">
+        <Button type="submit" className="col-span-3" disabled={pending}>
           {pending ? <LoadingSpinner /> : 'Next'}
         </Button>
       </div>
