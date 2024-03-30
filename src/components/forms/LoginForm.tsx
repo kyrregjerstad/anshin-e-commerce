@@ -1,5 +1,4 @@
 'use client';
-
 import {
   Card,
   CardContent,
@@ -22,7 +21,7 @@ import { z } from 'zod';
 
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { SubmitFn } from '@/lib/server/formAction';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { Button } from '../ui/button';
 import { Form } from './Form';
@@ -35,7 +34,6 @@ type Props = {
 };
 
 export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
-  const { push } = useRouter();
   const defaultValues = {
     email: '',
     password: '',
@@ -54,7 +52,7 @@ export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
           render={({ form, pending }) => (
             <FormContent form={form} pending={pending} />
           )}
-          onSuccess={() => push(callbackUrl || '/')}
+          onSuccess={() => redirect(callbackUrl || '/')}
         />
       </CardContent>
       <CardFooter className="flex flex-col items-center">

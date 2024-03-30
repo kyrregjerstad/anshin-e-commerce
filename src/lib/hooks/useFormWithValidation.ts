@@ -45,12 +45,6 @@ export const useFormWithValidation = <T extends FieldValues>({
     if (res?.status === 'error') {
       setFormErrors(res, setError);
     }
-
-    if (res?.status === 'success') {
-      // reset();
-
-      onSuccess?.();
-    }
   };
 
   return { form, processForm };

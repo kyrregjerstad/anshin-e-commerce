@@ -56,9 +56,6 @@ export const RegisterForm = ({ submitFn, callbackUrl }: Props) => {
           )}
           onSuccess={() => redirect(callbackUrl ?? '/')}
         />
-        {/* <form action={formAction} className="flex flex-col gap-3"> */}
-
-        {/* </form> */}
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <span className="text-sm">Already have an account?</span>

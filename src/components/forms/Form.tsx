@@ -1,7 +1,8 @@
+'use client';
 import { Form as FormCn } from '@/components/ui/form';
 import { useFormWithValidation } from '@/lib/hooks/useFormWithValidation';
 import { SubmitFn } from '@/lib/server/formAction';
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   DefaultValues,
   FieldValues,
@@ -33,6 +34,12 @@ export function Form<T extends FieldValues>({
   });
 
   const { handleSubmit, formState } = form;
+
+  useEffect(() => {
+    if (formState.isSubmitSuccessful) {
+      onSuccess?.();
+    }
+  }, [formState.isSubmitSuccessful, onSuccess]);
 
   return (
     <FormCn {...form}>
