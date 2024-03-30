@@ -102,13 +102,13 @@ export default async function AccountPage() {
       </Card>
 
       <Card variant="neutral">
-        <CardHeader>
+        <CardHeader className="">
           <CardTitle>Order history</CardTitle>
           <CardDescription>
             View details about your past orders.
           </CardDescription>
         </CardHeader>
-        <CardContent className="p-0">
+        <CardContent className="p-2">
           <OrderHistoryTable orders={orders} />
         </CardContent>
       </Card>
