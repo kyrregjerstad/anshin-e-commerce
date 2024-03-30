@@ -1,25 +1,16 @@
 import { SimpleForm } from '@/components/SimpleForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { generateId, generateOrderId } from '@/lib/server/auth/utils';
 import { db } from '@/lib/server/db';
 import { createNewOrder } from '@/lib/server/services/orderService';
 import { getUserBySessionId } from '@/lib/server/services/userService';
 import { InsertAddress, users } from '@/lib/server/tables';
-import { formatUSD } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
 import isEqual from 'lodash/isEqual';
 import { redirect } from 'next/navigation';
+import { OrderSummaryTable } from '../../../components/OrderSummaryTable';
 
 export default async function ReviewPage() {
   const sessionId = getSessionCookie();
@@ -86,7 +77,7 @@ export default async function ReviewPage() {
       </section>
       <section>
         <div>
-          <OrderSummaryTable cartItems={cartItems} />
+          <OrderSummaryTable items={cartItems} />
         </div>
       </section>
       <div className="flex w-full gap-2">
@@ -175,72 +166,6 @@ const PaymentCard = () => {
         </div>
       </CardContent>
     </Card>
-  );
-};
-
-const OrderSummaryTable = ({
-  cartItems,
-}: {
-  cartItems: {
-    id: string;
-    title: string;
-    price: number;
-    discountPrice: number;
-    quantity: number;
-    totalPrice: number;
-  }[];
-}) => {
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.discountPrice * item.quantity,
-    0
-  );
-
-  const calculateDiscount = (price: number, discountPrice: number) => {
-    const difference = price - discountPrice;
-    if (difference === 0) {
-      return '-';
-    }
-    return `${Math.round((difference / price) * 100)}%`;
-  };
-  return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Qty</TableHead>
-          <TableHead>Orig. Price</TableHead>
-          <TableHead>Disc. Price</TableHead>
-          <TableHead>Disc. %</TableHead>
-          <TableHead>Total</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {cartItems.map(
-          ({ id, title, quantity, price, discountPrice, totalPrice }) => (
-            <TableRow key={id}>
-              <TableCell className="font-medium">{title}</TableCell>
-              <TableCell>{quantity}</TableCell>
-              <TableCell>{formatUSD(price)}</TableCell>
-              <TableCell>
-                {discountPrice === price ? (
-                  <span>-</span>
-                ) : (
-                  formatUSD(discountPrice)
-                )}
-              </TableCell>
-              <TableCell>{calculateDiscount(price, discountPrice)}</TableCell>
-              <TableCell>{formatUSD(totalPrice)}</TableCell>
-            </TableRow>
-          )
-        )}
-      </TableBody>
-      <TableFooter>
-        <TableRow>
-          <TableCell colSpan={5}>Total</TableCell>
-          <TableCell>{formatUSD(totalPrice)}</TableCell>
-        </TableRow>
-      </TableFooter>
-    </Table>
   );
 };
 

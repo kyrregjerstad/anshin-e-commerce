@@ -170,7 +170,7 @@ const OrderHistoryTable = ({ orders }: OrdersTableProps) => {
         {orders.map((order) => (
           <TableRow key={order.id}>
             <TableCell className="font-mono">
-              <Link href={`/orders/${order.id}`}>{order.id}</Link>
+              <Link href={`account/orders/${order.id}`}>{order.id}</Link>
             </TableCell>
             <TableCell>{order.createdAt.toLocaleDateString()}</TableCell>
             <TableCell>{order.items.length}</TableCell>
