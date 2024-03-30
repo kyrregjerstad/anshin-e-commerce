@@ -39,82 +39,80 @@ export default async function AccountPage() {
   const { shippingAddress, billingAddress } = user;
 
   return (
-    <>
-      <section className="flex w-full flex-col gap-8 pt-8">
-        <Card variant="neutral" className="w-full">
-          <CardHeader>
-            <CardTitle>Profile</CardTitle>
-            <CardDescription>
-              Your profile information is used to personalize your experience.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:gap-6">
-            <div className="flex justify-between gap-2">
-              <div className="grid gap-1">
-                <div className="font-medium">Name</div>
-                <div>{user.name}</div>
-              </div>
-              <div className="grid gap-1">
-                <div className="font-medium">Email</div>
-                <div>{user.email}</div>
-              </div>
+    <section className="flex w-full max-w-4xl flex-col gap-8 pt-8">
+      <Card variant="neutral" className="w-full">
+        <CardHeader>
+          <CardTitle>Profile</CardTitle>
+          <CardDescription>
+            Your profile information is used to personalize your experience.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:gap-6">
+          <div className="flex justify-between gap-2">
+            <div className="grid gap-1">
+              <div className="font-medium">Name</div>
+              <div>{user.name}</div>
             </div>
             <div className="grid gap-1">
-              <div className="font-medium">Password</div>
-              <div>
-                <Link
-                  className="text-blue-600 underline transition-all hover:underline"
-                  href="#"
-                >
-                  Change password
-                </Link>
-              </div>
+              <div className="font-medium">Email</div>
+              <div>{user.email}</div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="grid gap-1">
+            <div className="font-medium">Password</div>
+            <div>
+              <Link
+                className="text-blue-600 underline transition-all hover:underline"
+                href="#"
+              >
+                Change password
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card variant="neutral">
-          <CardHeader>
-            <CardTitle>Addresses</CardTitle>
-            <CardDescription>
-              Manage your shipping and billing addresses.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-2">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Shipping</TableHead>
-                  <TableHead>Billing</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <DisplayAddress address={shippingAddress} />
-                  </TableCell>
-                  <TableCell>
-                    <DisplayAddress address={billingAddress} />
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
+      <Card variant="neutral">
+        <CardHeader>
+          <CardTitle>Addresses</CardTitle>
+          <CardDescription>
+            Manage your shipping and billing addresses.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-2">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Shipping</TableHead>
+                <TableHead>Billing</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>
+                  <DisplayAddress address={shippingAddress} />
+                </TableCell>
+                <TableCell>
+                  <DisplayAddress address={billingAddress} />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
-        <Card variant="neutral">
-          <CardHeader>
-            <CardTitle>Order history</CardTitle>
-            <CardDescription>
-              View details about your past orders.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <OrderHistoryTable orders={orders} />
-          </CardContent>
-        </Card>
-      </section>
-    </>
+      <Card variant="neutral">
+        <CardHeader>
+          <CardTitle>Order history</CardTitle>
+          <CardDescription>
+            View details about your past orders.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <OrderHistoryTable orders={orders} />
+        </CardContent>
+      </Card>
+    </section>
   );
 }
 type Address = {
@@ -161,29 +159,23 @@ const OrderHistoryTable = ({ orders }: OrdersTableProps) => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">Order</TableHead>
-          <TableHead className="min-w-[150px]">Date</TableHead>
-          <TableHead className="hidden md:table-cell">Items</TableHead>
-          <TableHead className="text-right">Total</TableHead>
-          <TableHead className="hidden sm:table-cell">Status</TableHead>
+          <TableHead>Order</TableHead>
+          <TableHead>Date</TableHead>
+          <TableHead>Items</TableHead>
+          <TableHead>Total</TableHead>
+          <TableHead>Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {orders.map((order) => (
           <TableRow key={order.id}>
-            <TableCell>
+            <TableCell className="font-mono">
               <Link href={`/orders/${order.id}`}>{order.id}</Link>
             </TableCell>
             <TableCell>{order.createdAt.toLocaleDateString()}</TableCell>
-            <TableCell className="hidden md:table-cell">
-              {order.items.length}
-            </TableCell>
-            <TableCell className="text-right">
-              {formatUSD(order.totalPrice)}
-            </TableCell>
-            <TableCell className="hidden sm:table-cell">
-              {order.status}
-            </TableCell>
+            <TableCell>{order.items.length}</TableCell>
+            <TableCell>{formatUSD(order.totalPrice)}</TableCell>
+            <TableCell>{order.status}</TableCell>
           </TableRow>
         ))}
       </TableBody>
