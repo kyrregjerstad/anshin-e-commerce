@@ -2,7 +2,7 @@
 
 import { avg, eq, like, sql } from 'drizzle-orm';
 import { db } from '../db';
-import { cart, images, products, reviews } from '../tables';
+import { cart, images, products, reviews, sessions } from '../tables';
 
 export type Product = {
   id: string;
@@ -38,7 +38,10 @@ const selectProductFields = () => {
 
 export async function getAllProducts(sessionId: string | null) {
   const allProducts = await selectProductFields().limit(100);
-  return await checkForItemsInCart(allProducts, sessionId);
+  const all = await checkForItemsInCart(allProducts, sessionId);
+  console.log('all', all);
+
+  return all;
 }
 
 export async function searchProductsByTitle(
@@ -67,25 +70,36 @@ async function checkForItemsInCart(
     }));
   }
 
-  const sessionCart = await db.query.cart.findFirst({
-    where: eq(cart.sessionId, sessionId),
-    columns: {
-      userId: false,
-      id: false,
-      createdAt: false,
-      updatedAt: false,
-      sessionId: false,
-    },
+  const sessionCart = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
     with: {
-      items: {
-        columns: {
-          productId: true,
+      cart: {
+        with: {
+          items: {
+            columns: {
+              productId: true,
+            },
+          },
+        },
+      },
+      user: {
+        with: {
+          cart: {
+            with: {
+              items: {
+                columns: {
+                  productId: true,
+                },
+              },
+            },
+          },
         },
       },
     },
   });
 
-  const sessionCartItems = sessionCart?.items || [];
+  const sessionCartItems =
+    sessionCart?.cart?.items || sessionCart?.user?.cart?.items || [];
 
   return allProducts.map((product) => ({
     ...product,

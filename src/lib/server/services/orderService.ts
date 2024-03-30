@@ -5,6 +5,7 @@ import { generateId } from '../auth/utils';
 import { db } from '../db';
 import {
   InsertOrderItem,
+  cart,
   cartItems,
   orderItems as orderItemsTable,
   orders,
