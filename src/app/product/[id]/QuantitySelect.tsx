@@ -15,7 +15,7 @@ export const QuantitySelect = () => {
         Quantity
       </Label>
       <Select defaultValue="1" name="quantity">
-        <SelectTrigger className="w-24">
+        <SelectTrigger className="w-32">
           <SelectValue placeholder="Select" />
         </SelectTrigger>
         <SelectContent>

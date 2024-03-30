@@ -15,7 +15,7 @@ export const CartIcon = ({ cartItems }: { cartItems: CartItem[] }) => {
   const cartAmount = items.reduce((acc, { quantity }) => acc + quantity, 0);
 
   return (
-    <div className="px-2">
+    <div className="-translate-y-[2px] pr-2">
       <div className="relative">
         <IconSvg cartAmount={cartAmount} />
         <AnimatedCartCounter cartAmount={cartAmount} />
@@ -61,13 +61,13 @@ const IconSvg = ({ cartAmount }: { cartAmount: number | undefined }) => (
         ? 'oklch(89.50% 0.07 121.34 / 1)'
         : 'oklch(89.50% 0.07 121.34 / 0)'
     )}
-    className="transition-fill duration-300"
+    className="transition-fill stroke-neutral-700 duration-300"
     viewBox="0 0 52 59"
   >
     <path
-      stroke="#000"
+      className="stroke-neutral-700"
       strokeLinecap="round"
-      strokeWidth={2}
+      strokeWidth={3}
       d="M16 16v-4.227c0-3.038 1.29-5.934 3.548-7.966v0a9.645 9.645 0 0 1 12.904 0v0A10.717 10.717 0 0 1 36 11.773V16m15 33V11.982A.985.985 0 0 0 50 11H2.483c-.545 0-.99.42-1 .966C1.399 17.114 1 41.363 1 48.5c0 8 .5 8 7 8h35.5c7.5 0 7.5 0 7.5-7.5Z"
     />
   </svg>

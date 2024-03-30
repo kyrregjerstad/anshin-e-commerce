@@ -15,7 +15,6 @@ export const SubmitButton = ({
   ...rest
 }: SubmitButtonProps) => {
   const { pending } = useFormStatus();
-  console.log(spinner);
 
   return (
     <Button {...rest} disabled={pending}>

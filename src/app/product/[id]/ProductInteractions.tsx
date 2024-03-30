@@ -38,7 +38,7 @@ export const ProductInteractions = ({
         action={addToCartAction}
         render={({ SubmitButton }) => (
           <div className="flex flex-col gap-4">
-            <div className="flex items-end gap-4">
+            <div className="flex items-end justify-between gap-4">
               <QuantitySelect />
               {onSale ? (
                 <div>
