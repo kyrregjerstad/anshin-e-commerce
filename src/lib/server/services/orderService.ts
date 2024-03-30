@@ -55,7 +55,7 @@ export async function createNewOrder({
 
 export async function test({ userId, items }: Order) {
   const orderId = generateId();
-  console.log(orderId);
+
   try {
     await db.transaction(async (tx) => {
       await tx.insert(orders).values({
@@ -73,6 +73,4 @@ export async function test({ userId, items }: Order) {
   } catch (error) {
     console.error(error);
   }
-
-  console.log(orderId);
 }

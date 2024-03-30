@@ -1,15 +1,22 @@
 'use server';
 import mysql from 'mysql2/promise';
 
-export async function createDbConnection() {
+let cachedConnection: mysql.Connection | null = null;
+
+export const createDbConnection = async (): Promise<mysql.Connection> => {
+  if (cachedConnection) {
+    return cachedConnection;
+  }
+
   try {
-    return await mysql.createConnection({
+    cachedConnection = await mysql.createConnection({
       host: process.env.DATABASE_HOST,
       user: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
       database: 'anshin',
-      port: Number(process.env.DATABASE_PORT), // 3307 when using docker and 3306 for deployment
+      port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
     });
+    return cachedConnection;
   } catch (error) {
     const isDev = process.env.NODE_ENV === 'development';
     if (isDev) {
@@ -19,4 +26,4 @@ export async function createDbConnection() {
     }
     throw new Error('Error connecting to database');
   }
-}
+};

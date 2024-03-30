@@ -20,8 +20,6 @@ export default async function RootLayout({
 }>) {
   const { user, cart } = await validateRequest();
 
-  console.log(cart);
-
   return (
     <html lang="en">
       <Analytics />
