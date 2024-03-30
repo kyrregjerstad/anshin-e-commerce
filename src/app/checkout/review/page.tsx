@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
-import { generateId } from '@/lib/server/auth/utils';
+import { generateId, generateOrderId } from '@/lib/server/auth/utils';
 import { db } from '@/lib/server/db';
 import { createNewOrder } from '@/lib/server/services/orderService';
 import { getUserBySessionId } from '@/lib/server/services/userService';
@@ -45,14 +45,18 @@ export default async function ReviewPage() {
   const sameAddress =
     !billingAddress || isEqual(shippingAddress, billingAddress);
 
-  const orderItems = cartItems.map(({ id, quantity }) => ({
-    productId: id,
-    quantity,
-  }));
+  const orderItems = cartItems.map(
+    ({ id, quantity, priceInCents, discountInCents }) => ({
+      productId: id,
+      quantity,
+      priceInCents,
+      discountInCents,
+    })
+  );
 
   const handleCompleteOrder = async () => {
     'use server';
-    const orderId = generateId();
+    const orderId = generateOrderId();
     try {
       await createNewOrder({
         orderId: orderId,

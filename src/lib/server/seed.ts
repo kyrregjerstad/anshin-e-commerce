@@ -37,6 +37,8 @@ const main = async () => {
   const db = drizzle(connection, { schema, mode: 'default' });
 
   await db.transaction(async (tx) => {
+    await deleteOrderItems(tx);
+    await deleteOrders(tx);
     await deleteProducts(tx);
     await deleteCarts(tx);
     await deleteSessions(tx);
@@ -82,6 +84,18 @@ async function deleteUsers(db: DB) {
   await db.delete(schema.users).execute();
 
   console.log('🗑️  Deleted users');
+}
+
+async function deleteOrderItems(db: DB) {
+  await db.delete(schema.orderItems).execute();
+
+  console.log('🗑️  Deleted order items');
+}
+
+async function deleteOrders(db: DB) {
+  await db.delete(schema.orders).execute();
+
+  console.log('🗑️  Deleted orders');
 }
 
 async function seedUsers(db: DB) {

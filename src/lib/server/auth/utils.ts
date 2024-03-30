@@ -9,6 +9,11 @@ export const generateId = ({ guest = false }: Params = {}) => {
     : generateRandomString(32, alphabet('a-z', '0-9'));
 };
 
+export const generateOrderId = () => {
+  const randString = () => generateRandomString(4, alphabet('a-z', '0-9'));
+  return `an-${randString()}-${randString()}-${randString()}`;
+};
+
 export const generateRefreshToken = ({ guest = false }: Params = {}) => {
   return guest
     ? 'guest-' + generateRandomString(58, alphabet('a-z', '0-9'))

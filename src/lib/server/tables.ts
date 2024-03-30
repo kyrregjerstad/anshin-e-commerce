@@ -152,13 +152,14 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 }));
 
 const statusEnum = mysqlEnum('status', ['pending', 'completed', 'cancelled']);
+export type OrderStatus = 'pending' | 'completed' | 'cancelled';
 
 export const orders = mysqlTable('orders', {
   id: varchar('id', { length: 36 }).primaryKey(),
-  createdAt: timestamp('created_at').defaultNow(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').onUpdateNow(),
   userId: varchar('user_id', { length: 64 }).references(() => users.id),
-  status: statusEnum,
+  status: statusEnum.notNull().default('pending'),
 });
 
 export const ordersRelations = relations(orders, ({ one, many }) => ({
@@ -185,6 +186,8 @@ export const orderItems = mysqlTable('order_items', {
     .notNull()
     .references(() => products.id),
   quantity: smallint('quantity', { unsigned: true }).notNull(),
+  priceInCents: int('price_in_cents', { unsigned: true }).notNull(),
+  discountInCents: int('discount_in_cents', { unsigned: true }).notNull(),
 });
 
 export type InsertOrderItem = InferInsertModel<typeof orderItems>;

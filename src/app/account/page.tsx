@@ -14,7 +14,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
-import { getUserBySessionId } from '@/lib/server/services/userService';
+import { db } from '@/lib/server/db';
+import { OrderStatus, sessions } from '@/lib/server/tables';
+import { formatUSD } from '@/lib/utils';
+import { eq } from 'drizzle-orm';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -25,11 +28,13 @@ export default async function AccountPage() {
     return redirect('/login');
   }
 
-  const user = await getUserBySessionId(sessionId);
+  const profile = await getUserProfileDetails(sessionId);
 
-  if (!user) {
+  if (!profile) {
     return redirect('/login');
   }
+
+  const { user, orders } = profile;
 
   const { shippingAddress, billingAddress } = user;
 
@@ -105,85 +110,7 @@ export default async function AccountPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[100px]">Order</TableHead>
-                  <TableHead className="min-w-[150px]">Date</TableHead>
-                  <TableHead className="hidden md:table-cell">Items</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead className="hidden sm:table-cell">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">#3210</TableCell>
-                  <TableCell>February 20, 2022</TableCell>
-                  <TableCell className="hidden md:table-cell">2</TableCell>
-                  <TableCell className="text-right">$42.25</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    Shipped
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3209</TableCell>
-                  <TableCell>January 5, 2022</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$74.99</TableCell>
-                  <TableCell className="hidden sm:table-cell">Paid</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3204</TableCell>
-                  <TableCell>August 3, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">3</TableCell>
-                  <TableCell className="text-right">$64.75</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    Unfulfilled
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3203</TableCell>
-                  <TableCell>July 15, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$34.50</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    Shipped
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3202</TableCell>
-                  <TableCell>June 5, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$89.99</TableCell>
-                  <TableCell className="hidden sm:table-cell">Paid</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3201</TableCell>
-                  <TableCell>May 20, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$24.99</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    Unfulfilled
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3207</TableCell>
-                  <TableCell>November 2, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$99.99</TableCell>
-                  <TableCell className="hidden sm:table-cell">Paid</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">#3206</TableCell>
-                  <TableCell>October 7, 2021</TableCell>
-                  <TableCell className="hidden md:table-cell">1</TableCell>
-                  <TableCell className="text-right">$67.50</TableCell>
-                  <TableCell className="hidden sm:table-cell">
-                    Shipped
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <OrderHistoryTable orders={orders} />
           </CardContent>
         </Card>
       </section>
@@ -224,4 +151,114 @@ const DisplayAddress = ({ address }: { address: Address | null }) => {
       <div>{address.country}</div>
     </div>
   );
+};
+
+type OrdersTableProps = {
+  orders: Order[];
+};
+const OrderHistoryTable = ({ orders }: OrdersTableProps) => {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Order</TableHead>
+          <TableHead className="min-w-[150px]">Date</TableHead>
+          <TableHead className="hidden md:table-cell">Items</TableHead>
+          <TableHead className="text-right">Total</TableHead>
+          <TableHead className="hidden sm:table-cell">Status</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {orders.map((order) => (
+          <TableRow key={order.id}>
+            <TableCell>
+              <Link href={`/orders/${order.id}`}>{order.id}</Link>
+            </TableCell>
+            <TableCell>{order.createdAt.toLocaleDateString()}</TableCell>
+            <TableCell className="hidden md:table-cell">
+              {order.items.length}
+            </TableCell>
+            <TableCell className="text-right">
+              {formatUSD(order.totalPrice)}
+            </TableCell>
+            <TableCell className="hidden sm:table-cell">
+              {order.status}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+async function getUserProfileDetails(sessionId: string) {
+  const res = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+    with: {
+      user: {
+        with: {
+          addresses: true,
+          orders: {
+            with: {
+              items: {
+                columns: {
+                  quantity: true,
+                  priceInCents: true,
+                  discountInCents: true,
+                },
+              },
+            },
+            columns: {
+              id: true,
+              createdAt: true,
+              status: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!res || !res.user) {
+    return null;
+  }
+
+  const transformedOrders = res.user.orders.map((order) => {
+    const totalPrice = order.items.reduce(
+      (acc, item) => acc + item.quantity * item.priceInCents,
+      0
+    );
+
+    return {
+      ...order,
+      totalPrice: totalPrice / 100,
+    };
+  });
+
+  const transformedUser = {
+    id: res.user.id,
+    name: res.user.name,
+    email: res.user.email,
+    shippingAddress:
+      res.user.addresses.find((a) => a.type === 'shipping') || null,
+    billingAddress:
+      res.user.addresses.find((a) => a.type === 'billing') || null,
+  };
+
+  return {
+    user: transformedUser,
+    orders: transformedOrders,
+  };
+}
+
+type Order = {
+  id: string;
+  createdAt: Date;
+  status: OrderStatus;
+  items: {
+    quantity: number;
+    priceInCents: number;
+    discountInCents: number;
+  }[];
+  totalPrice: number;
 };

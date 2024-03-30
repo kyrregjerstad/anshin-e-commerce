@@ -18,6 +18,8 @@ type Order = {
   items: {
     productId: string;
     quantity: number;
+    priceInCents: number;
+    discountInCents: number;
   }[];
 };
 

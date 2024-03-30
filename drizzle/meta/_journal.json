@@ -8,6 +8,13 @@
       "when": 1711126240748,
       "tag": "0000_quiet_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1711786524694,
+      "tag": "0001_furry_red_hulk",
+      "breakpoints": true
     }
   ]
 }
