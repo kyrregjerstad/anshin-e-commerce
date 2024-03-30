@@ -12,13 +12,7 @@ export const createDbConnection = async (): Promise<mysql.Connection> => {
     }
 
     try {
-      cachedConnection = await mysql.createConnection({
-        host: process.env.DATABASE_HOST,
-        user: process.env.DATABASE_USERNAME,
-        password: process.env.DATABASE_PASSWORD,
-        database: 'anshin',
-        port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
-      });
+      cachedConnection = await dbConnection;
       return cachedConnection;
     } catch (error) {
       const isDev = process.env.NODE_ENV === 'development';
@@ -31,15 +25,17 @@ export const createDbConnection = async (): Promise<mysql.Connection> => {
     }
   } else {
     try {
-      return await mysql.createConnection({
-        host: process.env.DATABASE_HOST,
-        user: process.env.DATABASE_USERNAME,
-        password: process.env.DATABASE_PASSWORD,
-        database: 'anshin',
-        port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
-      });
+      return await dbConnection;
     } catch (error) {
-      throw new Error('Error connecting to database');
+      throw new Error(`Error connecting to database: ${error}`);
     }
   }
 };
+
+const dbConnection = mysql.createConnection({
+  host: process.env.DATABASE_HOST,
+  user: process.env.DATABASE_USERNAME,
+  password: process.env.DATABASE_PASSWORD,
+  database: 'anshin',
+  port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
+});

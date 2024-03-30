@@ -9,10 +9,8 @@ async function main() {
   const connection = await createDbConnection();
 
   const db = drizzle(connection, { schema, mode: 'default' });
-  // This will run migrations on the database, skipping the ones already applied
   await migrate(db, { migrationsFolder: './drizzle' });
 
-  // Don't forget to close the connection, otherwise the script will hang
   await connection.end();
 }
 

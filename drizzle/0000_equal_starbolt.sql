@@ -38,17 +38,19 @@ CREATE TABLE `anshin_images` (
 );
 --> statement-breakpoint
 CREATE TABLE `anshin_order_items` (
-	`order_id` varchar(36),
-	`product_id` varchar(36),
-	`quantity` smallint unsigned NOT NULL
+	`order_id` varchar(36) NOT NULL,
+	`product_id` varchar(36) NOT NULL,
+	`quantity` smallint unsigned NOT NULL,
+	`price_in_cents` int unsigned NOT NULL,
+	`discount_in_cents` int unsigned NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `anshin_orders` (
 	`id` varchar(36) NOT NULL,
-	`created_at` timestamp DEFAULT (now()),
+	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp ON UPDATE CURRENT_TIMESTAMP,
 	`user_id` varchar(64),
-	`status` enum('pending','completed','cancelled'),
+	`status` enum('pending','completed','cancelled') NOT NULL DEFAULT 'pending',
 	CONSTRAINT `anshin_orders_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
