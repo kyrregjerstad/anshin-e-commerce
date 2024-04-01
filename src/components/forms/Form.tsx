@@ -17,7 +17,7 @@ type Props<T extends FieldValues> = {
   submitFn: SubmitFn<T>;
   onSuccess?: () => void;
   render: ({ pending, ...formMethods }: Render<T>) => React.ReactNode;
-};
+} & React.ComponentPropsWithoutRef<'form'>;
 
 export function Form<T extends FieldValues>({
   schema,
@@ -25,6 +25,7 @@ export function Form<T extends FieldValues>({
   submitFn,
   render,
   onSuccess,
+  ...rest
 }: Props<T>) {
   const { form, processForm } = useFormWithValidation<T>({
     schema,
@@ -43,7 +44,7 @@ export function Form<T extends FieldValues>({
 
   return (
     <FormCn {...form}>
-      <form onSubmit={handleSubmit(processForm)}>
+      <form onSubmit={handleSubmit(processForm)} {...rest}>
         {render({
           form,
           processForm,
