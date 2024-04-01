@@ -72,7 +72,7 @@ export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
                 href="/login"
                 className={buttonVariants({
                   variant: 'default',
-                  className: 'w-full',
+                  className: 'my-2 w-full',
                 })}
               >
                 Login
@@ -83,7 +83,7 @@ export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
                 href="/register"
                 className={buttonVariants({
                   variant: 'secondary',
-                  className: 'w-full',
+                  className: 'my-2 w-full',
                 })}
               >
                 Register
