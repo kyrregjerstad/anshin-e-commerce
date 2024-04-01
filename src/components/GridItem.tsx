@@ -8,11 +8,12 @@ import { cn } from '@/lib/utils';
 import { AddToWishlistIconButton } from './AddToWishlistIconButton';
 
 export type Props = {
-  product: Product & { inCart: boolean };
+  product: Product & { inCart: boolean; inWishlist: boolean };
 };
 
 export const ProductCard = async ({ product }: Props) => {
-  const { title, imageUrl, averageRating, onSale, inCart } = product;
+  const { title, imageUrl, averageRating, onSale, inCart, inWishlist } =
+    product;
 
   return (
     <Card className="group flex flex-col justify-between overflow-hidden rounded-2xl sm:aspect-square">
@@ -29,8 +30,11 @@ export const ProductCard = async ({ product }: Props) => {
 
         <AddToWishlistIconButton
           product={product}
-          inWishlist={false}
-          className="absolute left-0 top-0 rounded-full transition-opacity duration-300 group-hover:opacity-100 sm:opacity-0"
+          inWishlist={inWishlist}
+          className={cn(
+            'group absolute left-0 top-0 hidden rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:block',
+            inWishlist && 'opacity-100'
+          )}
         />
 
         <AddToCartIconButton

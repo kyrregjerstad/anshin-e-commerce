@@ -3,6 +3,7 @@
 import { avg, eq, like, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { cart, images, products, reviews, sessions } from '../tables';
+import { checkForItemsInWishlist } from './wishlistService';
 
 export type Product = {
   id: string;
@@ -40,8 +41,9 @@ const selectProductFields = () => {
 export async function getAllProducts(sessionId: string | null) {
   const allProducts = await selectProductFields().limit(100);
   const all = await checkForItemsInCart(allProducts, sessionId);
+  const items = await checkForItemsInWishlist(all, sessionId);
 
-  return all;
+  return items;
 }
 
 export async function searchProductsByTitle(

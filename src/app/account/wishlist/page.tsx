@@ -15,7 +15,7 @@ const WishlistPage = async () => {
 
   const res = await getUserWishlist(sessionId);
 
-  if (!res || !res.wishlist || res.wishlist.length === 0) {
+  if (!res) {
     return (
       <div>
         <h1>Wishlist</h1>
@@ -30,7 +30,10 @@ const WishlistPage = async () => {
     <section className="flex w-full flex-col">
       <div className="grid w-full gap-4 xs:grid-cols-2 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
         {wishlist.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={{ ...product, inWishlist: true }}
+          />
         ))}
       </div>
     </section>
@@ -96,11 +99,11 @@ async function getUserWishlist(sessionId: string) {
     },
   });
 
-  if (!res || !res.user || !res.user.id || !res.user.wishlist) {
+  if (!res?.user?.wishlist.items || res.user.wishlist.items.length === 0) {
     return null;
   }
 
-  const transform = {
+  return {
     id: res.user.id,
     wishlist: res.user.wishlist.items.map((item) => ({
       id: item.product.id,
@@ -117,6 +120,4 @@ async function getUserWishlist(sessionId: string) {
         item.product.reviews.length,
     })),
   };
-
-  return transform;
 }

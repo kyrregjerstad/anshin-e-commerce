@@ -4,8 +4,10 @@ import {
   handleAddToWishlist,
   handleRemoveFromWishlist,
 } from '@/lib/server/services/wishlistService';
-import { Heart } from 'lucide-react';
+
 import { Button } from './ui/button';
+import { HeartIcon as HearIconOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HearIconFilled } from '@heroicons/react/24/solid';
 
 type Props = {
   product: Product;
@@ -29,7 +31,12 @@ export const AddToWishlistIconButton = ({
       {...props}
     >
       <Button variant="ghost" size="icon">
-        <Heart />
+        {inWishlist ? (
+          <HearIconFilled className="size-7 fill-tea-100 stroke-neutral-300" />
+        ) : (
+          <HearIconOutline className="size-7" />
+        )}
+
         <span className="sr-only">Add to Wishlist</span>
       </Button>
     </form>

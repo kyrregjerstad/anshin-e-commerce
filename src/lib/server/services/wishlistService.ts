@@ -4,6 +4,7 @@ import { getSessionCookie } from '../auth/cookies';
 import { db } from '../db';
 import { sessions, wishlistItems } from '../tables';
 import { redirect } from 'next/navigation';
+import { Product } from './productService';
 
 export async function handleAddToWishlist(productId: string) {
   const sessionId = getSessionCookie();
@@ -105,4 +106,47 @@ export async function handleRemoveFromWishlist(productId: string) {
         eq(wishlistItems.wishlistId, res.user.wishlist.id)
       )
     );
+}
+
+export async function checkForItemsInWishlist(
+  allProducts: (Product & { inCart: boolean })[],
+  sessionId: string | null
+) {
+  if (!sessionId) {
+    return allProducts.map((product) => ({
+      ...product,
+      inWishlist: false,
+    }));
+  }
+
+  const res = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+    columns: {},
+    with: {
+      user: {
+        columns: {},
+        with: {
+          wishlist: {
+            columns: {
+              id: true,
+            },
+            with: {
+              items: {
+                columns: {
+                  productId: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return allProducts.map((product) => ({
+    ...product,
+    inWishlist: !!res?.user?.wishlist.items.some(
+      ({ productId }) => productId === product.id
+    ),
+  }));
 }
