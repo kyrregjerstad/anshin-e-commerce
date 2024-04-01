@@ -10,7 +10,7 @@ import { InsertAddress, users } from '@/lib/server/tables';
 import { eq } from 'drizzle-orm';
 import isEqual from 'lodash/isEqual';
 import { redirect } from 'next/navigation';
-import { OrderSummaryTable } from '../../../components/OrderSummaryTable';
+import { OrderSummaryTable } from '@/components/OrderSummaryTable';
 
 export default async function ReviewPage() {
   const sessionId = getSessionCookie();

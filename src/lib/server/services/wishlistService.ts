@@ -55,7 +55,7 @@ export async function handleAddToWishlist(productId: string) {
     wishlistId: res.user.wishlist.id,
   });
 
-  revalidatePath('/account/wishlist');
+  revalidatePath('/wishlist');
 }
 
 export async function handleRemoveFromWishlist(productId: string) {
@@ -110,7 +110,7 @@ export async function handleRemoveFromWishlist(productId: string) {
       )
     );
 
-  revalidatePath('/account/wishlist');
+  revalidatePath('/wishlist');
 }
 
 export async function checkForItemsInWishlist(

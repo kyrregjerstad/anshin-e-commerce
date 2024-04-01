@@ -13,13 +13,14 @@ import {
 import { SearchBar } from './SearchBar';
 
 type Props = {
+  showSearch?: boolean;
   user: {
     id: string;
     name: string;
   } | null;
   cart: Cart[];
 };
-export const Header = ({ user, cart }: Props) => {
+export const Header = ({ user, cart, showSearch }: Props) => {
   return (
     <>
       <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
@@ -42,7 +43,7 @@ export const Header = ({ user, cart }: Props) => {
               </UserAccountMenu>
             </li>
             <li>
-              <Link href="/account/wishlist" className="group">
+              <Link href="/wishlist" className="group">
                 <span className="sr-only">wishlist</span>
                 <HeartIcon
                   className="size-8 stroke-neutral-700"
@@ -59,9 +60,11 @@ export const Header = ({ user, cart }: Props) => {
           </ul>
         </nav>
       </header>
-      <div className="sticky top-14 z-50 block w-full px-2 sm:hidden">
-        <SearchBar />
-      </div>
+      {showSearch && (
+        <div className="sticky top-14 z-50 block w-full px-2 sm:hidden">
+          <SearchBar />
+        </div>
+      )}
     </>
   );
 };

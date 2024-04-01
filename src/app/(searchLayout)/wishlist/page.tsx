@@ -10,7 +10,7 @@ const WishlistPage = async () => {
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
-    return redirect('/login?callback=/account/wishlist');
+    return redirect('/login?callback=/wishlist');
   }
 
   const res = await getUserWishlist(sessionId);
