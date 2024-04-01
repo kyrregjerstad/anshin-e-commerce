@@ -27,7 +27,6 @@ export const ProductCard = async ({ product }: Props) => {
             className="absolute h-full w-full object-cover"
           />
         </Link>
-
         <AddToWishlistIconButton
           product={product}
           inWishlist={inWishlist}
@@ -36,7 +35,6 @@ export const ProductCard = async ({ product }: Props) => {
             inWishlist && 'opacity-100'
           )}
         />
-
         <AddToCartIconButton
           product={product}
           inCart={inCart}

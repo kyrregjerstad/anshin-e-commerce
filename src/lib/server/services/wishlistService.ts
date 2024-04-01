@@ -5,6 +5,7 @@ import { db } from '../db';
 import { sessions, wishlistItems } from '../tables';
 import { redirect } from 'next/navigation';
 import { Product } from './productService';
+import { revalidatePath } from 'next/cache';
 
 export async function handleAddToWishlist(productId: string) {
   const sessionId = getSessionCookie();
@@ -53,6 +54,8 @@ export async function handleAddToWishlist(productId: string) {
     productId,
     wishlistId: res.user.wishlist.id,
   });
+
+  revalidatePath('/account/wishlist');
 }
 
 export async function handleRemoveFromWishlist(productId: string) {
@@ -106,6 +109,8 @@ export async function handleRemoveFromWishlist(productId: string) {
         eq(wishlistItems.wishlistId, res.user.wishlist.id)
       )
     );
+
+  revalidatePath('/account/wishlist');
 }
 
 export async function checkForItemsInWishlist(
