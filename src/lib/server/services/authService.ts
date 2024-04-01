@@ -109,60 +109,6 @@ export const register = formAction(
     }
   }
 );
-// export async function register(
-//   _prevState: ActionResult | null,
-//   data: FormData
-// ): Promise<ActionResult> {
-//   try {
-//     const { name, email, password, repeatPassword } =
-//       registerSchema.parse(data);
-
-//     if (password !== repeatPassword) {
-//       return {
-//         status: 'error',
-//         message: 'Passwords do not match',
-//       };
-//     }
-
-//     const existingUser = await db.query.users.findFirst({
-//       where: eq(users.email, email),
-//     });
-
-//     if (existingUser) {
-//       const error = new ZodError([]);
-//       error.addIssue({
-//         code: ZodIssueCode.custom,
-//         message: 'User already exists',
-//         path: ['email'],
-//       });
-
-//       throw error;
-//     }
-
-//     const newUserId = generateId();
-//     const hashedPassword = await new Argon2id().hash(password);
-
-//     await db.insert(users).values({
-//       id: newUserId,
-//       name,
-//       email,
-//       hashedPassword,
-//     });
-
-//     const session = await createSession(newUserId);
-
-//     const sessionCookie = createSessionCookie(session.id);
-
-//     cookies().set(sessionCookie.name, sessionCookie.value);
-
-//     return {
-//       status: 'success',
-//       message: 'Registered and logged in successfully',
-//     };
-//   } catch (error) {
-//     return handleErrors(error);
-//   }
-// }
 
 async function verifyUserCredentials(email: string, password: string) {
   const existingUser = await db.query.users.findFirst({
