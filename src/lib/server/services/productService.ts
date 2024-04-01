@@ -3,7 +3,10 @@
 import { avg, eq, like, sql } from 'drizzle-orm';
 import { db } from '../db';
 import { cart, images, products, reviews, sessions } from '../tables';
-import { checkForItemsInWishlist } from './wishlistService';
+import {
+  checkForItemInWishlist,
+  checkForItemsInWishlist,
+} from './wishlistService';
 
 export type Product = {
   id: string;
@@ -198,6 +201,7 @@ export async function getProductById(id: string, sessionId: string | null) {
     ...singleProduct,
     ratingPercentages,
     inCart: await checkForItemInCart(id, sessionId),
+    inWishlist: await checkForItemInWishlist(id, sessionId),
   };
 }
 

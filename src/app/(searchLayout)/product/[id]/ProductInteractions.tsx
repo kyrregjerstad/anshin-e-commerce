@@ -1,20 +1,26 @@
 import { handleAddToCart } from '@/lib/server/services/cartService';
-import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
-import { HeartIcon } from 'lucide-react';
+import {
+  handleAddToWishlist,
+  handleRemoveFromWishlist,
+} from '@/lib/server/services/wishlistService';
 
 import { SimpleForm } from '@/components/SimpleForm';
 import { QuantitySelect } from './QuantitySelect';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 
 export const ProductInteractions = ({
   id,
   price,
   discountPrice,
   inCart,
+  inWishlist,
 }: {
   id: string;
   price: number;
   discountPrice: number;
   inCart: boolean;
+  inWishlist: boolean;
 }) => {
   const addToCartAction = async (formData: FormData) => {
     'use server';
@@ -27,7 +33,11 @@ export const ProductInteractions = ({
 
   const addToWishlistAction = async () => {
     'use server';
-    await handleAddToWishlist(id, `/product/${id}`);
+    if (!inWishlist) {
+      await handleAddToWishlist(id, `/product/${id}`);
+    } else {
+      await handleRemoveFromWishlist(id);
+    }
   };
 
   const onSale = discountPrice < price;
@@ -65,8 +75,17 @@ export const ProductInteractions = ({
         action={addToWishlistAction}
         render={({ SubmitButton }) => (
           <SubmitButton size="lg" variant="outline" className="w-full">
-            <HeartIcon className="mr-2 h-4 w-4" />
-            Add To Wishlist
+            {inWishlist ? (
+              <>
+                <HeartIconSolid className="mr-2 h-4 w-4" />
+                Remove From Wishlist
+              </>
+            ) : (
+              <>
+                <HeartIconOutline className="mr-2 h-4 w-4" />
+                Add To Wishlist
+              </>
+            )}
           </SubmitButton>
         )}
       />

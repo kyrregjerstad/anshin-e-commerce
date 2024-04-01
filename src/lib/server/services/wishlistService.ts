@@ -169,3 +169,38 @@ export async function checkForItemsInWishlist(
     ),
   }));
 }
+
+export async function checkForItemInWishlist(
+  productId: string,
+  sessionId: string | null
+) {
+  if (!sessionId) return false;
+
+  const res = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+    columns: {},
+    with: {
+      user: {
+        columns: {},
+        with: {
+          wishlist: {
+            columns: {
+              id: true,
+            },
+            with: {
+              items: {
+                columns: {
+                  productId: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return !!res?.user?.wishlist?.items.some(
+    ({ productId: id }) => id === productId
+  );
+}
