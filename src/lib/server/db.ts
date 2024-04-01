@@ -4,7 +4,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import * as schema from './tables';
 import { createDbConnection } from './dbConnection';
 
-const connection = await createDbConnection();
+export const connection = await createDbConnection();
 
 class CustomLogger implements Logger {
   logQuery(query: string, params: unknown[]): void {

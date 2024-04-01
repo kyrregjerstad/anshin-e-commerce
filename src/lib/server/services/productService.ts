@@ -39,7 +39,6 @@ const selectProductFields = () => {
 export async function getAllProducts(sessionId: string | null) {
   const allProducts = await selectProductFields().limit(100);
   const all = await checkForItemsInCart(allProducts, sessionId);
-  console.log('all', all);
 
   return all;
 }

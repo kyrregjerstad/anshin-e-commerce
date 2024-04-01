@@ -1,41 +1,28 @@
 'use server';
 import mysql from 'mysql2/promise';
 
-let cachedConnection: mysql.Connection | null = null;
+// https://www.prisma.io/docs/orm/more/help-and-troubleshooting/help-articles/nextjs-prisma-client-dev-practices
+declare global {
+  var cachedDbConnection: mysql.Pool | undefined;
+}
 
-// Hot reloading in nextjs dev mode will cause this file to
-// be reloaded and the connections to mysql to pile up
-export const createDbConnection = async (): Promise<mysql.Connection> => {
+export const createDbConnection = async (): Promise<mysql.Pool> => {
   if (process.env.NODE_ENV !== 'production') {
-    if (cachedConnection) {
-      return cachedConnection;
+    if (!global.cachedDbConnection) {
+      global.cachedDbConnection = createPool();
     }
-
-    try {
-      cachedConnection = await dbConnection;
-      return cachedConnection;
-    } catch (error) {
-      const isDev = process.env.NODE_ENV === 'development';
-      if (isDev) {
-        throw new Error(
-          `Error connecting to database, did you remember to start docker? ${error}`
-        );
-      }
-      throw new Error('Error connecting to database');
-    }
+    return global.cachedDbConnection;
   } else {
-    try {
-      return await dbConnection;
-    } catch (error) {
-      throw new Error(`Error connecting to database: ${error}`);
-    }
+    return createPool();
   }
 };
 
-const dbConnection = mysql.createConnection({
-  host: process.env.DATABASE_HOST,
-  user: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-  database: 'anshin',
-  port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
-});
+function createPool() {
+  return mysql.createPool({
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USERNAME,
+    password: process.env.DATABASE_PASSWORD,
+    database: 'anshin',
+    port: Number(process.env.DATABASE_PORT), // 💡 3307 when using docker and 3306 for deployment
+  });
+}
