@@ -1,4 +1,4 @@
-import { ProductCard } from '@/components/GridItem';
+import { ProductCard } from '@/components/ProductCard';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { searchProductsByTitle } from '@/lib/server/services/productService';
 

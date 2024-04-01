@@ -1,5 +1,5 @@
 'use server';
-import { ProductCard } from '@/components/GridItem';
+import { ProductCard } from '@/components/ProductCard';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { db } from '@/lib/server/db';
 import { sessions } from '@/lib/server/tables';
