@@ -2,10 +2,11 @@
 import { and, eq } from 'drizzle-orm';
 import { getSessionCookie } from '../auth/cookies';
 import { db } from '../db';
-import { sessions, wishlistItems } from '../tables';
+import { sessions, wishlist, wishlistItems } from '../tables';
 import { redirect } from 'next/navigation';
 import { Product } from './productService';
 import { revalidatePath } from 'next/cache';
+import { generateId } from '../auth/utils';
 
 export async function handleAddToWishlist(productId: string, pathname: string) {
   const sessionId = getSessionCookie();
@@ -19,7 +20,9 @@ export async function handleAddToWishlist(productId: string, pathname: string) {
     columns: {},
     with: {
       user: {
-        columns: {},
+        columns: {
+          id: true,
+        },
         with: {
           wishlist: {
             columns: {
@@ -38,22 +41,33 @@ export async function handleAddToWishlist(productId: string, pathname: string) {
     },
   });
 
-  if (!res || !res.user || !res.user.wishlist) {
+  if (!res || !res.user) {
     redirect(`/login?redirect=${pathname}`);
   }
 
-  const alreadyInWishlist = res.user.wishlist.items.some(
-    (item) => item.productId === productId
-  );
+  // If the user doesn't have a wishlist, create one - this happens the first time a user adds an item to their wishlist
+  if (!res.user.wishlist) {
+    const wishlistId = generateId();
+    await db.insert(wishlist).values({ userId: res.user.id, id: wishlistId });
 
-  if (alreadyInWishlist) {
-    return;
+    await db.insert(wishlistItems).values({
+      productId,
+      wishlistId,
+    });
+  } else {
+    const alreadyInWishlist = res.user.wishlist?.items.some(
+      (item) => item.productId === productId
+    );
+
+    if (alreadyInWishlist) {
+      return;
+    }
+
+    await db.insert(wishlistItems).values({
+      productId,
+      wishlistId: res.user.wishlist.id,
+    });
   }
-
-  await db.insert(wishlistItems).values({
-    productId,
-    wishlistId: res.user.wishlist.id,
-  });
 
   revalidatePath('/wishlist');
 }
