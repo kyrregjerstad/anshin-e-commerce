@@ -27,7 +27,7 @@ export const ProductInteractions = ({
 
   const addToWishlistAction = async () => {
     'use server';
-    await handleAddToWishlist({ productId: id });
+    await handleAddToWishlist(id);
   };
 
   const onSale = discountPrice < price;
