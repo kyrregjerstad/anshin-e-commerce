@@ -2,6 +2,7 @@
 'use client';
 import {
   ReadonlyURLSearchParams,
+  redirect,
   usePathname,
   useRouter,
   useSearchParams,
@@ -40,15 +41,12 @@ const handleSearch = (
   searchParams: ReadonlyURLSearchParams,
   replace: AppRouterInstance['replace']
 ) => {
-  if (searchTerm.trim().length < 2) {
-    return;
-  }
   const params = new URLSearchParams(searchParams);
-  if (searchTerm) {
+  if (searchTerm && searchTerm.trim().length > 0) {
     params.set('q', searchTerm);
+    replace(`/search?${params.toString()}`);
   } else {
     params.delete('q');
+    replace(`/`);
   }
-
-  replace(`/search?${params.toString()}`);
 };

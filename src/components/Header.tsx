@@ -10,6 +10,7 @@ import {
   UserCircleIcon,
   HeartIcon,
 } from '@heroicons/react/24/outline';
+import { SearchBar } from './SearchBar';
 
 type Props = {
   user: {
@@ -23,13 +24,15 @@ export const Header = ({ user, cart }: Props) => {
     <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
       <nav className="flex w-full max-w-8xl items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
         <ul className="flex w-full items-center justify-between gap-4">
-          <li className="flex-1">
+          <li>
             <Link href="/">
               <Logo />
             </Link>
           </li>
+          <li className="flex-1">
+            <SearchBar />
+          </li>
           <li>
-            {/* <SearchBar /> */}
             <MagnifyingGlassIcon
               className="size-8 stroke-neutral-700"
               strokeWidth={1.3}
@@ -41,9 +44,6 @@ export const Header = ({ user, cart }: Props) => {
                 className="size-8 stroke-neutral-700"
                 strokeWidth={1.3}
               />
-              {/* <Link href="/account">
-                <span className="sr-only">account</span>
-              </Link> */}
             </UserAccountMenu>
           </li>
           <li>

@@ -57,7 +57,7 @@ export const LoginForm = ({ submitFn, callbackUrl }: Props) => {
       </CardContent>
       <CardFooter className="flex flex-col items-center">
         <span className="text-sm">Don&apos;t have an account?</span>
-        <Link className="text-sm font-medium" href="/register">
+        <Link className="text-sm font-medium hover:underline" href="/register">
           Sign up
         </Link>
       </CardFooter>
@@ -108,7 +108,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           </FormItem>
         )}
       />
-      <Button type="submit">
+      <Button type="submit" className="w-full">
         {pending ? <LoadingSpinner /> : <span>Login</span>}
       </Button>
     </>
