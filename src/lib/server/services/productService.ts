@@ -58,7 +58,8 @@ export async function searchProductsByTitle(
     .limit(100)
     .execute();
 
-  return await checkForItemsInCart(matchingProducts, sessionId);
+  const items = await checkForItemsInCart(matchingProducts, sessionId);
+  return checkForItemsInWishlist(items, sessionId);
 }
 
 async function checkForItemsInCart(
