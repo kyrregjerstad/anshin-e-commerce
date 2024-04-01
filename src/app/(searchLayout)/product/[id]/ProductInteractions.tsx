@@ -2,8 +2,8 @@ import { handleAddToCart } from '@/lib/server/services/cartService';
 import { handleAddToWishlist } from '@/lib/server/services/wishlistService';
 import { HeartIcon } from 'lucide-react';
 
-import { QuantitySelect } from './QuantitySelect';
 import { SimpleForm } from '@/components/SimpleForm';
+import { QuantitySelect } from './QuantitySelect';
 
 export const ProductInteractions = ({
   id,
@@ -27,7 +27,7 @@ export const ProductInteractions = ({
 
   const addToWishlistAction = async () => {
     'use server';
-    await handleAddToWishlist(id);
+    await handleAddToWishlist(id, `/product/${id}`);
   };
 
   const onSale = discountPrice < price;

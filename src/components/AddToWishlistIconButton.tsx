@@ -5,9 +5,10 @@ import {
   handleRemoveFromWishlist,
 } from '@/lib/server/services/wishlistService';
 
-import { Button } from './ui/button';
 import { HeartIcon as HearIconOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HearIconFilled } from '@heroicons/react/24/solid';
+import { usePathname } from 'next/navigation';
+import { Button } from './ui/button';
 
 type Props = {
   product: Product;
@@ -25,7 +26,7 @@ export const AddToWishlistIconButton = ({
         if (inWishlist) {
           await handleRemoveFromWishlist(product.id);
         } else {
-          await handleAddToWishlist(product.id);
+          await handleAddToWishlist(product.id, '/');
         }
       }}
       {...props}

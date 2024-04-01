@@ -7,11 +7,11 @@ import { redirect } from 'next/navigation';
 import { Product } from './productService';
 import { revalidatePath } from 'next/cache';
 
-export async function handleAddToWishlist(productId: string) {
+export async function handleAddToWishlist(productId: string, pathname: string) {
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
-    redirect('/login');
+    redirect(`/login?redirect=${pathname}`);
   }
 
   const res = await db.query.sessions.findFirst({
@@ -39,7 +39,7 @@ export async function handleAddToWishlist(productId: string) {
   });
 
   if (!res || !res.user || !res.user.wishlist) {
-    redirect('/login');
+    redirect(`/login?redirect=${pathname}`);
   }
 
   const alreadyInWishlist = res.user.wishlist.items.some(

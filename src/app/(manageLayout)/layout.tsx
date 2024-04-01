@@ -12,7 +12,7 @@ export default async function RootLayout({
     <>
       <Header user={user} cart={cart} />
       <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 md:p-8">
-        {children};
+        {children}
       </main>
     </>
   );
