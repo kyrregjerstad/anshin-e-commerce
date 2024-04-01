@@ -150,7 +150,7 @@ export async function checkForItemsInWishlist(
 
   return allProducts.map((product) => ({
     ...product,
-    inWishlist: !!res?.user?.wishlist.items.some(
+    inWishlist: !!res?.user?.wishlist?.items.some(
       ({ productId }) => productId === product.id
     ),
   }));
