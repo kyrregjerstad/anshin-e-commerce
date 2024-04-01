@@ -29,6 +29,7 @@ export const SearchBar = () => {
         placeholder="Search"
         value={value}
         onChange={handleChange}
+        name="search"
         defaultValue={searchParams.get('q')?.toString()}
       />
       <MagnifyingGlassIcon

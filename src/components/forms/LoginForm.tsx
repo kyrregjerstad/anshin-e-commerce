@@ -85,7 +85,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="email">Email</FormLabel>
             <FormControl>
-              <Input placeholder="email@noroff.no" {...field} />
+              <Input
+                id="email"
+                placeholder="email@noroff.no"
+                {...field}
+                autoComplete="email"
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="email" />
@@ -100,7 +105,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="password">Password</FormLabel>
             <FormControl>
-              <Input type="password" placeholder="password" {...field} />
+              <Input
+                id="password"
+                type="password"
+                placeholder="password"
+                {...field}
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="password" />

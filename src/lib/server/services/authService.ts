@@ -3,11 +3,12 @@
 
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { registerSchema } from '@/lib/schema/registerSchema';
-import { SchemaKeys, createFormError, handleErrors, wait } from '@/lib/utils';
+import { SchemaKeys, createFormError, handleErrors } from '@/lib/utils';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { Argon2id } from 'oslo/password';
-import { ZodError, ZodIssueCode, z } from 'zod';
+import { ZodError, ZodIssueCode } from 'zod';
 import {
   createBlankRefreshTokenCookie,
   createBlankSessionCookie,
@@ -17,11 +18,10 @@ import {
 } from '../auth/cookies';
 import { generateId } from '../auth/utils';
 import { db } from '../db';
+import { ActionResult, formAction } from '../formAction';
 import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
-import { revalidatePath } from 'next/cache';
-import { ActionResult, formAction } from '../formAction';
 
 export const login = formAction(
   loginSchema,

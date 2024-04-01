@@ -87,7 +87,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="name">Name</FormLabel>
             <FormControl>
-              <Input placeholder="your name" {...field} />
+              <Input
+                placeholder="your name"
+                {...field}
+                autoComplete="name"
+                id="name"
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="name" />
@@ -102,7 +107,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="email">Email</FormLabel>
             <FormControl>
-              <Input placeholder="email@noroff.no" {...field} />
+              <Input
+                placeholder="email@noroff.no"
+                autoComplete="email"
+                id="email"
+                {...field}
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="email" />
@@ -117,7 +127,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="password">Password</FormLabel>
             <FormControl>
-              <Input type="password" placeholder="password" {...field} />
+              <Input
+                type="password"
+                placeholder="password"
+                {...field}
+                id="password"
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="password" />
@@ -132,7 +147,12 @@ const FormContent = ({ form, pending }: FormContentProps) => {
           <FormItem>
             <FormLabel htmlFor="repeatPassword">Repeat Password</FormLabel>
             <FormControl>
-              <Input type="password" placeholder="repeat password" {...field} />
+              <Input
+                type="password"
+                placeholder="repeat password"
+                {...field}
+                id="repeatPassword"
+              />
             </FormControl>
             <FormMessage>
               <ErrorMessage errors={errors} name="repeatPassword" />
