@@ -21,11 +21,11 @@ export async function middleware(request: NextRequest) {
 
   // short lived - 1 hour
   const sessionCookieToken =
-    request.cookies.get(sessionCookieName)?.value ?? null;
+    request.cookies.get(sessionCookieName)?.value || null;
 
   // long lived - 24h for guest, 30 days for logged in users
   const refreshCookieToken =
-    request.cookies.get(refreshTokenCookieName)?.value ?? null;
+    request.cookies.get(refreshTokenCookieName)?.value || null;
 
   if (sessionCookieToken) {
     const sessionType = await validateSession(sessionCookieToken);
@@ -71,7 +71,7 @@ async function handleGuestSession(
 ) {
   const { id, refreshToken, error } = await getRefreshToken(
     request,
-    request.cookies.get(refreshTokenCookieName)?.value ?? null
+    request.cookies.get(refreshTokenCookieName)?.value || null
   );
 
   if (error) {
