@@ -21,48 +21,47 @@ type Props = {
 };
 export const Header = ({ user, cart }: Props) => {
   return (
-    <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
-      <nav className="flex w-full max-w-8xl items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
-        <ul className="flex w-full items-center justify-between gap-4">
-          <li>
-            <Link href="/">
-              <Logo />
-            </Link>
-          </li>
-          <li className="flex-1">
-            <SearchBar />
-          </li>
-          <li>
-            <MagnifyingGlassIcon
-              className="size-8 stroke-neutral-700"
-              strokeWidth={1.3}
-            />
-          </li>
-          <li>
-            <UserAccountMenu user={user} logOutAction={logOut}>
-              <UserCircleIcon
-                className="size-8 stroke-neutral-700"
-                strokeWidth={1.3}
-              />
-            </UserAccountMenu>
-          </li>
-          <li>
-            <Link href="/account/wishlist" className="group">
-              <span className="sr-only">wishlist</span>
-              <HeartIcon
-                className="size-8 stroke-neutral-700"
-                strokeWidth={1.3}
-              />
-            </Link>
-          </li>
-          <li>
-            <Link href="/cart">
-              <span className="sr-only">cart</span>
-              <CartIcon cartItems={cart} />
-            </Link>
-          </li>
-        </ul>
-      </nav>
-    </header>
+    <>
+      <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
+        <nav className="flex w-full max-w-8xl items-center rounded-b-3xl border bg-tea-100 p-2 drop-shadow-sm">
+          <ul className="flex w-full items-center justify-between gap-4">
+            <li className="flex-1 sm:flex-initial">
+              <Link href="/">
+                <Logo />
+              </Link>
+            </li>
+            <li className="hidden flex-1 justify-center sm:flex">
+              <SearchBar />
+            </li>
+            <li>
+              <UserAccountMenu user={user} logOutAction={logOut}>
+                <UserCircleIcon
+                  className="size-8 stroke-neutral-700"
+                  strokeWidth={1.3}
+                />
+              </UserAccountMenu>
+            </li>
+            <li>
+              <Link href="/account/wishlist" className="group">
+                <span className="sr-only">wishlist</span>
+                <HeartIcon
+                  className="size-8 stroke-neutral-700"
+                  strokeWidth={1.3}
+                />
+              </Link>
+            </li>
+            <li>
+              <Link href="/cart">
+                <span className="sr-only">cart</span>
+                <CartIcon cartItems={cart} />
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <div className="sticky top-14 z-50 block w-full px-2 sm:hidden">
+        <SearchBar />
+      </div>
+    </>
   );
 };

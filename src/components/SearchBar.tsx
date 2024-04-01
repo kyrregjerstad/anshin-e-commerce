@@ -1,22 +1,20 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
 'use client';
+import debounce from 'lodash/debounce';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import {
   ReadonlyURLSearchParams,
-  redirect,
-  usePathname,
   useRouter,
   useSearchParams,
 } from 'next/navigation';
 import { useState } from 'react';
 import { Input } from './ui/input';
-import debounce from 'lodash/debounce';
-import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export const SearchBar = () => {
   const [value, setValue] = useState('');
-  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { replace, push } = useRouter();
+  const { replace } = useRouter();
 
   const debouncedSearch = debounce(handleSearch, 200);
 
@@ -26,13 +24,18 @@ export const SearchBar = () => {
   };
 
   return (
-    <Input
-      className="w-full"
-      placeholder="Search"
-      value={value}
-      onChange={handleChange}
-      defaultValue={searchParams.get('q')?.toString()}
-    />
+    <div className="relative w-full max-w-2xl">
+      <Input
+        placeholder="Search"
+        value={value}
+        onChange={handleChange}
+        defaultValue={searchParams.get('q')?.toString()}
+      />
+      <MagnifyingGlassIcon
+        className="absolute right-2 top-1 size-8 stroke-neutral-500"
+        strokeWidth={1.3}
+      />
+    </div>
   );
 };
 

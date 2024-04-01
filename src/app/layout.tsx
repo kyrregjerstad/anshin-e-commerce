@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
+import { SearchBar } from '@/components/SearchBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,6 +26,7 @@ export default async function RootLayout({
       <Analytics />
       <body className={inter.className}>
         <Header user={user} cart={cart} />
+
         <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 md:p-8">
           {children}
         </main>
