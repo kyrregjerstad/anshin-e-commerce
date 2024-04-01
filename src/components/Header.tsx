@@ -47,7 +47,7 @@ export const Header = ({ user, cart }: Props) => {
             </UserAccountMenu>
           </li>
           <li>
-            <Link href="/wishlist" className="group">
+            <Link href="/account/wishlist" className="group">
               <span className="sr-only">wishlist</span>
               <HeartIcon
                 className="size-8 stroke-neutral-700"

@@ -1,14 +1,13 @@
 import { Card } from '@/components/ui/card';
 import { Product } from '@/lib/server/services/productService';
-import { Heart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AddToCartIconButton } from './AddToCartIconButton';
 import { StarRating } from './StarRating';
-import { Button } from './ui/button';
 import { cn } from '@/lib/utils';
+import { AddToWishlistIconButton } from './AddToWishlistIconButton';
 
-type Props = {
+export type Props = {
   product: Product & { inCart: boolean };
 };
 
@@ -27,13 +26,12 @@ export const GridItem = async ({ product }: Props) => {
             className="absolute h-full w-full object-cover"
           />
         </Link>
-        <Button
+
+        <AddToWishlistIconButton
+          product={product}
+          inWishlist={false}
           className="absolute left-0 top-0 rounded-full transition-opacity duration-300 group-hover:opacity-100 sm:opacity-0"
-          variant="ghost"
-          size="icon"
-        >
-          <Heart />
-        </Button>
+        />
 
         <AddToCartIconButton
           product={product}

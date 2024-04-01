@@ -8,6 +8,13 @@
       "when": 1711802968912,
       "tag": "0000_equal_starbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1711968134991,
+      "tag": "0001_bitter_abomination",
+      "breakpoints": true
     }
   ]
 }

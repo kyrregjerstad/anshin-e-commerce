@@ -74,27 +74,24 @@ export const wishlistRelations = relations(wishlist, ({ one, many }) => ({
 export const wishlistItems = mysqlTable('wishlist_items', {
   wishlistId: varchar('wishlist_id', { length: 64 })
     .notNull()
-    .references(() => wishlist.id),
+    .references(() => wishlist.id, { onDelete: 'cascade' }),
   productId: varchar('product_id', { length: 36 })
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, { onDelete: 'cascade' }),
 });
 
-export const wishlistItemsRelations = relations(
-  wishlistItems,
-  ({ one, many }) => ({
-    wishlist: one(wishlist, {
-      fields: [wishlistItems.wishlistId],
-      references: [wishlist.id],
-      relationName: 'wishlist_items',
-    }),
-    product: one(products, {
-      fields: [wishlistItems.productId],
-      references: [products.id],
-      relationName: 'wishlist_products',
-    }),
-  })
-);
+export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
+  wishlist: one(wishlist, {
+    fields: [wishlistItems.wishlistId],
+    references: [wishlist.id],
+    relationName: 'wishlist_items',
+  }),
+  product: one(products, {
+    fields: [wishlistItems.productId],
+    references: [products.id],
+    relationName: 'wishlist_products',
+  }),
+}));
 
 export const address = mysqlTable('address', {
   id: varchar('id', { length: 64 }).primaryKey(),

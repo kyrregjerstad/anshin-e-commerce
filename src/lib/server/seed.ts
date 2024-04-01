@@ -37,6 +37,8 @@ const main = async () => {
   const db = drizzle(connection, { schema, mode: 'default' });
 
   await db.transaction(async (tx) => {
+    await deleteWishlists(tx);
+    await deleteWishlistItems(tx);
     await deleteOrderItems(tx);
     await deleteOrders(tx);
     await deleteProducts(tx);
@@ -73,6 +75,18 @@ async function seedRedis() {
 }
 
 type DB = ReturnType<typeof drizzle>;
+
+async function deleteWishlistItems(db: DB) {
+  await db.delete(schema.wishlistItems).execute();
+
+  console.log('🗑️  Deleted wishlist items');
+}
+
+async function deleteWishlists(db: DB) {
+  await db.delete(schema.wishlist).execute();
+
+  console.log('🗑️  Deleted wishlists');
+}
 
 async function deleteSessions(db: DB) {
   await db.delete(schema.sessions).execute();
