@@ -99,7 +99,7 @@ async function getUserWishlist(sessionId: string) {
     },
   });
 
-  if (!res?.user?.wishlist.items || res.user.wishlist.items.length === 0) {
+  if (!res?.user?.wishlist.items || res.user.wishlist?.items.length === 0) {
     return null;
   }
 
