@@ -32,16 +32,24 @@ export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
           <span className="sr-only">Toggle user menu</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="center" side="bottom">
+      <DropdownMenuContent
+        align="center"
+        side="bottom"
+        className="w-screen text-center sm:w-auto sm:text-left"
+      >
         {user ? (
           <>
             <DropdownMenuLabel>Hi, {user.name}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link href="/account">Account</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>My Orders</DropdownMenuItem>
-            <DropdownMenuItem>Help</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/account#orders">My Orders</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href="/contact">Contact</Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <SimpleForm
@@ -59,7 +67,7 @@ export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
           <>
             <DropdownMenuLabel>Hi, guest! 👋</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem asChild>
               <Link
                 href="/login"
                 className={buttonVariants({
@@ -68,6 +76,17 @@ export const UserAccountMenu = ({ children, logOutAction, user }: Props) => {
                 })}
               >
                 Login
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link
+                href="/register"
+                className={buttonVariants({
+                  variant: 'secondary',
+                  className: 'w-full',
+                })}
+              >
+                Register
               </Link>
             </DropdownMenuItem>
           </>

@@ -43,9 +43,6 @@ export default async function AccountPage() {
       <Card variant="neutral" className="w-full">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
-          <CardDescription>
-            Your profile information is used to personalize your experience.
-          </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:gap-6">
           <div className="flex justify-between gap-2">
@@ -101,7 +98,7 @@ export default async function AccountPage() {
         </CardContent>
       </Card>
 
-      <Card variant="neutral">
+      <Card variant="neutral" id="orders">
         <CardHeader className="">
           <CardTitle>Order history</CardTitle>
           <CardDescription>
@@ -109,7 +106,11 @@ export default async function AccountPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-2">
-          <OrderHistoryTable orders={orders} />
+          {orders.length > 0 ? (
+            <OrderHistoryTable orders={orders} />
+          ) : (
+            <div className="p-4">No orders</div>
+          )}
         </CardContent>
       </Card>
     </section>
