@@ -1,4 +1,5 @@
-import { Card, CardHeader } from '@/components/ui/card';
+'use server';
+import { ProductCard } from '@/components/GridItem';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { db } from '@/lib/server/db';
 import { sessions } from '@/lib/server/tables';
@@ -26,24 +27,12 @@ const WishlistPage = async () => {
   const { wishlist } = res;
 
   return (
-    <section className="flex w-full max-w-4xl flex-col gap-8 pt-8">
-      {wishlist.map((product) => (
-        <Card key={product.id} className="flex flex-col gap-4">
-          <CardHeader>
-            <h2 className="text-xl font-semibold">{product.title}</h2>
-          </CardHeader>
-          <div className="flex gap-4">
-            <p className="text-lg font-semibold">
-              ${(product.priceInCents / 100).toFixed(2)}
-            </p>
-            {product.discountInCents > 0 && (
-              <p className="text-lg font-semibold text-red-500">
-                ${(product.discountInCents / 100).toFixed(2)}
-              </p>
-            )}
-          </div>
-        </Card>
-      ))}
+    <section className="flex w-full flex-col">
+      <div className="grid w-full gap-4 xs:grid-cols-2 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
+        {wishlist.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
     </section>
   );
 };
@@ -60,6 +49,15 @@ async function getUserWishlist(sessionId: string) {
           id: true,
         },
         with: {
+          cart: {
+            with: {
+              items: {
+                columns: {
+                  productId: true,
+                },
+              },
+            },
+          },
           wishlist: {
             columns: {
               id: true,
@@ -76,6 +74,18 @@ async function getUserWishlist(sessionId: string) {
                       priceInCents: true,
                       discountInCents: true,
                     },
+                    with: {
+                      images: {
+                        columns: {
+                          url: true,
+                        },
+                      },
+                      reviews: {
+                        columns: {
+                          rating: true,
+                        },
+                      },
+                    },
                   },
                 },
               },
@@ -90,10 +100,23 @@ async function getUserWishlist(sessionId: string) {
     return null;
   }
 
-  return {
+  const transform = {
     id: res.user.id,
     wishlist: res.user.wishlist.items.map((item) => ({
-      ...item.product,
+      id: item.product.id,
+      title: item.product.title,
+      price: item.product.priceInCents / 100,
+      discountPrice: item.product.discountInCents / 100,
+      onSale: item.product.discountInCents < item.product.priceInCents,
+      imageUrl: item.product.images[0].url,
+      inCart: !!res.user?.cart.items.some(
+        (cartItem) => cartItem.productId === item.product.id
+      ),
+      averageRating:
+        item.product.reviews.reduce((acc, review) => acc + review.rating, 0) /
+        item.product.reviews.length,
     })),
   };
+
+  return transform;
 }

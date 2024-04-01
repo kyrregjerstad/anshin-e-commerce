@@ -1,4 +1,4 @@
-import { GridItem } from '@/components/GridItem';
+import { ProductCard } from '@/components/GridItem';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { getAllProducts } from '@/lib/server/services/productService';
 import { HeroSection } from '../components/HeroSection';
@@ -28,7 +28,7 @@ export default async function Home({ searchParams }: Props) {
       <section className="flex w-full flex-col">
         <div className="grid w-full gap-4 xs:grid-cols-2 sm:grid-cols-2 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 xl:gap-8">
           {allProducts.map((product) => (
-            <GridItem key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>

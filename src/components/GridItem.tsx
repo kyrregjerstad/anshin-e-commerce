@@ -11,7 +11,7 @@ export type Props = {
   product: Product & { inCart: boolean };
 };
 
-export const GridItem = async ({ product }: Props) => {
+export const ProductCard = async ({ product }: Props) => {
   const { title, imageUrl, averageRating, onSale, inCart } = product;
 
   return (

@@ -3,12 +3,13 @@ import { and, eq } from 'drizzle-orm';
 import { getSessionCookie } from '../auth/cookies';
 import { db } from '../db';
 import { sessions, wishlistItems } from '../tables';
+import { redirect } from 'next/navigation';
 
 export async function handleAddToWishlist(productId: string) {
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
-    throw new Error('Session not found');
+    redirect('/login');
   }
 
   const res = await db.query.sessions.findFirst({
@@ -36,7 +37,7 @@ export async function handleAddToWishlist(productId: string) {
   });
 
   if (!res || !res.user || !res.user.wishlist) {
-    throw new Error('User not found');
+    redirect('/login');
   }
 
   const alreadyInWishlist = res.user.wishlist.items.some(

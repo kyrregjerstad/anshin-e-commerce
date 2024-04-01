@@ -14,6 +14,7 @@ export type Product = {
   averageRating: number;
 };
 
+// This needs to be a function so that we can export it from a "use server" file
 const selectProductFields = () => {
   return db
     .select({
