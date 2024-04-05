@@ -1,5 +1,5 @@
 import { SimpleForm } from '@/components/SimpleForm';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { generateId, generateOrderId } from '@/lib/server/auth/utils';
@@ -11,6 +11,7 @@ import { eq } from 'drizzle-orm';
 import isEqual from 'lodash/isEqual';
 import { redirect } from 'next/navigation';
 import { OrderSummaryTable } from '@/components/OrderSummaryTable';
+import Link from 'next/link';
 
 export default async function ReviewPage() {
   const sessionId = getSessionCookie();
@@ -81,9 +82,15 @@ export default async function ReviewPage() {
         </div>
       </section>
       <div className="flex w-full gap-2">
-        <Button className="flex-1" variant="secondary">
+        <Link
+          className={buttonVariants({
+            variant: 'secondary',
+            className: 'flex-1',
+          })}
+          href="/checkout/payment"
+        >
           Back
-        </Button>
+        </Link>
         <SimpleForm
           className="flex-1"
           action={handleCompleteOrder}

@@ -5,6 +5,7 @@ import isEqual from 'lodash/isEqual';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { AddressCard } from '@/components/AddressCard';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 
 export default async function CheckoutPage() {
   const sessionId = getSessionCookie();
@@ -43,12 +44,27 @@ export default async function CheckoutPage() {
           />
         )}
       </div>
-      <Link
-        className={buttonVariants({ variant: 'default' })}
-        href="/checkout/payment"
-      >
-        Continue to payment
-      </Link>
+      <div className="flex w-full gap-4">
+        <Link
+          className={buttonVariants({
+            variant: 'secondary',
+            className: 'flex-1',
+          })}
+          href="/cart"
+        >
+          Back
+        </Link>
+        <Link
+          className={buttonVariants({
+            variant: 'default',
+            className: 'group flex-1',
+          })}
+          href="/checkout/payment"
+        >
+          Payment
+          <ChevronRightIcon className="size-5 transition-transform group-hover:translate-x-1" />
+        </Link>
+      </div>
     </section>
   );
 }

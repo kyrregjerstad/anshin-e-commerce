@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -12,8 +12,11 @@ import {
 import { Input } from '@/components/ui/input';
 
 import { paymentSchema } from '@/lib/schema/paymentSchema';
+import { SubmitFn } from '@/lib/server/formAction';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { ErrorMessage } from '@hookform/error-message';
-import { useFormStatus } from 'react-dom';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { LoadingSpinner } from '../LoadingSpinner';
@@ -24,17 +27,15 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form';
-import { SubmitFn } from '@/lib/server/formAction';
 import { Form } from './Form';
-import { redirect, useRouter } from 'next/navigation';
 
 type FormValues = z.infer<typeof paymentSchema>;
 
+// !NOTE: I don't want to save the payment data for data security reasons, so this form is not persisted to the database.
 type Props = {
   submitFn: SubmitFn<FormValues>;
 };
 export const PaymentForm = ({ submitFn }: Props) => {
-  const { push } = useRouter();
   const defaultValues = {
     name: '',
     cardNumber: '',
@@ -57,7 +58,7 @@ export const PaymentForm = ({ submitFn }: Props) => {
           schema={paymentSchema}
           defaultValues={defaultValues}
           submitFn={submitFn}
-          onSuccess={() => push('/checkout/review')}
+          onSuccess={() => redirect('/checkout/review')}
           render={({ form, pending }) => (
             <FormContent form={form} pending={pending} />
           )}
@@ -162,9 +163,27 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             )}
           />
         </div>
-        <Button type="submit" className="col-span-3" disabled={pending}>
-          {pending ? <LoadingSpinner /> : 'Next'}
-        </Button>
+        <div className="col-span-3 flex gap-4">
+          <Link
+            className={buttonVariants({
+              variant: 'secondary',
+              className: 'flex-1',
+            })}
+            href="/checkout/address"
+          >
+            Back
+          </Link>
+          <Button type="submit" className="group flex-1" disabled={pending}>
+            {pending ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                Review
+                <ChevronRightIcon className="size-5 transition-transform group-hover:translate-x-1" />
+              </>
+            )}
+          </Button>
+        </div>
       </div>
     </>
   );
