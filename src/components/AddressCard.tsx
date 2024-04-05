@@ -12,18 +12,19 @@ import Link from 'next/link';
 export const AddressCard = ({
   address,
   isSameAddress,
+  type = 'shipping',
 }: {
   address: InsertAddress;
   isSameAddress?: boolean;
+  type?: 'shipping' | 'billing';
 }) => {
-  const type = address.type === 'shipping' ? 'shipping' : 'billing';
   return (
     <Card variant="neutral" className="flex w-full flex-col justify-between">
       {isSameAddress ? (
         <>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              {address.type === 'shipping' ? 'Shipping' : 'Billing'}
+              {type === 'shipping' ? 'Shipping' : 'Billing'}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:gap-6">

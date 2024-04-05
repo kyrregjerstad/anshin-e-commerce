@@ -26,12 +26,12 @@ import {
 import { Address, addressSchema } from '@/lib/schema/addressSchema';
 import { SubmitFn } from '@/lib/server/formAction';
 import { ErrorMessage } from '@hookform/error-message';
+import { countries } from 'countries-list';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { Form } from './Form';
-import { continents, countries, languages } from 'countries-list';
 
 type Props = {
   addressType: 'shipping' | 'billing';
@@ -260,7 +260,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
 
                   <SelectContent>
                     <SelectItem value="shipping">Shipping</SelectItem>
-                    <SelectItem value="Billing">Billing</SelectItem>
+                    <SelectItem value="billing">Billing</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

@@ -39,8 +39,9 @@ export default async function CheckoutPage() {
 
         {showBillingAddressForm && (
           <AddressCard
-            address={billingAddress ?? shippingAddress}
+            address={shippingAddress}
             isSameAddress={sameAddress}
+            type="billing"
           />
         )}
       </div>
