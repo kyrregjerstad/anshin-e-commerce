@@ -31,6 +31,7 @@ import { redirect } from 'next/navigation';
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { Form } from './Form';
+import { continents, countries, languages } from 'countries-list';
 
 type Props = {
   addressType: 'shipping' | 'billing';
@@ -225,9 +226,13 @@ const FormContent = ({ form, pending }: FormContentProps) => {
                   </SelectTrigger>
 
                   <SelectContent>
-                    <SelectItem value="United States">United States</SelectItem>
-                    <SelectItem value="Canada">Canada</SelectItem>
-                    <SelectItem value="Mexico">Mexico</SelectItem>
+                    {Object.entries(countries).map(
+                      ([countryCode, countryData]) => (
+                        <SelectItem key={countryCode} value={countryCode}>
+                          {countryData.name}
+                        </SelectItem>
+                      )
+                    )}
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -244,11 +249,20 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="type">Type</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="Type"
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
                   {...field}
-                  value={field.value ?? ''}
-                />
+                >
+                  <SelectTrigger className="w-[200px]">
+                    <SelectValue placeholder="Type" />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="shipping">Shipping</SelectItem>
+                    <SelectItem value="Billing">Billing</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="type" />

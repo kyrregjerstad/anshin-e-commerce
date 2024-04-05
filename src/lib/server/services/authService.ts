@@ -22,6 +22,7 @@ import { ActionResult, formAction } from '../formAction';
 import { cart, cartItems, sessions, users } from '../tables';
 import { getCartBySessionId, getCartByUserId } from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
+import { redirect } from 'next/navigation';
 
 export const login = formAction(
   loginSchema,
@@ -210,4 +211,5 @@ export async function logOut() {
   cookies().delete(refreshCookie.name);
 
   revalidatePath('/');
+  redirect('/');
 }
