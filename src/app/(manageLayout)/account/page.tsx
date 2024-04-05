@@ -60,7 +60,7 @@ export default async function AccountPage() {
             <div>
               <Link
                 className="text-blue-600 underline transition-all hover:underline"
-                href="#"
+                href="/account/new-password"
               >
                 Change password
               </Link>
