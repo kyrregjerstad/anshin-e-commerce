@@ -51,3 +51,17 @@ export async function getUserBySessionId(sessionId: string) {
       res.user.addresses.find((a) => a.type === 'billing') || null,
   };
 }
+
+export async function checkForLoggedInUser(sessionId: string | null) {
+  if (!sessionId) {
+    return false;
+  }
+
+  const session = await db.query.sessions.findFirst({
+    where: eq(sessions.id, sessionId),
+  });
+
+  const userLoggedIn = !!session?.userId;
+
+  return userLoggedIn;
+}
