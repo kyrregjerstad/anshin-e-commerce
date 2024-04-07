@@ -60,7 +60,9 @@ export const login = formAction(
         refreshCookie.value,
         refreshCookie.options
       );
-      cookies().set('displayLoginSuccessToast', 'true');
+      cookies().set('displayLoginSuccessToast', 'true', {
+        maxAge: 5,
+      });
 
       return {
         status: 'success',

@@ -9,7 +9,6 @@ type Props = {
 
 export const CookiesToast = ({ name }: Props) => {
   useEffect(() => {
-    console.log('CookiesToast');
     const displayLoginSuccessToast = document.cookie.includes(
       'displayLoginSuccessToast'
     );
