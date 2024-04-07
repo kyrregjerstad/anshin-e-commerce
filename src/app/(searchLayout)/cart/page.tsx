@@ -47,13 +47,13 @@ const CartPage = async () => {
                 <Image
                   src={item.imageUrl}
                   alt={item.imageAlt}
-                  width={150}
-                  height={150}
+                  width={75}
+                  height={75}
                   className="h-full w-full object-cover"
                 />
               </div>
             </CardHeader>
-            <CardContent className="col-span-3 flex w-full flex-col justify-between gap-2 py-4 pl-0 pr-0 sm:col-span-2 sm:pr-4">
+            <CardContent className="col-span-3 flex w-full flex-col gap-2 py-4 pl-0 pr-0 sm:col-span-2 sm:pr-4">
               <div className="flex w-full justify-between">
                 <Link
                   href={`product/${item.id}`}
@@ -67,9 +67,6 @@ const CartPage = async () => {
                 <QuantitySelector cartId={cartId} item={item} />
                 <span className="font-bold">{formatUSD(item.totalPrice)}</span>
               </div>
-              <Button className="self-start" variant="outline">
-                Move to wishlist
-              </Button>
             </CardContent>
           </Card>
         ))}

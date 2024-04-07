@@ -8,6 +8,8 @@ import {
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
+import { XCircle } from 'lucide-react';
 
 type Props = {
   product: Product;
@@ -18,8 +20,10 @@ export const AddToCartIconButton = ({ product, inCart, ...props }: Props) => {
     <form
       action={async () => {
         if (inCart) {
+          toast.info('Removed from cart', { icon: <XCircle /> });
           await handleRemoveFromCart(product.id);
         } else {
+          toast.success('Added to cart');
           await handleAddToCart({
             productId: product.id,
             quantity: 1,

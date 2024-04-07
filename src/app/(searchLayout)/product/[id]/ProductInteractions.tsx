@@ -5,9 +5,9 @@ import {
 } from '@/lib/server/services/wishlistService';
 
 import { SimpleForm } from '@/components/SimpleForm';
-import { QuantitySelect } from './QuantitySelect';
-import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
+import { QuantitySelect } from './QuantitySelect';
 
 export const ProductInteractions = ({
   id,

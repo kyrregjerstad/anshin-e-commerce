@@ -7,7 +7,7 @@ import {
 
 import { HeartIcon as HearIconOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HearIconFilled } from '@heroicons/react/24/solid';
-import { usePathname } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
 
 type Props = {
@@ -24,8 +24,14 @@ export const AddToWishlistIconButton = ({
     <form
       action={async () => {
         if (inWishlist) {
+          toast.info(`Removed ${product.title} from wishlist`, {
+            icon: <HearIconOutline />,
+          });
           await handleRemoveFromWishlist(product.id);
         } else {
+          toast.success(`Added ${product.title} to wishlist`, {
+            icon: <HearIconFilled />,
+          });
           await handleAddToWishlist(product.id, '/');
         }
       }}
