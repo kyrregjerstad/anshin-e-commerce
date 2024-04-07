@@ -41,19 +41,19 @@ const CartPage = async () => {
     <section className="grid w-full max-w-5xl gap-4 p-4 md:grid-cols-2">
       <div className="flex flex-col gap-4">
         {customerCart.items.map((item) => (
-          <Card className="grid grid-cols-3 gap-1 px-4 sm:px-0" key={item.id}>
+          <Card className="grid grid-cols-4 gap-1 px-4 sm:px-0" key={item.id}>
             <CardHeader className="col-span-1 hidden p-4 sm:block">
-              <div className="aspect-square overflow-hidden rounded-xl">
+              <div className="aspect-square overflow-hidden rounded-xl ">
                 <Image
                   src={item.imageUrl}
                   alt={item.imageAlt}
                   width={75}
                   height={75}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full min-w-full object-cover"
                 />
               </div>
             </CardHeader>
-            <CardContent className="col-span-3 flex w-full flex-col gap-2 py-4 pl-0 pr-0 sm:col-span-2 sm:pr-4">
+            <CardContent className="col-span-4 flex w-full flex-col gap-2 py-4 pl-0 pr-0 sm:col-span-3 sm:pr-4">
               <div className="flex w-full justify-between">
                 <Link
                   href={`product/${item.id}`}
