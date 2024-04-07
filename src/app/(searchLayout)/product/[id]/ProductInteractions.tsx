@@ -8,6 +8,7 @@ import { SimpleForm } from '@/components/SimpleForm';
 import { HeartIcon as HeartIconOutline } from '@heroicons/react/24/outline';
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid';
 import { QuantitySelect } from './QuantitySelect';
+import { Badge } from '@/components/ui/badge';
 
 export const ProductInteractions = ({
   id,
@@ -53,7 +54,9 @@ export const ProductInteractions = ({
               {onSale ? (
                 <div>
                   <div className="text-end text-sm font-bold">
-                    Save {calculateDiscount(price, discountPrice)}%
+                    <Badge>
+                      Save {calculateDiscount(price, discountPrice)}%
+                    </Badge>
                   </div>
 
                   <div className="text-end text-lg font-bold text-gray-500 line-through">

@@ -20,10 +20,12 @@ export const AddToCartIconButton = ({ product, inCart, ...props }: Props) => {
     <form
       action={async () => {
         if (inCart) {
-          toast.info('Removed from cart', { icon: <XCircle /> });
+          toast.info(`Removed ${product.title} from cart`, {
+            icon: <XCircle />,
+          });
           await handleRemoveFromCart(product.id);
         } else {
-          toast.success('Added to cart');
+          toast.success(`Added ${product.title} to cart`);
           await handleAddToCart({
             productId: product.id,
             quantity: 1,
