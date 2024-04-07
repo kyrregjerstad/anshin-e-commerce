@@ -26,10 +26,13 @@ export const AddToCartIconButton = ({ product, inCart, ...props }: Props) => {
           await handleRemoveFromCart(product.id);
         } else {
           toast.success(`Added ${product.title} to cart`);
-          await handleAddToCart({
+          const res = await handleAddToCart({
             productId: product.id,
             quantity: 1,
           });
+          if (res?.error) {
+            toast.error(res.error);
+          }
         }
       }}
       {...props}

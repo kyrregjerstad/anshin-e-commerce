@@ -180,7 +180,9 @@ export async function createSession(
   } satisfies InsertSession;
 
   try {
-    await db.insert(sessions).values(session);
+    await db.transaction(async (tx) => {
+      tx.insert(sessions).values(session);
+    });
     await setRedisSession(session.id, guest);
   } catch (error) {
     console.error(error);
@@ -192,13 +194,14 @@ export async function createSession(
 export async function refreshSession(refreshToken: string, guest: boolean) {
   try {
     const newSessionId = generateId({ guest });
-    await db
-      .update(sessions)
-      .set({
-        id: newSessionId,
-        expiresAt: getExpiresAt({ guest }),
-      })
-      .where(eq(sessions.refreshToken, refreshToken));
+    await db.transaction(async (tx) => {
+      tx.update(sessions)
+        .set({
+          id: newSessionId,
+          expiresAt: getExpiresAt({ guest }),
+        })
+        .where(eq(sessions.refreshToken, refreshToken));
+    });
 
     await setRedisSession(newSessionId, guest);
 

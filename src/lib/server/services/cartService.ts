@@ -9,6 +9,7 @@ import { db } from '../db';
 import { Product } from './productService';
 import { cart, cartItems, sessions } from '../tables';
 import { createSession } from './sessionService';
+import { redirect } from 'next/navigation';
 
 export async function getCartById(cartId: string) {
   const res = await db.query.cart.findFirst({
@@ -139,7 +140,7 @@ export async function getCartQuantity() {
 export async function handleRemoveFromCart(itemId: string) {
   const sessionId = getSessionCookie();
   if (!sessionId) {
-    throw new Error('Session not found');
+    redirect('/cart');
   }
   const session = await getSessionDetails(sessionId);
   if (!session) {
@@ -183,7 +184,7 @@ export async function handleAddToCart({
   const sessionId = getSessionCookie();
 
   if (!sessionId) {
-    throw new Error('Session not found');
+    return { error: `Oh dear, that didn't work! please try again` }; // in the edge case where the user interacts with the cart while their session cookie is missing or expired
   }
 
   const selectedCartId = await getOrCreateCart(sessionId);
