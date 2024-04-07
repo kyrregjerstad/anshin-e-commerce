@@ -1,10 +1,10 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
+import { ONE_HOUR_IN_SECONDS } from '@/lib/constants';
 import { redis } from '../redis';
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
 type SessionType = 'guest' | 'user' | null;
 
-// fast in memory cache for recent sessions, to avoid calling redis
+// fast in-memory cache for recent sessions, to avoid calling redis
 // since this is running in a serverless edge environment, this cache is per instance and can be cleared after the function execution depending on the cloud provider
 // vercel seems to keep the instance alive for a few minutes, so this cache will be useful for repeated requests within the same instance
 const recentSessions = new Map<string, SessionType>();

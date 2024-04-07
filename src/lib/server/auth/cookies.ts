@@ -1,10 +1,9 @@
+import { ONE_HOUR_IN_SECONDS } from '@/lib/constants';
 import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { cookies } from 'next/headers';
 
 export const sessionCookieName = 'session_id';
 export const refreshTokenCookieName = 'refresh_token';
-
-const ONE_HOUR_IN_SECONDS = 60 * 60;
 
 // max age set in SECONDS
 function createDefaultCookieOptions(maxAge: number) {

@@ -14,8 +14,7 @@ import {
 } from './types';
 import { getEmptySessionDetails, transformCartItems } from './utils';
 import { redis } from '../redis';
-
-const ONE_HOUR_IN_SECONDS = 60 * 60;
+import { ONE_HOUR_IN_SECONDS } from '@/lib/constants';
 
 export async function getSessionById(
   sessionId: string
