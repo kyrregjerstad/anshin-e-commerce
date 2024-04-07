@@ -30,7 +30,6 @@ export async function createNewOrder({
   cartId,
   items,
 }: Order) {
-  await wait(2000);
   try {
     await db.transaction(async (tx) => {
       await tx.insert(orders).values({
