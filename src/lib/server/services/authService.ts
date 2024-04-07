@@ -20,7 +20,12 @@ import { generateId } from '../auth/utils';
 import { db } from '../db';
 import { ActionResult, formAction } from '../formAction';
 import { cart, cartItems, sessions, users } from '../tables';
-import { getCartBySessionId, getCartByUserId } from './cartService';
+import {
+  getCartById,
+  getCartBySessionId,
+  getCartByUserId,
+  getOrCreateCart,
+} from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
 import { redirect } from 'next/navigation';
 
@@ -45,10 +50,15 @@ export const login = formAction(
 
       const { id: userId } = existingUser;
 
-      const session = await createSession(userId);
+      const guestSessionId = getSessionCookie();
+      const newSession = await createSession(userId);
 
-      const sessionCookie = createSessionCookie(session.id);
-      const refreshCookie = createRefreshTokenCookie(session.refreshToken);
+      if (guestSessionId) {
+        await mergeCarts(guestSessionId, newSession.id);
+      }
+
+      const sessionCookie = createSessionCookie(newSession.id);
+      const refreshCookie = createRefreshTokenCookie(newSession.refreshToken);
 
       cookies().set(
         sessionCookie.name,
@@ -69,7 +79,7 @@ export const login = formAction(
         message: 'Logged in successfully',
       };
     } catch (error) {
-      console.log('error', error);
+      console.error('error', error);
       return handleErrors(error);
     }
   }
@@ -104,10 +114,16 @@ export const register = formAction(
         hashedPassword,
       });
 
-      const session = await createSession(newUserId);
+      const newSession = await createSession(newUserId);
 
-      const sessionCookie = createSessionCookie(session.id);
-      const refreshCookie = createRefreshTokenCookie(session.refreshToken);
+      const guestSessionId = getSessionCookie();
+
+      if (guestSessionId) {
+        await mergeCarts(guestSessionId, newSession.id);
+      }
+
+      const sessionCookie = createSessionCookie(newSession.id);
+      const refreshCookie = createRefreshTokenCookie(newSession.refreshToken);
 
       cookies().set(sessionCookie.name, sessionCookie.value);
       cookies().set(refreshCookie.name, refreshCookie.value);
@@ -118,6 +134,7 @@ export const register = formAction(
         message: 'Registered and logged in successfully',
       };
     } catch (error) {
+      console.error('error', error);
       return handleErrors(error);
     }
   }
@@ -130,6 +147,8 @@ async function verifyUserCredentials(email: string, password: string) {
 
   const validPassword = await new Argon2id().verify(
     // default password to hash, so that the hashing function always try to hash a password
+    // this ensures that the function always takes a similar amount of time to execute
+    // regardless of whether the user exists or not
     existingUser?.hashedPassword ??
       '$argon2id$v=19$m=19456,t=2,p=1$juj2N0Frdb1BvKwHFfx3nw$/THeVkBkxDSSDA5AKpFEtMki9ffbRFc+SvvZVmuXMeU',
     password
@@ -138,26 +157,22 @@ async function verifyUserCredentials(email: string, password: string) {
   return { existingUser, validPassword };
 }
 
-async function clearGuestCart(guestSessionId: string) {
-  await db.transaction(async (tx) => {
-    await tx.delete(cart).where(eq(cart.id, guestSessionId));
-    await tx.delete(cartItems).where(eq(cartItems.cartId, guestSessionId));
-  });
-}
+async function mergeCarts(guestSessionId: string, newSessionId: string) {
+  const { items: guestSessionCartItems, cartId: guestCartId } =
+    await getCartBySessionId(guestSessionId);
 
-async function mergeCarts(
-  guestSessionId: string,
-  userId: string,
-  cartId: string,
-  guestSessionCartItems: {
-    id: string;
-    title: string;
-    quantity: number;
-    priceInCents: number;
-    discountInCents: number;
-  }[]
-) {
-  const userCart = await getCartByUserId(userId);
+  if (
+    !guestSessionCartItems ||
+    guestSessionCartItems.length === 0 ||
+    !guestCartId
+  ) {
+    return;
+  }
+
+  const userCartId = await getOrCreateCart(newSessionId);
+
+  const userCart = await getCartById(userCartId);
+
   const mergedCart = guestSessionCartItems.reduce(
     (acc, guestItem) => {
       const itemIndex = acc.findIndex((item) => item.id === guestItem.id);
@@ -174,31 +189,18 @@ async function mergeCarts(
   );
 
   const mergedCartItems = mergedCart.map((item) => ({
-    cartId,
+    cartId: userCartId,
     productId: item.id,
     quantity: item.quantity,
   }));
 
   await db.transaction(async (tx) => {
-    await tx.delete(cartItems).where(eq(cartItems.cartId, cartId));
-    await tx.insert(cartItems).values(mergedCartItems);
+    await tx.delete(cartItems).where(eq(cartItems.cartId, userCartId));
     await tx.delete(cart).where(eq(cart.id, guestSessionId));
     await tx.delete(cartItems).where(eq(cartItems.cartId, guestSessionId));
+
+    await tx.insert(cartItems).values(mergedCartItems);
   });
-}
-
-async function handleGuestCart(
-  guestSessionId: string,
-  userId: string,
-  cartId: string
-) {
-  const guestSessionCartItems = await getCartBySessionId(guestSessionId);
-
-  if (guestSessionCartItems.length === 0) {
-    await clearGuestCart(guestSessionId);
-  } else {
-    await mergeCarts(guestSessionId, userId, cartId, guestSessionCartItems);
-  }
 }
 
 export async function logOut() {

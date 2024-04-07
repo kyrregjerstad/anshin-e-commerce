@@ -48,6 +48,9 @@ export async function getCartById(cartId: string) {
 export async function getCartBySessionId(sessionId: string) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.sessionId, sessionId),
+    columns: {
+      id: true,
+    },
     with: {
       items: {
         columns: {
@@ -68,7 +71,7 @@ export async function getCartBySessionId(sessionId: string) {
   });
 
   if (!res) {
-    return [];
+    return { cartId: null, items: [] };
   }
 
   const transformedCart = res.items.map((item) => ({
@@ -76,12 +79,18 @@ export async function getCartBySessionId(sessionId: string) {
     quantity: item.quantity,
   }));
 
-  return transformedCart;
+  return {
+    cartId: res.id,
+    items: transformedCart,
+  };
 }
 
 export async function getCartByUserId(userId: string) {
   const res = await db.query.cart.findFirst({
     where: eq(cart.userId, userId),
+    columns: {
+      id: true,
+    },
     with: {
       items: {
         columns: {
@@ -102,7 +111,10 @@ export async function getCartByUserId(userId: string) {
   });
 
   if (!res) {
-    return [];
+    return {
+      cartId: null,
+      items: [] as CartItem[],
+    };
   }
 
   const transformedCart = res.items.map((item) => ({
@@ -110,7 +122,10 @@ export async function getCartByUserId(userId: string) {
     quantity: item.quantity,
   }));
 
-  return transformedCart;
+  return {
+    cartId: res.id,
+    items: transformedCart,
+  };
 }
 
 export async function getCartQuantity() {
@@ -248,18 +263,6 @@ export async function createCart(sessionId: string, userId?: string | null) {
   return cartId;
 }
 
-type Session = {
-  id: string;
-  cart: {
-    id: string;
-  } | null;
-  user: {
-    id: string;
-    cart: {
-      id: string | undefined;
-    };
-  } | null;
-};
 export async function getOrCreateCart(sessionId: string) {
   const existingSession = await getSessionDetails(sessionId);
 
@@ -276,7 +279,7 @@ export async function getOrCreateCart(sessionId: string) {
   }
 
   // If the user has a cart, return the cart id
-  if (existingSession.user?.cart.id) {
+  if (existingSession.user?.cart?.id) {
     return existingSession.user.cart.id;
   }
 
