@@ -101,6 +101,7 @@ export const register = formAction(
 
       cookies().set(sessionCookie.name, sessionCookie.value);
       cookies().set(refreshCookie.name, refreshCookie.value);
+      cookies().set('displayRegisterSuccessToast', 'true');
 
       return {
         status: 'success',
@@ -191,26 +192,32 @@ async function handleGuestCart(
 }
 
 export async function logOut() {
-  const sessionId = getSessionCookie();
+  try {
+    const sessionId = getSessionCookie();
 
-  if (!sessionId) return;
+    if (!sessionId) return;
 
-  const { session } = await getSessionDetails(sessionId);
+    const { session } = await getSessionDetails(sessionId);
 
-  if (!session) {
-    return {
-      error: 'Unauthorized',
-    };
+    if (!session) {
+      return {
+        error: 'Unauthorized',
+      };
+    }
+
+    await db.delete(sessions).where(eq(sessions.id, sessionId));
+
+    const sessionCookie = createBlankSessionCookie();
+    const refreshCookie = createBlankRefreshTokenCookie();
+
+    cookies().set('displayLogoutSuccessToast', 'true');
+    cookies().delete(sessionCookie.name);
+    cookies().delete(refreshCookie.name);
+
+    revalidatePath('/');
+    redirect('/');
+  } catch (error) {
+    console.error('error', error);
+    handleErrors(error);
   }
-
-  await db.delete(sessions).where(eq(sessions.id, sessionId));
-
-  const sessionCookie = createBlankSessionCookie();
-  const refreshCookie = createBlankRefreshTokenCookie();
-
-  cookies().delete(sessionCookie.name);
-  cookies().delete(refreshCookie.name);
-
-  revalidatePath('/');
-  redirect('/');
 }
