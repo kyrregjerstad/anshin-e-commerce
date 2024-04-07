@@ -3,6 +3,10 @@ import { redis } from '../redis';
 
 const ONE_HOUR_IN_SECONDS = 60 * 60;
 type SessionType = 'guest' | 'user' | null;
+
+// fast in memory cache for recent sessions, to avoid calling redis
+// since this is running in a serverless edge environment, this cache is per instance and can be cleared after the function execution depending on the cloud provider
+// vercel seems to keep the instance alive for a few minutes, so this cache will be useful for repeated requests within the same instance
 const recentSessions = new Map<string, SessionType>();
 
 export async function getSessionType(
@@ -24,7 +28,7 @@ export async function getSessionType(
     setTimeout(() => {
       console.log(`deleting key ${sessionToken} from cache`);
       recentSessions.delete(sessionToken);
-    }, 1000); // deletes the key after 1 second
+    }, 1000); // deletes the cache key after 1 second
   }
 
   return sessionType;
@@ -32,6 +36,5 @@ export async function getSessionType(
 
 export async function refreshRedisSessionExpiration(sessionToken: string) {
   const ttl = ONE_HOUR_IN_SECONDS;
-
-  await redis.expire(`session:${sessionToken}`, 60);
+  await redis.expire(`session:${sessionToken}`, ttl);
 }

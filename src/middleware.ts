@@ -42,7 +42,7 @@ async function handleGuestSession(
     return response;
   }
 
-  const sessionCookie = createSessionCookie(newSessionId, { guest: true });
+  const sessionCookie = createSessionCookie(newSessionId);
   const refreshCookie = createRefreshTokenCookie(refreshToken, { guest: true });
 
   response.cookies.set(
@@ -83,8 +83,7 @@ async function handleRefreshSession(
   return response;
 }
 
-// workaround since mysql2 does not work in edge functions
-// ideally we should just call the db directly if we were in a serverless function such as Planetscale
+// if refreshToken is null, a new guest session is created
 async function authFetch(
   url: string,
   refreshToken: string | null

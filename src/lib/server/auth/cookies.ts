@@ -20,11 +20,11 @@ function createDefaultCookieOptions(maxAge: number) {
 // valid for 1 hour, no db call required.
 // This cookie is used to create a session in the db,
 // and keeps the refresh token in the sessions table refreshToken column
-export function createSessionCookie(sessionId: string, { guest = false } = {}) {
+export function createSessionCookie(sessionId: string) {
   return {
     name: sessionCookieName,
     value: sessionId,
-    options: createDefaultCookieOptions(10),
+    options: createDefaultCookieOptions(ONE_HOUR_IN_SECONDS),
   };
 }
 
