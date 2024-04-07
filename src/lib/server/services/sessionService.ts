@@ -180,7 +180,7 @@ export async function createSession(
 
   try {
     await db.transaction(async (tx) => {
-      tx.insert(sessions).values(session);
+      await tx.insert(sessions).values(session);
     });
     await setRedisSession(session.id, guest);
   } catch (error) {
@@ -194,7 +194,8 @@ export async function refreshSession(refreshToken: string, guest: boolean) {
   try {
     const newSessionId = generateId({ guest });
     await db.transaction(async (tx) => {
-      tx.update(sessions)
+      await tx
+        .update(sessions)
         .set({
           id: newSessionId,
           expiresAt: getExpiresAt({ guest }),

@@ -13,11 +13,8 @@ export async function getSessionType(
   sessionToken: string
 ): Promise<SessionType> {
   if (recentSessions.has(sessionToken)) {
-    console.count('cache hit');
     return recentSessions.get(sessionToken)!;
   }
-
-  console.count('calling redis');
 
   const sessionType = (await redis.get(
     `session:${sessionToken}`
@@ -26,7 +23,6 @@ export async function getSessionType(
   if (sessionType !== null) {
     recentSessions.set(sessionToken, sessionType);
     setTimeout(() => {
-      console.log(`deleting key ${sessionToken} from cache`);
       recentSessions.delete(sessionToken);
     }, 1000); // deletes the cache key after 1 second
   }
