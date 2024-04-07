@@ -99,7 +99,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="firstName">First name</FormLabel>
               <FormControl>
-                <Input placeholder="First name" {...field} />
+                <Input placeholder="First name" {...field} id="firstName" />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="firstName" />
@@ -114,7 +114,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="lastName">Last name</FormLabel>
               <FormControl>
-                <Input placeholder="Last name" {...field} />
+                <Input placeholder="Last name" {...field} id="lastName" />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="lastName" />
@@ -129,7 +129,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="address">Address</FormLabel>
               <FormControl>
-                <Input placeholder="Address" {...field} />
+                <Input placeholder="Address" {...field} id="address" />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="streetAddress1" />
@@ -148,6 +148,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
                   placeholder="Address 2"
                   {...field}
                   value={field.value ?? ''}
+                  id="address2"
                 />
               </FormControl>
               <FormMessage>
@@ -167,6 +168,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
                   placeholder="City"
                   {...field}
                   value={field.value ?? ''}
+                  id="city"
                 />
               </FormControl>
               <FormMessage>
@@ -182,7 +184,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
             <FormItem>
               <FormLabel htmlFor="zip">Zip</FormLabel>
               <FormControl>
-                <Input placeholder="Zip" {...field} />
+                <Input placeholder="Zip" {...field} id="zip" />
               </FormControl>
               <FormMessage>
                 <ErrorMessage errors={errors} name="postalCode" />
@@ -201,6 +203,7 @@ const FormContent = ({ form, pending }: FormContentProps) => {
                   placeholder="State"
                   {...field}
                   value={field.value ?? ''}
+                  id="state"
                 />
               </FormControl>
               <FormMessage>

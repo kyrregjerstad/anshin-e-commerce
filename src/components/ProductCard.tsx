@@ -23,7 +23,7 @@ export const ProductCard = async ({ product }: Props) => {
             src={imageUrl ?? '/placeholder.jpg'}
             width={300}
             height={300}
-            alt="test"
+            alt={`anshin - ${title}`}
             className="absolute h-full w-full object-cover"
           />
         </Link>
@@ -46,12 +46,9 @@ export const ProductCard = async ({ product }: Props) => {
       </div>
       <div className="relative">
         <div className="absolute top-0 max-w-48 -translate-y-1/2 truncate rounded-r-md border-t bg-gradient-to-tr from-tea-100 to-tea-50 px-4 py-2">
-          <Link
-            href={`/product/${product.id}`}
-            className="font-medium hover:underline"
-          >
+          <span className="cursor-pointer font-medium hover:underline">
             {title}
-          </Link>
+          </span>
         </div>
         <div className="flex flex-col justify-between p-4 pb-3 sm:flex-row sm:items-center">
           <StarRating rating={averageRating} />

@@ -10,6 +10,7 @@ import {
 import { useState } from 'react';
 import { Input } from './ui/input';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Label } from './ui/label';
 
 export const SearchBar = () => {
   const [value, setValue] = useState('');
@@ -23,13 +24,19 @@ export const SearchBar = () => {
     debouncedSearch(e.currentTarget.value, searchParams, replace);
   };
 
+  const randomString = Math.random().toString(36).substring(2);
+
   return (
     <div className="relative w-full max-w-2xl">
+      <Label htmlFor={`search-${randomString}`} className="sr-only">
+        Search
+      </Label>
       <Input
         placeholder="Search"
         value={value}
         onChange={handleChange}
         name="search"
+        id={`search-${randomString}`}
         defaultValue={searchParams.get('q')?.toString()}
       />
       <MagnifyingGlassIcon

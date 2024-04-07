@@ -29,6 +29,7 @@ export const Header = ({ user, cart, showSearch }: Props) => {
             <li className="flex-1 sm:flex-initial">
               <Link href="/">
                 <Logo />
+                <span className="sr-only">home</span>
               </Link>
             </li>
             <li className="hidden flex-1 justify-center sm:flex">

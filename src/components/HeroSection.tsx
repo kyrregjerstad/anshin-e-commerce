@@ -16,7 +16,7 @@ export const HeroSection = () => {
           src="https://static.noroff.dev/api/online-shop/7-shoes-white.jpg"
           width={300}
           height={300}
-          alt="test"
+          alt={`anshin - white shoes`}
           className="h-full w-full object-cover object-right"
         />
       </Link>
@@ -28,7 +28,7 @@ export const HeroSection = () => {
           src="https://static.noroff.dev/api/online-shop/3-headphones-beats.jpg"
           width={300}
           height={300}
-          alt="test"
+          alt="anshin - beats headphones"
           className="h-full w-full object-cover"
         />
       </Link>
@@ -40,7 +40,7 @@ export const HeroSection = () => {
           src="https://static.noroff.dev/api/online-shop/1-perfume-white.jpg"
           width={300}
           height={300}
-          alt="test"
+          alt="anshin - white perfume"
           className="h-full w-full object-cover"
         />
       </Link>
@@ -52,7 +52,7 @@ export const HeroSection = () => {
           src="https://static.noroff.dev/api/online-shop/12-toy-car.jpg"
           width={300}
           height={300}
-          alt="test"
+          alt="anshin - toy car"
           className="h-full w-full object-cover"
         />
       </Link>
@@ -64,7 +64,7 @@ export const HeroSection = () => {
           src="https://static.noroff.dev/api/online-shop/11-shampoo.jpg"
           width={300}
           height={300}
-          alt="test"
+          alt="anshin - shampoo"
           className="h-full w-full object-cover"
         />
       </Link>

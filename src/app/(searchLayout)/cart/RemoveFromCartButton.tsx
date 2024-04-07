@@ -34,6 +34,7 @@ const SubmitButton = () => {
       className="text-xl"
       disabled={pending}
     >
+      <span className="sr-only">remove from cart</span>
       <XMarkIcon strokeWidth={1} />
     </Button>
   );

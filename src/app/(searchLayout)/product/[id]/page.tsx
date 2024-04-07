@@ -57,7 +57,7 @@ export default async function ProductDetailsPage({ params }: Props) {
           </div>
         </div>
         <Image
-          alt="Product Image"
+          alt={`Anshin - ${title}`}
           className="-order-1 aspect-square w-full overflow-hidden rounded-lg border border-gray-200 object-cover dark:border-gray-800 md:order-1"
           height={600}
           src={images[0].url}
