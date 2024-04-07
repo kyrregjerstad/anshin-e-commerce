@@ -23,7 +23,7 @@ export default async function RootLayout({
     <html lang="en">
       <Analytics />
       <AxiomWebVitals />
-
+      <link rel="icon" href="/favicon.ico" sizes="any" />
       <body className={inter.className}>
         {children}
         <div className="py-12" />
