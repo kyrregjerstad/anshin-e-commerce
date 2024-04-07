@@ -1,8 +1,10 @@
 import { Analytics } from '@/components/Analytics';
+import { Toaster } from '@/components/ui/sonner';
 import type { Metadata } from 'next';
 import { AxiomWebVitals } from 'next-axiom';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
+
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -26,6 +28,7 @@ export default async function RootLayout({
         {children}
         <div className="py-12" />
         <Footer />
+        <Toaster />
       </body>
     </html>
   );

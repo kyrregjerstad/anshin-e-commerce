@@ -1,5 +1,6 @@
 import { Header } from '@/components/Header';
 import { validateRequest } from '@/lib/auth';
+import { LoginSuccessToast } from './LoginSuccessToast';
 
 export default async function RootLayout({
   children,
@@ -14,6 +15,7 @@ export default async function RootLayout({
       <main className="mx-auto flex min-h-screen w-full max-w-8xl flex-col items-center p-4 md:p-8">
         {children}
       </main>
+      <LoginSuccessToast name={user?.name} />
     </>
   );
 }

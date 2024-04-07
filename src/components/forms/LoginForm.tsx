@@ -21,7 +21,7 @@ import { z } from 'zod';
 
 import { loginSchema } from '@/lib/schema/loginSchema';
 import { SubmitFn } from '@/lib/server/formAction';
-import { redirect, useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { Button } from '../ui/button';
 import { Form } from './Form';

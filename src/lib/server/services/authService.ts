@@ -52,6 +52,7 @@ export const login = formAction(
 
       cookies().set(sessionCookie.name, sessionCookie.value);
       cookies().set(refreshCookie.name, refreshCookie.value);
+      cookies().set('displayLoginSuccessToast', 'true');
 
       return {
         status: 'success',

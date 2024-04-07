@@ -3,6 +3,7 @@ import { getSessionCookie } from '@/lib/server/auth/cookies';
 import { getAllProducts } from '@/lib/server/services/productService';
 import { HeroSection } from '../../components/HeroSection';
 import { SearchPage } from './SearchPage';
+import { LoginSuccessToast } from './LoginSuccessToast';
 
 type Props = {
   searchParams?: {
