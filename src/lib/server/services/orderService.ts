@@ -10,7 +10,6 @@ import {
   orderItems as orderItemsTable,
   orders,
 } from '../tables';
-import { wait } from '@/lib/utils';
 
 type Order = {
   userId: string;

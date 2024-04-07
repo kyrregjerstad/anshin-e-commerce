@@ -1,11 +1,9 @@
 import { Analytics } from '@/components/Analytics';
-import { Header } from '@/components/Header';
-import { validateRequest } from '@/lib/auth';
 import type { Metadata } from 'next';
+import { AxiomWebVitals } from 'next-axiom';
 import { Inter } from 'next/font/google';
 import Link from 'next/link';
 import './globals.css';
-import { SearchBar } from '@/components/SearchBar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,11 +17,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, cart } = await validateRequest();
-
   return (
     <html lang="en">
       <Analytics />
+      <AxiomWebVitals />
+
       <body className={inter.className}>
         {children}
         <div className="py-12" />

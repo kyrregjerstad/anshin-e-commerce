@@ -1,12 +1,11 @@
-import {withSentryConfig} from '@sentry/nextjs';
+import { withAxiom } from 'next-axiom';
+import withPlugins from 'next-compose-plugins';
+import { withSentryConfig } from '@sentry/nextjs';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
       {
         protocol: 'https',
         hostname: 'static.noroff.dev',
@@ -19,36 +18,21 @@ const nextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-// For all available options, see:
-// https://github.com/getsentry/sentry-webpack-plugin#options
+const sentryConfig = {
+  silent: true,
+  org: 'kyrre-gjerstad',
+  project: 'anshin',
+  widenClientFileUpload: true,
+  transpileClientSDK: true,
+  tunnelRoute: '/monitoring',
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+};
 
-// Suppresses source map uploading logs during build
-silent: true,
-org: "kyrre-gjerstad",
-project: "anshin",
-}, {
-// For all available options, see:
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+const nextPlugins = [
+  (nextConfig) => withAxiom(nextConfig),
+  (nextConfig) => withSentryConfig(nextConfig, sentryConfig),
+];
 
-// Upload a larger set of source maps for prettier stack traces (increases build time)
-widenClientFileUpload: true,
-
-// Transpiles SDK to be compatible with IE11 (increases bundle size)
-transpileClientSDK: true,
-
-// Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-tunnelRoute: "/monitoring",
-
-// Hides source maps from generated client bundles
-hideSourceMaps: true,
-
-// Automatically tree-shake Sentry logger statements to reduce bundle size
-disableLogger: true,
-
-// Enables automatic instrumentation of Vercel Cron Monitors.
-// See the following for more information:
-// https://docs.sentry.io/product/crons/
-// https://vercel.com/docs/cron-jobs
-automaticVercelMonitors: true,
-});
+export default withPlugins(nextPlugins, nextConfig);
