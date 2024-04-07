@@ -50,8 +50,16 @@ export const login = formAction(
       const sessionCookie = createSessionCookie(session.id);
       const refreshCookie = createRefreshTokenCookie(session.refreshToken);
 
-      cookies().set(sessionCookie.name, sessionCookie.value);
-      cookies().set(refreshCookie.name, refreshCookie.value);
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.options
+      );
+      cookies().set(
+        refreshCookie.name,
+        refreshCookie.value,
+        refreshCookie.options
+      );
       cookies().set('displayLoginSuccessToast', 'true');
 
       return {

@@ -175,7 +175,7 @@ export async function createSession(
   const session = {
     id: generateId({ guest }),
     userId,
-    expiresAt: getExpiresAt(guest),
+    expiresAt: getExpiresAt({ guest }),
     refreshToken: generateRefreshToken({ guest }),
   } satisfies InsertSession;
 
@@ -189,7 +189,46 @@ export async function createSession(
   }
 }
 
-function getExpiresAt(guest: boolean) {
+export async function refreshSession(refreshToken: string, guest: boolean) {
+  try {
+    const newSessionId = generateId({ guest });
+    await db
+      .update(sessions)
+      .set({
+        id: newSessionId,
+        expiresAt: getExpiresAt({ guest }),
+      })
+      .where(eq(sessions.refreshToken, refreshToken));
+
+    await setRedisSession(newSessionId, guest);
+
+    return newSessionId;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+export async function findSessionByRefreshToken(refreshToken: string) {
+  const res = await db.query.sessions.findFirst({
+    where: eq(sessions.refreshToken, refreshToken),
+    columns: {
+      id: true,
+      userId: true,
+    },
+  });
+
+  if (!res) {
+    return null;
+  }
+
+  return {
+    id: res.id,
+    guest: !res.userId,
+  };
+}
+
+function getExpiresAt({ guest = true }) {
   return guest
     ? new Date(Date.now() + 1000 * 60 * 60 * 24) // 24 hours
     : new Date(Date.now() + 1000 * 60 * 60 * 24 * 30); // 30 days

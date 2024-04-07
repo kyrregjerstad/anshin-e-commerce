@@ -7,115 +7,105 @@ import {
   refreshTokenCookieName,
   sessionCookieName,
 } from './lib/server/auth/cookies';
-import {
-  refreshRedisSessionExpiration,
-  validateSession,
-} from './lib/server/services/redisService';
+import { getSessionType } from './lib/server/services/redisService';
 
-// 1. If the sessionCookie is valid, proceed without database calls
-// 2. f the sessionCookie is expired, but the refreshToken is valid, generate a new sessionCookie and a new refresh token, updating the session expiry in the database
-// 3. If no tokens are present or valid, create a new guest session and set the sessionCookie
+// 1. If a sessionCookie is present and valid, allow the request to proceed
+// 2. If a refreshCookie is present and no sessionCookie is present, refresh the session and set the sessionCookie
+// 3. If no sessionCookie or refreshCookie is present, create a new session and set the sessionCookie
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
+  const sessionCookie = request.cookies.get(sessionCookieName)?.value || null; // short lived - 1 hour
+  const refreshCookie =
+    request.cookies.get(refreshTokenCookieName)?.value || null; // long lived - 24h for guest, 30 days for logged in users
 
-  // short lived - 1 hour
-  const sessionCookieToken =
-    request.cookies.get(sessionCookieName)?.value || null;
-
-  // long lived - 24h for guest, 30 days for logged in users
-  const refreshCookieToken =
-    request.cookies.get(refreshTokenCookieName)?.value || null;
-
-  if (sessionCookieToken) {
-    const sessionType = await validateSession(sessionCookieToken);
-
-    if (sessionType) {
-      await refreshRedisSessionExpiration(sessionCookieToken);
-
-      response.cookies.set(
-        createSessionCookie(sessionCookieToken, {
-          guest: sessionType === 'guest',
-        })
-      );
-      return response;
-    }
+  if (sessionCookie) {
+    const sessionType = await getSessionType(sessionCookie);
+    if (sessionType) return response; // if a sessionType is returned, the session is valid
   }
 
-  if (!refreshCookieToken) {
-    return await handleGuestSession(request, response);
+  if (refreshCookie) {
+    return handleRefreshSession(request, response, refreshCookie); // refresh the session
   }
 
-  const { id, refreshToken, error } = await getRefreshToken(
-    request,
-    refreshCookieToken
-  );
-
-  if (error) {
-    return response;
-  }
-
-  if (id && refreshToken) {
-    response.cookies.set(createSessionCookie(id));
-    response.cookies.set(createRefreshTokenCookie(refreshToken));
-
-    return response;
-  }
-
-  return await handleGuestSession(request, response);
+  return handleGuestSession(request, response);
 }
 
 async function handleGuestSession(
   request: NextRequest,
   response: NextResponse
 ) {
-  const { id, refreshToken, error } = await getRefreshToken(
-    request,
-    request.cookies.get(refreshTokenCookieName)?.value || null
-  );
+  const url = new URL('/api/auth', request.url).href;
+  const { newSessionId, refreshToken, error } = await authFetch(url, null);
 
   if (error) {
     return response;
   }
 
-  response.cookies.set(createSessionCookie(id, { guest: true }));
-  response.cookies.set(createRefreshTokenCookie(refreshToken, { guest: true }));
+  const sessionCookie = createSessionCookie(newSessionId, { guest: true });
+  const refreshCookie = createRefreshTokenCookie(refreshToken, { guest: true });
+
+  response.cookies.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.options
+  );
+  response.cookies.set(
+    refreshCookie.name,
+    refreshCookie.value,
+    refreshCookie.options
+  );
 
   return response;
 }
 
-type RefreshTokenResponse =
-  | {
-      id: string;
-      refreshToken: string;
-      error?: false;
-    }
-  | {
-      id: null;
-      refreshToken: null;
-      error: true;
-    };
+async function handleRefreshSession(
+  request: NextRequest,
+  response: NextResponse,
+  refreshCookieToken: string
+) {
+  const url = new URL('/api/auth', request.url).href;
+  const { newSessionId, error } = await authFetch(url, refreshCookieToken);
+
+  // TODO: handle error
+  if (error) {
+    return response;
+  }
+
+  const sessionCookie = createSessionCookie(newSessionId);
+
+  response.cookies.set(
+    sessionCookie.name,
+    sessionCookie.value,
+    sessionCookie.options
+  );
+
+  return response;
+}
 
 // workaround since mysql2 does not work in edge functions
 // ideally we should just call the db directly if we were in a serverless function such as Planetscale
-async function getRefreshToken(
-  request: NextRequest,
-  refreshCookieToken: string | null
+async function authFetch(
+  url: string,
+  refreshToken: string | null
 ): Promise<RefreshTokenResponse> {
-  const url = new URL('/api/auth', request.url);
-
-  try {
-    const { id, refreshToken } = (await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken: refreshCookieToken }),
-    }).then((res) => res.json())) as { id: string; refreshToken: string };
-
-    return { id, refreshToken };
-  } catch (error) {
-    console.error('Failed to get refresh token:', error);
-    return { id: null, refreshToken: null, error: true };
-  }
+  return await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ refreshToken }),
+  }).then((res) => res.json());
 }
+
+type RefreshTokenResponse =
+  | {
+      newSessionId: string;
+      refreshToken: string;
+      error?: never;
+    }
+  | {
+      newSessionId: null;
+      refreshToken: null;
+      error: true;
+    };

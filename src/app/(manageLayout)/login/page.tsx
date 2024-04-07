@@ -13,9 +13,7 @@ type Props = {
 export default async function LoginPage({ searchParams }: Props) {
   const { callbackUrl } = searchParams;
 
-  const sessionId = getSessionCookie();
-
-  const isUserLoggedIn = await checkForLoggedInUser(sessionId);
+  const isUserLoggedIn = await checkForLoggedInUser(getSessionCookie());
 
   if (isUserLoggedIn) {
     redirect(callbackUrl ?? '/');

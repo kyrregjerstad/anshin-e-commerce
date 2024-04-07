@@ -1,3 +1,4 @@
+import { ResponseCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { cookies } from 'next/headers';
 
 export const sessionCookieName = 'session_id';
@@ -13,7 +14,7 @@ function createDefaultCookieOptions(maxAge: number) {
     secure: process.env.NODE_ENV === 'production', // Use secure cookies in production for HTTPS
     path: '/',
     sameSite: 'lax',
-  };
+  } satisfies Partial<ResponseCookie>;
 }
 
 // valid for 1 hour, no db call required.
@@ -23,7 +24,7 @@ export function createSessionCookie(sessionId: string, { guest = false } = {}) {
   return {
     name: sessionCookieName,
     value: sessionId,
-    options: createDefaultCookieOptions(ONE_HOUR_IN_SECONDS),
+    options: createDefaultCookieOptions(10),
   };
 }
 
