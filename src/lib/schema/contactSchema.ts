@@ -12,6 +12,6 @@ export const contactSchema = z.object({
     .max(255, { message: 'Subject must be at most 255 characters' }),
   message: z
     .string()
-    .min(10, { message: 'Message must be at least 10 characters' })
+    .min(3, { message: 'Message must be at least 3 characters' })
     .max(1000, { message: 'Message must be at most 1000 characters' }),
 });
