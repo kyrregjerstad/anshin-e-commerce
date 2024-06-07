@@ -5,7 +5,7 @@ export const Analytics = () => {
     <Script
       defer
       data-domain="anshin.world"
-      src="https://analytics.kyrre.dev/js/script.js"
+      src="https://insight.webstad.com/js/script.js"
     />
   );
 };
