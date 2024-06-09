@@ -16,6 +16,9 @@ const nextConfig = {
     config.externals.push('@node-rs/argon2', '@node-rs/bcrypt');
     return config;
   },
+  experimental: {
+    ppr: true,
+  },
 };
 
 const sentryConfig = {
