@@ -21,7 +21,9 @@ export async function middleware(request: NextRequest) {
 
   if (sessionCookie) {
     const sessionType = await getSessionType(sessionCookie);
-    if (sessionType) return response; // if a sessionType is returned, the session is valid
+
+    if (sessionType === 'user') return handleAuthenticatedUser(request);
+    if (sessionType === 'guest') return handleUnauthorizedUser(request);
   }
 
   if (refreshCookie) {
@@ -29,6 +31,33 @@ export async function middleware(request: NextRequest) {
   }
 
   return handleGuestSession(request, response);
+}
+
+const authorizedRedirectionRules: { [key: string]: string } = {
+  '/register': '/',
+  '/login': '/',
+};
+
+const unauthorizedRedirectionRules: { [key: string]: string } = {
+  '/account': '/login',
+  '/wishlist': '/login',
+  '/checkout': '/login',
+};
+
+async function handleAuthenticatedUser(request: NextRequest) {
+  const redirectTo = authorizedRedirectionRules[request.nextUrl.pathname];
+  if (redirectTo) {
+    return NextResponse.redirect(new URL(redirectTo, request.url));
+  }
+  return NextResponse.next();
+}
+
+async function handleUnauthorizedUser(request: NextRequest) {
+  const redirectTo = unauthorizedRedirectionRules[request.nextUrl.pathname];
+  if (redirectTo) {
+    return NextResponse.redirect(new URL(redirectTo, request.url));
+  }
+  return NextResponse.next();
 }
 
 async function handleGuestSession(

@@ -3,11 +3,7 @@
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
-type Props = {
-  name: string | undefined;
-};
-
-export const CookiesToast = ({ name }: Props) => {
+export const CookiesToast = () => {
   useEffect(() => {
     const displayLoginSuccessToast = document.cookie.includes(
       'displayLoginSuccessToast'
@@ -18,7 +14,7 @@ export const CookiesToast = ({ name }: Props) => {
     );
 
     if (displayLoginSuccessToast) {
-      toast.success(`Welcome back, ${name || 'friend'}! 👋`);
+      toast.success(`Welcome back! 👋`);
       document.cookie = 'displayLoginSuccessToast=; max-age=0';
     }
 
@@ -26,7 +22,7 @@ export const CookiesToast = ({ name }: Props) => {
       toast.info('Bye, see you soon! 👋');
       document.cookie = 'displayLogoutSuccessToast=; max-age=0';
     }
-  }, [name]);
+  }, []);
 
   return null;
 };

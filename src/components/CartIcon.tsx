@@ -17,7 +17,7 @@ export const CartIcon = ({ cartItems }: { cartItems: CartItem[] }) => {
   return (
     <div className="-translate-y-[2px] pr-2">
       <div className="relative">
-        <IconSvg cartAmount={cartAmount} />
+        <CartIconSvg cartAmount={cartAmount} />
         <AnimatedCartCounter cartAmount={cartAmount} />
       </div>
     </div>
@@ -52,7 +52,11 @@ const AnimatedCartCounter = ({
   );
 };
 
-const IconSvg = ({ cartAmount }: { cartAmount: number | undefined }) => (
+export const CartIconSvg = ({
+  cartAmount,
+}: {
+  cartAmount: number | undefined;
+}) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={30}

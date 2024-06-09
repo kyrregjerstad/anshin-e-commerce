@@ -1,26 +1,17 @@
-import { CartIcon } from '@/components/CartIcon';
+import { CartIconSvg } from '@/components/CartIcon';
 import Link from 'next/link';
-import { Cart } from '@/lib/server/services/types';
-import { UserAccountMenu } from './UserAccountMenu';
 import Logo from './Logo';
-import { logOut } from '@/lib/server/services/authService';
 
-import {
-  MagnifyingGlassIcon,
-  UserCircleIcon,
-  HeartIcon,
-} from '@heroicons/react/24/outline';
-import { SearchBar } from './SearchBar';
+import { HeartIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { Suspense } from 'react';
+import { AccountMenuWrapper } from './AccountMenuWrapper';
+import { CartIconLink } from './CartIconLink';
+import { SearchBar, SearchBarSkeleton } from './SearchBar';
 
 type Props = {
   showSearch?: boolean;
-  user: {
-    id: string;
-    name: string;
-  } | null;
-  cart: Cart[];
 };
-export const Header = ({ user, cart, showSearch }: Props) => {
+export const Header = ({ showSearch }: Props) => {
   return (
     <>
       <header className="sticky top-0 z-50 flex w-full items-center justify-center px-1">
@@ -33,15 +24,21 @@ export const Header = ({ user, cart, showSearch }: Props) => {
               </Link>
             </li>
             <li className="hidden flex-1 justify-center sm:flex">
-              <SearchBar />
+              <Suspense fallback={<SearchBarSkeleton />}>
+                <SearchBar />
+              </Suspense>
             </li>
             <li>
-              <UserAccountMenu user={user} logOutAction={logOut}>
-                <UserCircleIcon
-                  className="size-8 stroke-neutral-700"
-                  strokeWidth={1.3}
-                />
-              </UserAccountMenu>
+              <Suspense
+                fallback={
+                  <UserCircleIcon
+                    className="size-8 stroke-neutral-700"
+                    strokeWidth={1.3}
+                  />
+                }
+              >
+                <AccountMenuWrapper />
+              </Suspense>
             </li>
             <li>
               <Link href="/wishlist" className="group">
@@ -53,17 +50,24 @@ export const Header = ({ user, cart, showSearch }: Props) => {
               </Link>
             </li>
             <li>
-              <Link href="/cart">
-                <span className="sr-only">cart</span>
-                <CartIcon cartItems={cart} />
-              </Link>
+              <Suspense
+                fallback={
+                  <div className="-translate-y-[2px] pr-2">
+                    <CartIconSvg cartAmount={undefined} />
+                  </div>
+                }
+              >
+                <CartIconLink />
+              </Suspense>
             </li>
           </ul>
         </nav>
       </header>
       {showSearch && (
         <div className="sticky top-14 z-50 block w-full px-2 sm:hidden">
-          <SearchBar />
+          <Suspense fallback={<SearchBarSkeleton />}>
+            <SearchBar />
+          </Suspense>
         </div>
       )}
     </>
