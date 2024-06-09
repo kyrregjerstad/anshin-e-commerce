@@ -4,7 +4,7 @@ import { newPasswordSchema } from '@/lib/schema/resetPasswordSchema';
 import { handleErrors } from '@/lib/utils';
 import { ActionResult, formAction } from '../formAction';
 import { getSessionCookie } from '../auth/cookies';
-import { db } from '../db';
+import { db } from '@/lib/server/db';
 import { eq } from 'drizzle-orm';
 import { sessions, users } from '../tables';
 import { Argon2id } from 'oslo/password';

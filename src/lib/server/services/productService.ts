@@ -1,7 +1,7 @@
 'use server';
 
 import { avg, eq, like, sql } from 'drizzle-orm';
-import { db } from '../db';
+import { db } from '@/lib/server/db';
 import { cart, images, products, reviews, sessions } from '../tables';
 import {
   checkForItemInWishlist,

@@ -1,7 +1,7 @@
 'use server';
 import { and, eq } from 'drizzle-orm';
 import { getSessionCookie } from '../auth/cookies';
-import { db } from '../db';
+import { db } from '@/lib/server/db';
 import { sessions, wishlist, wishlistItems } from '../tables';
 import { redirect } from 'next/navigation';
 import { Product } from './productService';

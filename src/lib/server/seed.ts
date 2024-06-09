@@ -15,7 +15,7 @@ import {
   seedUsersData,
   seedWishlistData,
 } from '../seedData';
-import { db, dbConnection } from './db';
+import { db, dbConnection } from '@/lib/server/db';
 import * as schema from './tables';
 import { MySqlTableWithColumns, TableConfig } from 'drizzle-orm/mysql-core';
 

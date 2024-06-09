@@ -17,7 +17,7 @@ import {
   getSessionCookie,
 } from '../auth/cookies';
 import { generateId } from '../auth/utils';
-import { db } from '../db';
+
 import { ActionResult, formAction } from '../formAction';
 import { cart, cartItems, sessions, users } from '../tables';
 import {
@@ -28,6 +28,7 @@ import {
 } from './cartService';
 import { createSession, getSessionDetails } from './sessionService';
 import { redirect } from 'next/navigation';
+import { db } from '@/lib/server/db';
 
 export const login = formAction(
   loginSchema,

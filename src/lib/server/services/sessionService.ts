@@ -2,7 +2,7 @@
 
 import { eq } from 'drizzle-orm';
 import { generateId, generateRefreshToken } from '../auth/utils';
-import { db } from '../db';
+import { db } from '@/lib/server/db';
 import { InsertSession, sessions } from '../tables';
 import { createCart } from './cartService';
 

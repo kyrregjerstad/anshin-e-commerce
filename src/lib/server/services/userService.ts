@@ -1,6 +1,6 @@
 'use server';
 import { eq } from 'drizzle-orm';
-import { db } from '../db';
+import { db } from '@/lib/server/db';
 import { sessions, users } from '../tables';
 
 export async function getUserById(userId: string) {
