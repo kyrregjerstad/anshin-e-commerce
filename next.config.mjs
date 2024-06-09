@@ -22,11 +22,10 @@ const nextConfig = {
 };
 
 const sentryConfig = {
-  silent: true,
+  silent: !process.env.CI,
   org: 'kyrre-gjerstad',
   project: 'anshin',
   widenClientFileUpload: true,
-  transpileClientSDK: true,
   tunnelRoute: '/monitoring',
   hideSourceMaps: true,
   disableLogger: true,
