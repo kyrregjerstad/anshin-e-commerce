@@ -24,11 +24,9 @@ export const SearchBar = () => {
     debouncedSearch(e.currentTarget.value, searchParams, replace);
   };
 
-  const randomString = Math.random().toString(36).substring(2);
-
   return (
     <div className="relative w-full max-w-2xl">
-      <Label htmlFor={`search-${randomString}`} className="sr-only">
+      <Label htmlFor={`search`} className="sr-only">
         Search
       </Label>
       <Input
@@ -36,7 +34,7 @@ export const SearchBar = () => {
         value={value}
         onChange={handleChange}
         name="search"
-        id={`search-${randomString}`}
+        id={`search`}
         defaultValue={searchParams.get('q')?.toString()}
       />
       <MagnifyingGlassIcon
