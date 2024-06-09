@@ -1,12 +1,12 @@
-import type { Config } from 'drizzle-kit';
+import { type Config } from 'drizzle-kit';
 import 'dotenv/config';
 
 export default {
   schema: './src/lib/server/tables.ts',
   out: './drizzle',
-  driver: 'mysql2',
+  dialect: 'mysql',
   dbCredentials: {
-    uri: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL,
   },
   tablesFilter: ['anshin_*'],
   verbose: true,

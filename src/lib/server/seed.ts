@@ -3,6 +3,7 @@ import * as dotenv from 'dotenv';
 import { drizzle } from 'drizzle-orm/mysql2';
 import { Argon2id } from 'oslo/password';
 
+import { Redis } from '@upstash/redis';
 import {
   seedAddressesData,
   seedCartsData,
@@ -14,9 +15,9 @@ import {
   seedUsersData,
   seedWishlistData,
 } from '../seedData';
+import { db, dbConnection } from './db';
 import * as schema from './tables';
-import { createDbConnection } from './dbConnection';
-import { Redis } from '@upstash/redis';
+import { MySqlTableWithColumns, TableConfig } from 'drizzle-orm/mysql-core';
 
 dotenv.config();
 
@@ -31,20 +32,23 @@ export const redis = new Redis({
     : process.env.SRH_TOKEN,
 });
 
+if (!process.env.DB_SEEDING) {
+  throw new Error(
+    `You must set the DB_SEEDING environment variable to true to run this command. 
+    This is to ensure only a single db connection is used during seeding.`
+  );
+}
+
 const main = async () => {
-  const connection = await createDbConnection();
-
-  const db = drizzle(connection, { schema, mode: 'default' });
-
   await db.transaction(async (tx) => {
-    await deleteWishlists(tx);
-    await deleteWishlistItems(tx);
-    await deleteOrderItems(tx);
-    await deleteOrders(tx);
-    await deleteProducts(tx);
-    await deleteCarts(tx);
-    await deleteSessions(tx);
-    await deleteUsers(tx);
+    await deleteTableData(tx, schema.wishlist);
+    await deleteTableData(tx, schema.wishlistItems);
+    await deleteTableData(tx, schema.orderItems);
+    await deleteTableData(tx, schema.orders);
+    await deleteTableData(tx, schema.products);
+    await deleteTableData(tx, schema.cart);
+    await deleteTableData(tx, schema.sessions);
+    await deleteTableData(tx, schema.users);
 
     await seedProducts(tx);
     await seedImages(tx);
@@ -57,7 +61,7 @@ const main = async () => {
     await seedReviews(tx);
   });
 
-  await connection.end();
+  await dbConnection.end();
 
   await seedRedis();
 };
@@ -76,40 +80,13 @@ async function seedRedis() {
 
 type DB = ReturnType<typeof drizzle>;
 
-async function deleteWishlistItems(db: DB) {
-  await db.delete(schema.wishlistItems).execute();
+async function deleteTableData<T extends TableConfig>(
+  db: DB,
+  table: MySqlTableWithColumns<T>
+) {
+  await db.delete(table).execute();
 
-  console.log('🗑️  Deleted wishlist items');
-}
-
-async function deleteWishlists(db: DB) {
-  await db.delete(schema.wishlist).execute();
-
-  console.log('🗑️  Deleted wishlists');
-}
-
-async function deleteSessions(db: DB) {
-  await db.delete(schema.sessions).execute();
-
-  console.log('🗑️  Deleted sessions');
-}
-
-async function deleteUsers(db: DB) {
-  await db.delete(schema.users).execute();
-
-  console.log('🗑️  Deleted users');
-}
-
-async function deleteOrderItems(db: DB) {
-  await db.delete(schema.orderItems).execute();
-
-  console.log('🗑️  Deleted order items');
-}
-
-async function deleteOrders(db: DB) {
-  await db.delete(schema.orders).execute();
-
-  console.log('🗑️  Deleted orders');
+  console.log(`🗑️  Deleted table data`);
 }
 
 async function seedUsers(db: DB) {
@@ -147,22 +124,10 @@ async function seedCarts(db: DB) {
   console.log('🛒 Seeded carts');
 }
 
-async function deleteCarts(db: DB) {
-  await db.delete(schema.cart).execute();
-
-  console.log('🗑️  Deleted carts');
-}
-
 async function seedItemsToCarts(db: DB) {
   await db.insert(schema.cartItems).values(seedItemsToCartsData).execute();
 
   console.log('📦 Seeded items to carts');
-}
-
-async function deleteProducts(db: DB) {
-  await db.delete(schema.products).execute();
-
-  console.log('🗑️  Deleted products');
 }
 
 async function seedProducts(db: DB) {

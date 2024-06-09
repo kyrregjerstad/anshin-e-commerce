@@ -1,17 +1,20 @@
 import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/mysql2';
 import { migrate } from 'drizzle-orm/mysql2/migrator';
-import * as schema from './lib/server/tables';
+import config from '../drizzle.config';
 
-import { createDbConnection } from './lib/server/dbConnection';
+import { db, dbConnection } from './lib/server/db';
 
 async function main() {
-  const connection = await createDbConnection();
+  if (!process.env.DB_MIGRATING) {
+    throw new Error(
+      `You must set the DB_MIGRATING environment variable to true to run this command. 
+      This is to ensure only a single db connection is used during migrations.`
+    );
+  }
 
-  const db = drizzle(connection, { schema, mode: 'default' });
-  await migrate(db, { migrationsFolder: './drizzle' });
+  await migrate(db, { migrationsFolder: config.out });
 
-  await connection.end();
+  await dbConnection.end();
 }
 
 main().catch(console.error);

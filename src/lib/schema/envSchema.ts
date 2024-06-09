@@ -10,6 +10,8 @@ export const envVariables = z.object({
   UPSTASH_REDIS_REST_URL: z.string(),
   UPSTASH_REDIS_REST_TOKEN: z.string(),
   SRH_TOKEN: z.string(),
+  DB_MIGRATING: z.boolean().optional(),
+  DB_SEEDING: z.boolean().optional(),
 });
 
 envVariables.parse(process.env);
