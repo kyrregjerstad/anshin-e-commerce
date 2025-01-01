@@ -5,7 +5,7 @@ export const Analytics = () => {
     <Script
       defer
       data-domain="anshin.world"
-      src="https://insight.webstad.com/js/script.js"
+      src={process.env.NEXT_PUBLIC_ANALYTICS_URL}
     />
   );
 };
